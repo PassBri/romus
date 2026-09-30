@@ -309,3 +309,6 @@ textarea::placeholder { color: var(--tenue); }
 #btnTema .ico-sol { display: none; }
 :root[data-tema="oscuro"] #btnTema .ico-sol { display: block; }
 :root[data-tema="oscuro"] #btnTema .ico-luna { display: none; }
+
+#txtInstrucciones { width: 100%; resize: vertical; min-height: 72px; font: inherit; font-size: 12.5px; line-height: 1.45; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--linea); background: var(--superficie); color: var(--texto); box-sizing: border-box; }
+#txtInstrucciones:focus { outline: 2px solid var(--acento); outline-offset: -1px; }

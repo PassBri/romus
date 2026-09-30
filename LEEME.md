@@ -35,7 +35,8 @@ romus/
 │   ├── documento.js      ← lectura y edición del documento (Word API)
 │   ├── panel.js          ← estadísticas y estructura del documento
 │   ├── romus.js          ← la esfera de Romus
-│   ├── orbe.js           ← apariencia alternativa «cielo»
+│   ├── escucha.js        ← oído propio en Word de escritorio
+│   ├── orbe.js           ← medidor del micrófono
 │   └── config.js         ← ajustes guardados en tu equipo
 ├── assets/
 │   ├── iconos/           ← icon-16 … icon-512.png (cinta de Word)
@@ -46,7 +47,7 @@ romus/
 
 ## Conectar una IA (la que prefieras)
 
-VozDoc funciona con **cualquier IA que tenga API**. En el panel pulsa el **engranaje → IA en uso → + Agregar**, elige el proveedor, pega la clave y pulsa **Probar conexión y corrección**. La prueba le pide al modelo que corrija una frase con errores y te dice si sirve para corregir o solo para conversar.
+Romus funciona con **cualquier IA que tenga API**. En el panel pulsa el **engranaje → IA en uso → + Agregar**, elige el proveedor, pega la clave y pulsa **Probar conexión y corrección**. La prueba le pide al modelo que corrija una frase con errores y te dice si sirve para corregir o solo para conversar.
 
 | Proveedor | Dónde se consigue la clave | Nota |
 |---|---|---|
@@ -61,7 +62,7 @@ VozDoc funciona con **cualquier IA que tenga API**. En el panel pulsa el **engra
 
 - **Modelos:** los nombres cambian con el tiempo. Pulsa **Cargar modelos** para ver los que ofrece tu cuenta hoy.
 - **Varias IA a la vez:** puedes guardar varias y cambiar entre ellas desde el chip de abajo del panel o con la voz: «usa Gemini», «usa Claude», «usa la IA local».
-- **Modo básico:** algunos modelos (sobre todo los locales y pequeños) no manejan «herramientas». VozDoc lo detecta y cambia solo a un modo básico en el que les pide la respuesta en JSON. Funciona, pero corrige con menos precisión.
+- **Modo básico:** algunos modelos (sobre todo los locales y pequeños) no manejan «herramientas». Romus lo detecta y cambia solo a un modo básico en el que les pide la respuesta en JSON. Funciona, pero corrige con menos precisión.
 - **IA local con Ollama:** instala Ollama, descarga un modelo (`ollama pull qwen2.5`) y, para que Word pueda conectarse, inícialo con la variable de entorno `OLLAMA_ORIGINS=*`. En Windows: Configuración del sistema → Variables de entorno → nueva variable `OLLAMA_ORIGINS` con valor `*`, y reinicia Ollama.
 - **LM Studio:** pestaña Developer → Start Server y activa **Enable CORS**.
 - **Si un proveedor no conecta desde Word:** algunos bloquean las llamadas directas desde el navegador (CORS). En ese caso usa ese mismo modelo a través de OpenRouter.
@@ -112,15 +113,15 @@ El panel sigue el tema de Office (claro u oscuro).
 
 ### Modo voz, burbuja flotante y dictado
 
-- **Modo voz** (ícono del círculo con onda, arriba en el panel, o di «modo voz»): la pantalla muestra un **orbe de cielo con nubes en movimiento**, que cambia según lo que pasa. En reposo se mueve despacio; cuando escucha, reacciona a tu voz; cuando piensa, gira; cuando habla, late con cada palabra. Debajo aparece el texto con la **palabra que se está leyendo resaltada**. Si tocas la esfera mientras habla, lo interrumpes.
-- **Apariencia «Romus»** (predeterminada): un holograma limpio, de estilo futurista y minimalista, que combina con Word. Es una esfera de puntos nítidos sobre una malla fina, rodeada de anillos de interfaz con marcas y de un **ecualizador circular** que dibuja tu voz en magenta y la de Romus en cian. En el centro, un **núcleo dorado** late y envía una onda fina con cada latido. En reposo respira; cuando escucha se acerca; cuando trabaja, los puntos se ordenan en anillos, pasa una línea de escaneo y el núcleo se vuelve un **átomo**. Se adapta al tema de Office: azul Word sobre blanco en el tema claro y neón sobre azul noche en el oscuro. Se cambia con el botón de partículas del modo voz, en Ajustes → Apariencia, o diciendo «apariencia Romus» / «apariencia cielo».
+- **Modo voz** (ícono del círculo con onda, arriba en el panel, o di «modo voz»): la pantalla muestra la **esfera de Romus**, que cambia según lo que pasa. Debajo aparece el texto con la **palabra que se está leyendo resaltada**. Si tocas la esfera mientras habla, lo interrumpes.
+- **La esfera de Romus:** un holograma limpio, de estilo futurista y minimalista, que combina con Word. Es una esfera de puntos nítidos sobre una malla fina, rodeada de anillos de interfaz con marcas y de un **ecualizador circular** que dibuja tu voz en magenta y la de Romus en cian. En el centro, un **núcleo dorado** late y envía una onda fina con cada latido. En reposo respira; cuando escucha se acerca; cuando trabaja, los puntos se ordenan en anillos, pasa una línea de escaneo y el núcleo se vuelve un **átomo**. Se adapta al tema de Office: azul Word sobre blanco en el tema claro y neón sobre azul noche en el oscuro. El modo claro u oscuro se cambia con el botón de luna/sol, en Ajustes → Apariencia o diciendo «modo oscuro» / «modo claro».
 - **Burbuja flotante** (ícono del cuadro con círculo, o di «abre la burbuja»): abre una ventana pequeña con el orbe que puedes **mover a cualquier parte de la pantalla** mientras trabajas en el documento. Escucha tus comandos y muestra lo que está leyendo. El panel debe seguir abierto, porque es el que trabaja con el documento.
 - **Modo dictado** (di «modo dictado»): lo que digas se escribe donde está el cursor. Reconoce la puntuación hablada: «punto», «coma», «dos puntos», «punto y coma», «nuevo párrafo», «abre/cierra interrogación», «abre/cierra exclamación», «abre/cierra comillas» y «abre/cierra paréntesis». Pone mayúscula al comenzar cada oración. «Borra eso» quita lo último dictado y «termina dictado» sale del modo.
 - **Lectura con seguimiento:** al leer, Word selecciona la **frase** que se está leyendo, no el párrafo entero.
 
 ### Si el micrófono del panel no funciona
 
-El micrófono del panel usa el reconocimiento de voz del navegador. Ese servicio funciona bien en **Word para la web con Chrome o Edge**. En **Word de escritorio** el panel corre en un navegador interno que muchas veces **no trae** ese servicio. Por eso VozDoc IA tiene un plan B que siempre funciona:
+El micrófono del panel usa el reconocimiento de voz del navegador. Ese servicio funciona bien en **Word para la web con Chrome o Edge**. En **Word de escritorio** el panel corre en un navegador interno que muchas veces **no trae** ese servicio. Por eso Romus usa su propio oído (transcribe con Gemini, OpenAI o Groq) y además tiene un plan B que siempre funciona:
 
 1. Haz clic en la caja de texto del panel.
 2. Pulsa **Windows + H** (en Mac, **Fn** dos veces) y habla.

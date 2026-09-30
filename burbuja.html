@@ -6,47 +6,110 @@
   <title>Romus</title>
   <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
   <style>
-    /* Burbuja transparente: sin tarjeta ni fondo; solo la esfera de Romus flotando y controles de vidrio. */
-    :root { --texto:#1b1d21; --texto-2:#5c6370; --vidrio:rgba(255,255,255,.55); --borde:rgba(24,90,189,.18); --acento:#185abd; --magenta:#c239b3; }
-    :root[data-tema="oscuro"] { --texto:#eef3ff; --texto-2:#9fb0c8; --vidrio:rgba(26,29,35,.5); --borde:rgba(95,179,255,.22); --acento:#4f9bff; --magenta:#ff3dcb; }
-    :root[data-tema="claro"] { --texto:#1b1d21; --texto-2:#5c6370; --vidrio:rgba(255,255,255,.55); --borde:rgba(24,90,189,.18); --acento:#185abd; --magenta:#c239b3; }
-    @media (prefers-color-scheme: dark) { :root:not([data-tema]) { --texto:#eef3ff; --texto-2:#9fb0c8; --vidrio:rgba(26,29,35,.5); --borde:rgba(95,179,255,.22); --acento:#4f9bff; --magenta:#ff3dcb; } }
+    /* Burbuja holográfica. Office no deja que una ventana sea realmente transparente,
+       así que se simula un «vidrio acrílico» (como las ventanas de Windows 11) con profundidad:
+       fondo de vidrio con grano, halo de luz que respira con tu voz, proyector y piso holográfico. */
+    :root {
+      --texto:#14171d; --texto-2:#4a5260; --acento:#185abd; --acento-rgb:24,90,189; --magenta:#c239b3; --oro:255,196,60;
+      --vidrio:rgba(255,255,255,.72); --vidrio-borde:rgba(24,90,189,.28); --sombra:0 6px 20px rgba(20,40,80,.14);
+      --fondo-a:#ffffff; --fondo-b:#eef3fb; --fondo-c:#dde6f3; --grano:.05; --rejilla:rgba(24,90,189,.22); --nivel:0;
+    }
+    :root[data-tema="oscuro"] {
+      --texto:#eef4ff; --texto-2:#a9b8d0; --acento:#4f9bff; --acento-rgb:79,155,255; --magenta:#ff3dcb;
+      --vidrio:rgba(18,26,42,.72); --vidrio-borde:rgba(95,179,255,.35); --sombra:0 6px 24px rgba(0,0,0,.45);
+      --fondo-a:#12305e; --fondo-b:#0a1428; --fondo-c:#04060b; --grano:.09; --rejilla:rgba(0,229,255,.28);
+    }
+    @media (prefers-color-scheme: dark) { :root:not([data-tema]) {
+      --texto:#eef4ff; --texto-2:#a9b8d0; --acento:#4f9bff; --acento-rgb:79,155,255; --magenta:#ff3dcb;
+      --vidrio:rgba(18,26,42,.72); --vidrio-borde:rgba(95,179,255,.35); --sombra:0 6px 24px rgba(0,0,0,.45);
+      --fondo-a:#12305e; --fondo-b:#0a1428; --fondo-c:#04060b; --grano:.09; --rejilla:rgba(0,229,255,.28);
+    } }
     * { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; background: transparent; }
-    /* En oscuro, Word pinta la ventana de blanco si no se le da un fondo: se usa un negro azulado muy sutil. */
-    :root[data-tema="oscuro"], :root[data-tema="oscuro"] body { background: #14161b; }
+    html, body { height: 100%; margin: 0; }
     body {
       font-family: "Segoe UI Variable Text", "Segoe UI", -apple-system, Roboto, sans-serif; color: var(--texto);
-      display: flex; flex-direction: column; align-items: center; padding: 4px 10px 10px; gap: 4px; overflow: hidden; user-select: none;
+      background: radial-gradient(120% 90% at 50% 34%, var(--fondo-a) 0%, var(--fondo-b) 45%, var(--fondo-c) 100%);
+      display: flex; flex-direction: column; align-items: center; padding: 8px 12px 12px; gap: 6px; overflow: hidden; user-select: none;
+      position: relative; transition: background .4s;
     }
-    canvas { width: min(96vw, 64vh); height: min(96vw, 64vh); flex-shrink: 0; cursor: pointer; background: transparent; }
-    #estado { font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--acento); text-align: center; min-height: 15px; margin-top: -6px; }
-    #sub { flex: 1; min-height: 0; overflow: hidden; font-size: 13px; line-height: 1.5; text-align: center; color: var(--texto-2); width: 100%;
-      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; mask-image: linear-gradient(#000 75%, transparent); }
-    #sub span { border-radius: 4px; padding: 0 1px; transition: color .15s; }
+    /* Capas de profundidad (detrás de todo) */
+    .capa { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    #grano { opacity: var(--grano); mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+    #brillo { background: linear-gradient(160deg, rgba(255,255,255,.18) 0%, transparent 38%, transparent 70%, rgba(255,255,255,.06) 100%); }
+    #piso { top: auto; height: 46%; opacity: .55;
+      background:
+        repeating-linear-gradient(90deg, var(--rejilla) 0 1px, transparent 1px 34px),
+        repeating-linear-gradient(0deg, var(--rejilla) 0 1px, transparent 1px 34px);
+      transform: perspective(260px) rotateX(64deg) scale(2.2); transform-origin: 50% 0%;
+      -webkit-mask-image: radial-gradient(60% 70% at 50% 0%, #000 0%, transparent 75%); mask-image: radial-gradient(60% 70% at 50% 0%, #000 0%, transparent 75%); }
+    #marco { border-radius: 0; box-shadow: inset 0 0 0 1px rgba(var(--acento-rgb),.18), inset 0 0 60px rgba(var(--acento-rgb),.10); }
+
+    .escena { position: relative; z-index: 1; width: min(94vw, 60vh); aspect-ratio: 1; flex-shrink: 0; display: grid; place-items: center; }
+    #halo { position: absolute; inset: 6%; border-radius: 50%;
+      background: radial-gradient(circle, rgba(var(--acento-rgb),.34) 0%, rgba(var(--acento-rgb),.12) 38%, transparent 68%);
+      transform: scale(calc(.92 + var(--nivel) * .22)); filter: blur(6px); transition: transform .12s linear; animation: respirar 5s ease-in-out infinite; }
+    #nucleoLuz { position: absolute; width: 22%; aspect-ratio: 1; border-radius: 50%;
+      background: radial-gradient(circle, rgba(var(--oro),.45) 0%, transparent 70%); filter: blur(4px); opacity: calc(.55 + var(--nivel) * .45); }
+    #proyector { position: absolute; bottom: -4%; width: 62%; height: 12%; border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(var(--acento-rgb),.45) 0%, rgba(var(--acento-rgb),.12) 45%, transparent 72%); filter: blur(3px); }
+    #proyector::after { content: ""; position: absolute; left: 18%; right: 18%; top: 38%; height: 24%; border-radius: 50%; border: 1px solid rgba(var(--acento-rgb),.55); }
+    canvas { position: relative; width: 100%; height: 100%; cursor: pointer; background: transparent;
+      filter: drop-shadow(0 0 10px rgba(var(--acento-rgb),.35)); animation: flotar 6s ease-in-out infinite; }
+    @keyframes flotar { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    @keyframes respirar { 0%,100% { opacity: .85; } 50% { opacity: 1; } }
+
+    .barra { position: absolute; top: 8px; right: 10px; z-index: 2; display: flex; gap: 6px; }
+    #estado { position: relative; z-index: 1; font-size: 11px; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; color: var(--acento); text-align: center; min-height: 16px; margin-top: -2px;
+      text-shadow: 0 0 12px rgba(var(--acento-rgb),.45); }
+    #sub { position: relative; z-index: 1; flex: 0 1 auto; min-height: 1.5em; max-height: 4.5em; overflow: hidden; font-size: 13.5px; line-height: 1.5; text-align: center; color: var(--texto); width: 100%;
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+    #sub span { border-radius: 4px; padding: 0 1px; color: var(--texto-2); transition: color .15s; }
     #sub span.leida { color: var(--texto); }
     #sub span.actual { background: var(--acento); color: #fff; }
-    #sub.usuario { font-style: italic; color: var(--magenta); }
-    .controles { display: flex; flex-direction: column; align-items: center; gap: 7px; width: 100%; opacity: .5; transition: opacity .25s; }
-    body:hover .controles, .controles:focus-within { opacity: 1; }
+    #sub.usuario span { font-style: italic; color: var(--magenta); }
+    .controles { position: relative; z-index: 1; margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
     .fila { display: flex; gap: 10px; align-items: center; }
     button { font: inherit; cursor: pointer; }
-    .redondo { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--borde); background: var(--vidrio); color: var(--texto);
-      display: grid; place-items: center; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: background .15s, color .15s, border-color .15s; }
-    .redondo:hover { border-color: var(--acento); color: var(--acento); }
-    .redondo.activo { background: var(--acento); border-color: var(--acento); color: #fff; }
+    .redondo { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--vidrio-borde); background: var(--vidrio); color: var(--texto);
+      display: grid; place-items: center; box-shadow: var(--sombra); backdrop-filter: blur(12px) saturate(1.4); -webkit-backdrop-filter: blur(12px) saturate(1.4);
+      transition: background .15s, color .15s, border-color .15s, box-shadow .15s; }
+    .redondo:hover { border-color: var(--acento); color: var(--acento); box-shadow: var(--sombra), 0 0 0 3px rgba(var(--acento-rgb),.15); }
+    .redondo.activo { background: var(--acento); border-color: var(--acento); color: #fff; box-shadow: 0 0 18px rgba(var(--acento-rgb),.55); }
     .redondo.cerrar:hover { background: #d13438; color: #fff; border-color: #d13438; }
+    .redondo.chico { width: 30px; height: 30px; box-shadow: none; }
+    .redondo.chico svg { width: 15px; height: 15px; }
     svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    #btnTema .ico-sol { display: none; }
+    :root[data-tema="oscuro"] #btnTema .ico-sol { display: block; }
+    :root[data-tema="oscuro"] #btnTema .ico-luna { display: none; }
     .caja { width: 100%; display: flex; }
-    .caja input { flex: 1; min-width: 0; font: inherit; font-size: 12.5px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--borde);
-      background: var(--vidrio); color: var(--texto); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); outline: none; }
-    .caja input:focus { border-color: var(--acento); }
+    .caja input { flex: 1; min-width: 0; font: inherit; font-size: 13px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--vidrio-borde);
+      background: var(--vidrio); color: var(--texto); box-shadow: var(--sombra); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); outline: none; }
+    .caja input:focus { border-color: var(--acento); box-shadow: var(--sombra), 0 0 0 3px rgba(var(--acento-rgb),.15); }
     .caja input::placeholder { color: var(--texto-2); }
-    .pista { font-size: 10.5px; color: var(--texto-2); text-align: center; min-height: 14px; }
+    .pista { font-size: 11px; color: var(--texto-2); text-align: center; min-height: 14px; }
   </style>
 </head>
 <body>
-  <canvas id="orbe" title="Toca la esfera para hablar con Romus"></canvas>
+  <div class="capa" id="piso"></div>
+  <div class="capa" id="grano"></div>
+  <div class="capa" id="brillo"></div>
+  <div class="capa" id="marco"></div>
+
+  <div class="barra">
+    <button id="btnTema" class="redondo chico" title="Modo claro u oscuro" aria-label="Modo claro u oscuro">
+      <svg viewBox="0 0 24 24" class="ico-luna"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+      <svg viewBox="0 0 24 24" class="ico-sol"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg>
+    </button>
+  </div>
+
+  <div class="escena">
+    <div id="halo"></div>
+    <div id="proyector"></div>
+    <div id="nucleoLuz"></div>
+    <canvas id="orbe" title="Toca la esfera para hablar con Romus"></canvas>
+  </div>
   <div id="estado">Conectando…</div>
   <div id="sub"></div>
   <div class="controles">
@@ -69,6 +132,10 @@
     const $ = (id) => document.getElementById(id);
     let orbe, idioma = "es-CO", estadoPadre = "reposo", bidireccional = false, palabras = [], ultimaTecla = 0, temporizador = null, detenerMedidor = null;
     const esMac = /Mac/i.test(navigator.platform || navigator.userAgent);
+
+    let nivelSuave = 0;
+    function nivelCSS(v) { nivelSuave = Math.max(v, nivelSuave * 0.9); document.documentElement.style.setProperty("--nivel", nivelSuave.toFixed(3)); }
+    setInterval(() => { nivelSuave *= 0.85; document.documentElement.style.setProperty("--nivel", nivelSuave.toFixed(3)); }, 120);
 
     function enviar(obj) { try { Office.context.ui.messageParent(JSON.stringify(obj)); } catch (e) { /* sin conexión con el panel */ } }
 
@@ -95,7 +162,7 @@
       try {
         Voz.iniciar({
           idioma, continuo: true,
-          nivel: (v) => { if (estadoPadre !== "hablando") orbe.nivel(v); },
+          nivel: (v) => { if (estadoPadre !== "hablando") orbe.nivel(v); nivelCSS(v); },
           parcial: (t) => { if (t === "…" || t === "(transcribiendo…)" || t === "") { $("estado").textContent = t ? (t === "…" ? "Te oigo…" : "Entendiendo…") : "Di «Ok Romus»"; return; } if (estadoPadre === "escuchando" || !bidireccional || /^\s*(ok|okey|oye|hola|hey)?[\s,]*r[oó]m/i.test(t)) { if (estadoPadre !== "hablando") { subtitulo(t.replace(/^\s*(ok\w*|oye|hola|hey)?[\s,]*r\w+[\s,.]*/i, ""), "usuario"); orbe.nivel(0.7); } } },
           final: (t) => { enviar({ tipo: "comando", texto: t, origen: "voz" }); },
           error: (e) => {
@@ -120,7 +187,7 @@
       else if (m.tipo === "estado") { estadoPadre = m.estado; window.romusHablando = m.estado === "hablando"; orbe.estado(m.estado); $("estado").textContent = m.etiqueta; }
       else if (m.tipo === "subtitulo") subtitulo(m.texto, m.quien);
       else if (m.tipo === "palabra") resaltar(m.k);
-      else if (m.tipo === "pulso") orbe.pulso();
+      else if (m.tipo === "pulso") { orbe.pulso(); nivelCSS(0.7); }
       else if (m.tipo === "texto" && (m.quien === "accion" || m.quien === "error")) subtitulo(m.texto, "ia");
     }
 
@@ -136,7 +203,7 @@
         $("pista").innerHTML = `Haz clic en la caja y usa ${esMac ? "Fn Fn" : "Windows + H"} para dictar.`;
       }
       estadoLocal();
-      detenerMedidor = await Orbe.medirMicrofono((v) => { if (estadoPadre !== "hablando") orbe.nivel(v); });
+      detenerMedidor = await Orbe.medirMicrofono((v) => { if (estadoPadre !== "hablando") orbe.nivel(v); nivelCSS(v); });
     });
 
     $("orbe").addEventListener("click", () => {
@@ -144,6 +211,17 @@
       enviar({ tipo: "despertar" }); // clic en la esfera = «Ok Romus» (y si estaba hablando, lo interrumpe)
     });
     $("mic").addEventListener("click", () => { if (Voz.escuchando) Voz.detenerEscucha(false); else escuchar(); });
+    $("btnTema").addEventListener("click", () => {
+      // Lo cambia el panel (así quedan iguales); si no responde, cambia solo aquí.
+      const antes = document.documentElement.dataset.tema;
+      enviar({ tipo: "tema" });
+      setTimeout(() => {
+        if (document.documentElement.dataset.tema === antes) {
+          const oscuro = antes ? antes === "oscuro" : matchMedia("(prefers-color-scheme: dark)").matches;
+          document.documentElement.dataset.tema = oscuro ? "claro" : "oscuro";
+        }
+      }, 400);
+    });
     $("parar").addEventListener("click", () => enviar({ tipo: "interrumpir" }));
     $("cerrar").addEventListener("click", () => { Voz.detenerEscucha(true); if (detenerMedidor) detenerMedidor(); enviar({ tipo: "cerrar" }); });
 

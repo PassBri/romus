@@ -40,6 +40,7 @@
     const hora = new Date().toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit", hour12: false });
     div.dataset.meta = `${quien} · ${hora}`;
     div.textContent = texto;
+    if ((tipo === "ia" || tipo === "accion") && Voz.recordarDicho) Voz.recordarDicho(texto);
     if (extra) div.appendChild(extra);
     $("conversacion").appendChild(div);
     if (estado.burbuja && (tipo === "usuario" || tipo === "ia" || tipo === "accion" || tipo === "error")) enviarBurbuja({ tipo: "texto", quien: tipo, texto });
@@ -129,6 +130,9 @@
   function esperandoPalabra() {
     return Config.get().palabraActivacion && !estado.conversacion && !estado.dictado && (Voz.escuchando || estado.burbujaEscuchando);
   }
+
+  let textoOriginalActual = "";
+  function responderLocal(texto) { agregarMensaje("ia", texto); hablar(texto); }
 
   async function hablar(texto) {
     if (!Config.get().leerRespuestas || !texto) return;
@@ -413,6 +417,27 @@
   /* ============ Comandos locales (lectura, cambios, ayuda) ============ */
 
   function comandoLocal(n) {
+    // Estilo de las respuestas
+    const me = n.match(/^(habla|hablame|responde|respondeme|contesta|se)( de forma| de manera| en tono| con tono| mas)? (mas )?(formal|profesional|natural|calido|cercano|breve|corto|conciso|detallado|didactico|extenso)$/);
+    if (me) return () => {
+      const mapa = { formal: "profesional", profesional: "profesional", natural: "natural", calido: "natural", cercano: "natural", breve: "breve", corto: "breve", conciso: "breve", detallado: "detallado", didactico: "detallado", extenso: "detallado" };
+      const e = mapa[me[4]];
+      Config.set({ estiloRespuesta: e }); $("selEstiloRespuesta").value = e;
+      responderLocal({ natural: "Perfecto, te hablaré de forma natural y cercana.", profesional: "De acuerdo, usaré un tono más profesional.", breve: "Entendido, seré breve.", detallado: "Claro, te daré respuestas más completas." }[e]);
+    };
+    // Instrucciones permanentes: «a partir de ahora…», «de ahora en adelante…», «recuerda que…»
+    const mi = textoOriginalActual.match(/^\s*(a partir de ahora|de ahora en adelante|desde ahora|siempre|recuerda que|recuerda siempre que)[\s,:]+(.{4,})$/i);
+    if (mi && !/^(lee|leeme|corrige)/.test(n)) return () => {
+      const nueva = mi[2].trim().replace(/[.。]*$/, ".");
+      const previas = (Config.get().instrucciones || "").trim();
+      const todo = (previas ? previas + "\n" : "") + nueva.charAt(0).toUpperCase() + nueva.slice(1);
+      Config.set({ instrucciones: todo.slice(-1500) }); $("txtInstrucciones").value = Config.get().instrucciones;
+      responderLocal("Anotado. Lo tendré en cuenta de ahora en adelante.");
+    };
+    if (/^(olvida|borra|elimina) (mis|tus|las) instrucciones$/.test(n)) return () => {
+      Config.set({ instrucciones: "" }); $("txtInstrucciones").value = "";
+      responderLocal("Listo, borré tus instrucciones personales.");
+    };
     // Tema claro / oscuro
     const mt = n.match(/^((pon|activa|cambia|cambia a|usa|pasa a) )?(el )?(modo|tema) (oscuro|noche|nocturno|claro|dia|diurno)$/);
     if (mt) return () => {
@@ -526,6 +551,7 @@
     if (!estado.enWord) { agregarMensaje("error", "Abre este panel dentro de Word para trabajar con documentos."); return; }
 
     agregarMensaje("usuario", texto);
+    textoOriginalActual = texto;
     const local = comandoLocal(n);
     try {
       if (local) { await local(); return; }
@@ -882,6 +908,8 @@
         } else if (m.tipo === "despertar") {
           if (Voz.hablando || Voz.pausado) { detenerLectura(false); Voz.callar(); }
           despertar();
+        } else if (m.tipo === "tema") {
+          cambiarTema(temaEfectivo() === "oscuro" ? "claro" : "oscuro");
         } else if (m.tipo === "interrumpir") {
           detenerLectura(false); Voz.callar(); sincronizarOrbe();
         } else if (m.tipo === "escuchando") {
@@ -1144,6 +1172,8 @@
     $("chkPalabraActivacion").checked = c.palabraActivacion;
     $("selMotorVoz").value = c.motorVoz || "auto";
     $("selTema").value = c.tema || "auto";
+    $("selEstiloRespuesta").value = c.estiloRespuesta || "natural";
+    $("txtInstrucciones").value = c.instrucciones || "";
     pintarNotaMotor();
     Voz.setPausa(c.pausa == null ? 250 : c.pausa);
     cambiarVelocidad(c.velocidad || 1, true);
@@ -1391,6 +1421,8 @@
     $("chkLeerRespuestas").addEventListener("change", (e) => Config.set({ leerRespuestas: e.target.checked }));
     $("btnTema").addEventListener("click", () => cambiarTema(temaEfectivo() === "oscuro" ? "claro" : "oscuro"));
     $("selTema").addEventListener("change", (e) => cambiarTema(e.target.value));
+    $("selEstiloRespuesta").addEventListener("change", (e) => Config.set({ estiloRespuesta: e.target.value }));
+    $("txtInstrucciones").addEventListener("input", (e) => Config.set({ instrucciones: e.target.value }));
     $("selMotorVoz").addEventListener("change", (e) => {
       Config.set({ motorVoz: e.target.value, falloNavegador: false });
       pintarNotaMotor();

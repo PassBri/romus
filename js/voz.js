@@ -158,7 +158,8 @@ window.Voz = (function () {
   /** ¿Lo que se oyó es Romus oyéndose a sí mismo por los parlantes? */
   function esEco(oido) {
     const ahora = Date.now();
-    const recientes = dichos.filter(d => ahora - d.t < 90000).map(d => " " + sinTildes(d.texto).replace(/[^a-zñ0-9 ]+/g, " ").replace(/\s+/g, " ") + " ");
+    // Los ejemplos entre comillas («Ok Romus, lee el documento») no cuentan: son cosas que el usuario sí puede decir.
+    const recientes = dichos.filter(d => ahora - d.t < 60000).map(d => " " + sinTildes(d.texto.replace(/«[^»]*»|"[^"]*"/g, " ")).replace(/[^a-zñ0-9 ]+/g, " ").replace(/\s+/g, " ") + " ");
     if (!recientes.length) return false;
     const palabras = sinTildes(oido).replace(/[^a-zñ0-9 ]+/g, " ").split(/\s+/).filter(w => w && !RELLENO.test(w));
     if (!palabras.length) return false;
@@ -267,7 +268,7 @@ window.Voz = (function () {
     const ficha = fichaCancelacion;
     const trozos = trocear(texto);
     dichos.push({ t: Date.now(), texto: String(texto) });
-    while (dichos.length > 12) dichos.shift();
+    while (dichos.length > 16) dichos.shift();
     hablando = true;
     if (alHablar) alHablar(true);
     for (let k = 0; k < trozos.length;) {
@@ -340,6 +341,7 @@ window.Voz = (function () {
     get vozActual() { return vozElegida; },
     aplicarAhora, generoVoz, etiquetaVoz,
     decir, callar, pausar, reanudar, esEco,
+    recordarDicho(t) { dichos.push({ t: Date.now(), texto: String(t || "") }); while (dichos.length > 16) dichos.shift(); },
     get hablando() { return hablando; },
     get pausado() { return pausado; },
     setManejadorHablando(fn) { alHablar = fn; },
