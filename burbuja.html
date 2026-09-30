@@ -6,51 +6,54 @@
   <title>Romus</title>
   <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
   <style>
-    :root { --fondo:#f4f8ff; --texto:#1f2328; --texto-2:#5b6370; --boton:#fff; --borde:#dde1e7; --acento:#185abd; }
-    @media (prefers-color-scheme: dark) { :root { --fondo:#0d0f14; --texto:#f0f0f0; --texto-2:#a9b1bd; --boton:#1f242d; --borde:#2f3540; --acento:#6ea3ee; } }
+    /* Burbuja transparente: sin tarjeta ni fondo; solo la esfera de Romus flotando y controles de vidrio. */
+    :root { --texto:#1b1d21; --texto-2:#5c6370; --vidrio:rgba(255,255,255,.55); --borde:rgba(24,90,189,.18); --acento:#185abd; --magenta:#c239b3; }
+    @media (prefers-color-scheme: dark) { :root { --texto:#eef3ff; --texto-2:#9fb0c8; --vidrio:rgba(26,29,35,.5); --borde:rgba(95,179,255,.22); --acento:#4f9bff; --magenta:#ff3dcb; } }
     * { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; }
+    html, body { height: 100%; margin: 0; background: transparent; }
     body {
-      font-family: "Segoe UI", -apple-system, Roboto, sans-serif; color: var(--texto);
-      background: radial-gradient(120% 75% at 50% 35%, color-mix(in srgb, var(--acento) 16%, var(--fondo)) 0%, var(--fondo) 72%);
-      display: flex; flex-direction: column; align-items: center; padding: 10px 14px 12px; gap: 8px; overflow: hidden; user-select: none;
+      font-family: "Segoe UI Variable Text", "Segoe UI", -apple-system, Roboto, sans-serif; color: var(--texto);
+      display: flex; flex-direction: column; align-items: center; padding: 4px 10px 10px; gap: 4px; overflow: hidden; user-select: none;
     }
-    body.noche { --fondo:#fafafa; --texto:#1f2328; --texto-2:#5b6370; --boton:#fff; --borde:#dbe3ef; --acento:#185abd; --rejilla: rgba(24,90,189,.055); background: var(--fondo); }
-    @media (prefers-color-scheme: dark) {
-      body.noche { --fondo:#111317; --texto:#e9f1ff; --texto-2:#8ea3c2; --boton:#1a1d23; --borde:#373c46; --acento:#4f9bff; --rejilla: rgba(0,229,255,.045); }
-      body.noche #sub span.actual { color: #041018; }
-    }
-    body.noche #sub.usuario { color: #c239b3; }
-    
-    canvas { width: min(82vw, 62vh); height: min(82vw, 62vh); flex-shrink: 0; cursor: pointer; }
-    #estado { font-weight: 600; font-size: 14px; text-align: center; min-height: 20px; }
-    #sub { flex: 1; min-height: 0; overflow-y: auto; font-size: 13.5px; line-height: 1.55; text-align: center; color: var(--texto-2); width: 100%; }
-    #sub span { border-radius: 4px; padding: 0 1px; }
+    canvas { width: min(96vw, 64vh); height: min(96vw, 64vh); flex-shrink: 0; cursor: pointer; background: transparent; }
+    #estado { font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--acento); text-align: center; min-height: 15px; margin-top: -6px; }
+    #sub { flex: 1; min-height: 0; overflow: hidden; font-size: 13px; line-height: 1.5; text-align: center; color: var(--texto-2); width: 100%;
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; mask-image: linear-gradient(#000 75%, transparent); }
+    #sub span { border-radius: 4px; padding: 0 1px; transition: color .15s; }
     #sub span.leida { color: var(--texto); }
     #sub span.actual { background: var(--acento); color: #fff; }
-    #sub.usuario { font-style: italic; color: var(--texto); }
-    .fila { display: flex; gap: 12px; align-items: center; }
+    #sub.usuario { font-style: italic; color: var(--magenta); }
+    .controles { display: flex; flex-direction: column; align-items: center; gap: 7px; width: 100%; opacity: .5; transition: opacity .25s; }
+    body:hover .controles, .controles:focus-within { opacity: 1; }
+    .fila { display: flex; gap: 10px; align-items: center; }
     button { font: inherit; cursor: pointer; }
-    .redondo { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--borde); background: var(--boton); color: var(--texto); display: grid; place-items: center; }
-    .redondo.activo { background: #d13438; border-color: #d13438; color: #fff; }
+    .redondo { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--borde); background: var(--vidrio); color: var(--texto);
+      display: grid; place-items: center; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: background .15s, color .15s, border-color .15s; }
+    .redondo:hover { border-color: var(--acento); color: var(--acento); }
+    .redondo.activo { background: var(--acento); border-color: var(--acento); color: #fff; }
     .redondo.cerrar:hover { background: #d13438; color: #fff; border-color: #d13438; }
-    svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-    .caja { width: 100%; display: flex; gap: 6px; }
-    .caja input { flex: 1; min-width: 0; font: inherit; font-size: 13px; padding: 7px 10px; border-radius: 10px; border: 1px solid var(--borde); background: var(--boton); color: var(--texto); }
-    .pista { font-size: 11px; color: var(--texto-2); text-align: center; }
+    svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .caja { width: 100%; display: flex; }
+    .caja input { flex: 1; min-width: 0; font: inherit; font-size: 12.5px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--borde);
+      background: var(--vidrio); color: var(--texto); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); outline: none; }
+    .caja input:focus { border-color: var(--acento); }
+    .caja input::placeholder { color: var(--texto-2); }
+    .pista { font-size: 10.5px; color: var(--texto-2); text-align: center; min-height: 14px; }
   </style>
 </head>
 <body>
-  <canvas id="orbe" title="Romus"></canvas>
+  <canvas id="orbe" title="Toca la esfera para hablar con Romus"></canvas>
   <div id="estado">Conectando…</div>
   <div id="sub"></div>
-  <div class="fila">
-    <button id="mic" class="redondo" title="Micrófono" aria-label="Micrófono"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
-    <button id="parar" class="redondo" title="Detener lectura" aria-label="Detener"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg></button>
-    <button id="cerrar" class="redondo cerrar" title="Cerrar burbuja" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  <div class="controles">
+    <div class="fila">
+      <button id="mic" class="redondo" title="Micrófono" aria-label="Micrófono"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
+      <button id="parar" class="redondo" title="Detener lectura" aria-label="Detener"><svg viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="1.5"/></svg></button>
+      <button id="cerrar" class="redondo cerrar" title="Cerrar burbuja" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="caja"><input id="txt" placeholder="Escribe o dicta una orden…"></div>
+    <div class="pista" id="pista"></div>
   </div>
-  <div class="caja"><input id="txt" placeholder="Escribe o dicta un comando…"></div>
-  <div class="pista" id="pista"></div>
 
   <script src="js/config.js"></script>
   <script src="js/voz.js"></script>
@@ -60,7 +63,6 @@
   <script>
   (function () {
     const $ = (id) => document.getElementById(id);
-    let apariencia = "romus";
     let orbe, idioma = "es-CO", estadoPadre = "reposo", bidireccional = false, palabras = [], ultimaTecla = 0, temporizador = null, detenerMedidor = null;
     const esMac = /Mac/i.test(navigator.platform || navigator.userAgent);
 
@@ -109,13 +111,6 @@
       if (m.tipo === "config" || m.tipo === "apariencia") {
         if (m.idioma) idioma = m.idioma;
         if (m.tipo === "config") bidireccional = true;
-        if (m.apariencia && m.apariencia !== apariencia) {
-          apariencia = m.apariencia;
-          orbe.detener();
-          orbe = crearOrbe($("orbe"), apariencia);
-          orbe.estado(estadoPadre);
-          document.body.classList.toggle("noche", apariencia === "romus");
-        }
       }
       else if (m.tipo === "estado") { estadoPadre = m.estado; orbe.estado(m.estado); $("estado").textContent = m.etiqueta; }
       else if (m.tipo === "subtitulo") subtitulo(m.texto, m.quien);
@@ -125,8 +120,7 @@
     }
 
     Office.onReady(async () => {
-      orbe = crearOrbe($("orbe"), apariencia);
-      document.body.classList.toggle("noche", apariencia === "romus");
+      orbe = crearOrbe($("orbe"));
       try { Office.context.ui.addHandlerAsync(Office.EventType.DialogParentMessageReceived, alMensaje); } catch (e) { /* DialogApi 1.2 no disponible */ }
       enviar({ tipo: "lista" });
       subtitulo("Hola, soy Romus. Di «Ok Romus» y lo que necesitas.");

@@ -378,8 +378,6 @@
     if (/^(voz |tono |lee )?mas (grave|gruesa|grueso|bajo)$/.test(n)) return () => { cambiarTono(Voz.tono - 0.15); agregarMensaje("sistema", "Tono: " + describirTono(Voz.tono)); };
     if (/^(voz |tono |lee )?mas (aguda|agudo|fina|fino|alto)$/.test(n)) return () => { cambiarTono(Voz.tono + 0.15); agregarMensaje("sistema", "Tono: " + describirTono(Voz.tono)); };
     if (/^(velocidad normal|lee normal|tono normal)$/.test(n)) return () => { if (/tono/.test(n)) cambiarTono(1); else cambiarVelocidad(1); agregarMensaje("sistema", "Listo, " + (/tono/.test(n) ? "tono" : "velocidad") + " normal."); };
-    const mAp = n.match(/^(apariencia|estilo|modo|pon|usa|cambia a|activa) (de |a |el |la )?(romus|cielo)$/);
-    if (mAp) return () => { const ap = aplicarApariencia(mAp[3]); agregarMensaje("sistema", ap === "romus" ? "Apariencia: Romus." : "Apariencia: cielo."); };
     let mEstilo = n.match(/^(estilo|modo|voz|lee en (modo|estilo)|lee como|lee con voz|lee con estilo|pon (el )?(estilo|modo)|usa (el )?(estilo|modo)) (de )?(natural|narrador|clase|clase pausada|profesor|calmad[oa]|tranquil[oa]|energic[oa]|animad[oa]|grave|agud[oa]|rapid[oa]|lectura rapida)$/);
     if (mEstilo) {
       const palabra = mEstilo[mEstilo.length - 1];
@@ -782,7 +780,7 @@
     aplicarApariencia(Config.get().apariencia, true);
     mostrarSubtitulo(Config.get().palabraActivacion && (Config.get().manosLibres || true) ? "Hola, soy Romus. Di «Ok Romus» y lo que necesitas: «Ok Romus, lee el documento»." : "Hola, soy Romus. ¿Qué necesitas?");
     sincronizarOrbe();
-    // Nivel del micrófono para animar el cielo (si el navegador lo permite).
+    // Nivel del micrófono para animar la esfera (si el navegador lo permite).
     estado.detenerMedidor = await Orbe.medirMicrofono((v) => {
       if (estado.orbe && !Voz.hablando) estado.orbe.nivel(Math.max(v, estado.nivelSintetico));
     });
@@ -796,26 +794,20 @@
 
   function crearOrbePanel() {
     if (estado.orbePanel) estado.orbePanel.detener();
-    estado.orbePanel = crearOrbe($("orbePanel"), Config.get().apariencia);
+    estado.orbePanel = crearOrbe($("orbePanel"));
     estado.ultimoEstadoOrbe = "";
     sincronizarOrbe();
   }
 
   function aplicarApariencia(ap, forzar) {
-    ap = ap === "cielo" ? "cielo" : "romus";
-    const cambio = ap !== Config.get().apariencia;
-    Config.set({ apariencia: ap });
-    $("selApariencia").value = ap;
-    $("modoVoz").classList.toggle("noche", ap === "romus");
+    $("modoVoz").classList.add("noche");
     $("mvMarca").textContent = "Romus";
-    if (estado.modoVoz && (cambio || forzar || !estado.orbe)) {
+    if (estado.modoVoz && (forzar || !estado.orbe)) {
       if (estado.orbe) estado.orbe.detener();
-      estado.orbe = crearOrbe($("orbe"), ap);
+      estado.orbe = crearOrbe($("orbe"));
       sincronizarOrbe();
     }
-    if (estado.burbuja) enviarBurbuja({ tipo: "apariencia", apariencia: ap });
-    if (!estado.modoVoz && cambio) crearOrbePanel();
-    return ap;
+    return "romus";
   }
 
   function cerrarModoVoz() {
@@ -851,7 +843,7 @@
     }
     if (estado.burbuja) { agregarMensaje("sistema", "La burbuja ya está abierta."); return; }
     const url = location.href.replace(/taskpane\.html.*$/, "burbuja.html");
-    Office.context.ui.displayDialogAsync(url, { height: 46, width: 20, displayInIframe: false, promptBeforeOpen: false }, (res) => {
+    Office.context.ui.displayDialogAsync(url, { height: 44, width: 17, displayInIframe: false, promptBeforeOpen: false }, (res) => {
       if (res.status !== Office.AsyncResultStatus.Succeeded) {
         agregarMensaje("error", "No pude abrir la burbuja: " + (res.error && res.error.message));
         return;
@@ -863,7 +855,7 @@
         let m;
         try { m = JSON.parse(arg.message); } catch (e) { return; }
         if (m.tipo === "lista") {
-          enviarBurbuja({ tipo: "config", idioma: Config.get().idioma, apariencia: Config.get().apariencia, bidireccional: true });
+          enviarBurbuja({ tipo: "config", idioma: Config.get().idioma, bidireccional: true });
           estado.ultimoEstadoOrbe = "";
           sincronizarOrbe();
         } else if (m.tipo === "comando") {
@@ -1138,8 +1130,7 @@
     cambiarVelocidad(c.velocidad || 1, true);
     cambiarTono(c.tono || 1, true);
     pintarEstilos();
-    $("selApariencia").value = c.apariencia || "romus";
-    $("modoVoz").classList.toggle("noche", (c.apariencia || "romus") === "romus");
+    $("modoVoz").classList.add("noche");
     $("mvMarca").textContent = "Romus";
     llenarVoces();
   }
@@ -1265,8 +1256,6 @@
     $("btnAbrirBurbuja").addEventListener("click", abrirBurbuja);
     $("mvBurbuja").addEventListener("click", () => { cerrarModoVoz(); abrirBurbuja(); });
     $("mvCerrar").addEventListener("click", cerrarModoVoz);
-    $("mvApariencia").addEventListener("click", () => aplicarApariencia(Config.get().apariencia === "romus" ? "cielo" : "romus"));
-    $("selApariencia").addEventListener("change", (e) => aplicarApariencia(e.target.value));
     $("orbe").addEventListener("click", tocarOrbe);
     $("orbePanel").addEventListener("click", tocarOrbe);
     $("mvMic").addEventListener("click", () => { if (Voz.escuchando) Voz.detenerEscucha(false); else empezarEscucha(); });

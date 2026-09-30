@@ -88,6 +88,7 @@ window.Config = (function () {
   if ((cfg.versionConfig || 0) < 5) { cfg.manosLibres = true; cfg.palabraActivacion = true; cfg.versionConfig = 5; }
   // v2.2: Romus tiene oído propio; se vuelve a encender «Siempre atento» (antes se apagaba al fallar el micrófono en Word de escritorio).
   if (cfg.versionConfig < 6) { cfg.manosLibres = true; cfg.falloNavegador = false; cfg.versionConfig = 6; }
+  cfg.apariencia = "romus"; // la apariencia «cielo» se retiró
   if (!cfg.perfiles.some(p => p.id === cfg.perfilActivo)) cfg.perfilActivo = cfg.perfiles[0].id;
 
   function nuevoPerfil(proveedorId, extra) {

@@ -340,8 +340,7 @@ window.OrbeRomus = (function () {
   return OrbeRomus;
 })();
 
-/* Fábrica común: elige la apariencia del asistente. */
-window.crearOrbe = function (canvas, apariencia) {
-  if (apariencia === "romus" && window.OrbeRomus) return new OrbeRomus(canvas);
-  return new Orbe(canvas);
+/* Fábrica común: Romus tiene una sola apariencia (la esfera holográfica). */
+window.crearOrbe = function (canvas) {
+  return new OrbeRomus(canvas);
 };
