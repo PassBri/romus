@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Romus para Word</title>
+  <link rel="icon" href="assets/iconos/icon-32.png">
+  <style>
+    :root { --bg:#fafafa; --sup:#fff; --linea:#e6e8ec; --texto:#1b1d21; --texto-2:#5c6370; --acento:#185abd; --ok:#107c41; }
+    @media (prefers-color-scheme: dark) { :root { --bg:#111317; --sup:#1a1d23; --linea:#2a2e36; --texto:#eceef2; --texto-2:#a4abb8; --acento:#4f9bff; --ok:#54c28a; } }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:"Segoe UI Variable Text","Segoe UI",-apple-system,Roboto,sans-serif; background:var(--bg); color:var(--texto); line-height:1.55; }
+    main { max-width:720px; margin:0 auto; padding:56px 16px 72px; }
+    header { display:flex; align-items:center; gap:18px; margin-bottom:10px; }
+    header img { width:64px; height:64px; }
+    h1 { margin:0; font-weight:300; letter-spacing:.4em; font-size:34px; }
+    .lema { margin:4px 0 0; font-size:12px; letter-spacing:.24em; color:var(--texto-2); }
+    .intro { font-size:16px; color:var(--texto-2); margin:24px 0 32px; }
+    section { background:var(--sup); border:1px solid var(--linea); border-radius:14px; padding:22px 24px; margin-bottom:16px; }
+    h2 { font-size:16px; margin:0 0 12px; }
+    ol, ul { margin:0; padding-left:20px; }
+    li { margin-bottom:8px; }
+    .boton { display:inline-flex; align-items:center; gap:8px; background:var(--acento); color:#fff; border:none; text-decoration:none; padding:10px 18px; border-radius:8px; font:inherit; font-weight:600; cursor:pointer; }
+    .boton:hover { filter:brightness(1.08); }
+    .nota { font-size:13px; color:var(--texto-2); margin-top:10px; }
+    .ok { color:var(--ok); }
+    code { background:var(--bg); border:1px solid var(--linea); border-radius:5px; padding:1px 5px; font-size:.9em; }
+    footer { color:var(--texto-2); font-size:13px; margin-top:28px; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="assets/logo/logo-romus-app.svg" alt="">
+    <div><h1>ROMUS</h1><p class="lema">ASISTENTE DE VOZ · WORD</p></div>
+  </header>
+  <p class="intro">Romus lee tus documentos en voz alta, los corrige con inteligencia artificial y obedece tus órdenes dentro de Microsoft Word. Solo di «Ok Romus».</p>
+
+  <section>
+    <h2>1. Descarga tu manifiesto</h2>
+    <p style="margin:0 0 14px">Este botón crea el archivo <code>manifest.xml</code> con la dirección de esta página, listo para cargar en Word. No tienes que editar nada.</p>
+    <button class="boton" id="btnManifiesto">Descargar mi manifest.xml</button>
+    <p class="nota" id="notaManifiesto">Dirección detectada: <span id="base">…</span></p>
+  </section>
+
+  <section>
+    <h2>2. Cárgalo en Word</h2>
+    <ol>
+      <li><b>Word para la web</b> (office.com): abre un documento → <b>Inicio → Complementos → Más complementos → Mis complementos → Cargar mi complemento</b> → elige el archivo → <b>Cargar</b>.</li>
+      <li><b>Word de escritorio (Windows o Mac)</b>: sigue la guía <code>GUIA-INSTALACION.md</code> del repositorio.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>3. Conecta la IA</h2>
+    <p style="margin:0">Pulsa <b>Romus</b> en la pestaña <b>Inicio</b>, abre <b>Ajustes</b> (ícono de controles, arriba a la derecha) → <b>+ Agregar</b>, elige tu IA (Claude, ChatGPT, Gemini, una IA local…), pega la clave y pulsa <b>Probar conexión y corrección</b>.</p>
+  </section>
+
+  <footer>Romus para Word v2.2 · Brian Gonzalo Suárez Acevedo</footer>
+</main>
+<script>
+  // Carpeta donde está publicada esta página (por ejemplo https://usuario.github.io/romus)
+  const base = location.href.split(/[?#]/)[0].replace(/\/[^/]*$/, "");
+  document.getElementById("base").textContent = base;
+  document.getElementById("btnManifiesto").addEventListener("click", async () => {
+    const nota = document.getElementById("notaManifiesto");
+    try {
+      if (!/^https:\/\//.test(base)) throw new Error("La página debe abrirse desde una dirección https:// (por ejemplo, GitHub Pages).");
+      const r = await fetch("manifest.xml", { cache: "no-store" });
+      if (!r.ok) throw new Error("No encontré manifest.xml junto a esta página.");
+      const xml = (await r.text()).replaceAll("https://TU-USUARIO.github.io/romus", base);
+      const url = URL.createObjectURL(new Blob([xml], { type: "application/xml" }));
+      const a = Object.assign(document.createElement("a"), { href: url, download: "manifest.xml" });
+      document.body.appendChild(a); a.click(); a.remove();
+      nota.innerHTML = '<span class="ok">Listo: se descargó <b>manifest.xml</b> configurado para ' + base + '</span>';
+    } catch (e) {
+      nota.textContent = e.message;
+    }
+  });
+</script>
+</body>
+</html>
