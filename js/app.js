@@ -1006,6 +1006,11 @@
         idioma: Config.get().idioma,
         continuo: continuoAhora,
         parcial: (t) => {
+          if (t === "" ) { $("transcripcion").classList.remove("viva"); return; }
+          if (t === "…" || t === "(transcribiendo…)") { // oído propio: aviso de que oyó algo
+            $("transcripcion").textContent = t === "…" ? "Te oigo…" : "Entendiendo…"; $("transcripcion").classList.add("viva");
+            return;
+          }
           const dirigido = !esperandoPalabra() || RE_ACTIVACION.test(t);
           if (!dirigido) return; // no se muestra lo que no va dirigido a Romus
           $("transcripcion").textContent = t; $("transcripcion").classList.add("viva");
@@ -1021,14 +1026,25 @@
           manejarComando(t, continuoAhora ? "voz" : "voz-directa");
         },
         error: manejarErrorMic,
-        estado: actualizarBotonMic
+        estado: actualizarBotonMic,
+        nivel: (v) => { if (v > estado.nivelSintetico) estado.nivelSintetico = v; }
       });
     } catch (e) {
       manejarErrorMic("no-soportado");
     }
   }
 
+  let ultimoAvisoTranscripcion = 0;
   function manejarErrorMic(codigo) {
+    // Errores pasajeros del oído propio: se avisa sin apagar el micrófono.
+    if (["transcripcion", "cuota"].includes(codigo) && Voz.escuchando) {
+      const m = codigo === "cuota"
+        ? "La IA que transcribe tu voz llegó a su límite por minuto. Espera un momento y repite."
+        : "No pude transcribir esa frase. Repite, por favor.";
+      $("transcripcion").textContent = m; $("transcripcion").classList.remove("viva");
+      if (Date.now() - ultimoAvisoTranscripcion > 60000) { ultimoAvisoTranscripcion = Date.now(); agregarMensaje("sistema", m); }
+      return;
+    }
     actualizarBotonMic(false);
     const mensajes = {
       "not-allowed": "No tengo permiso para usar el micrófono.",
@@ -1036,12 +1052,17 @@
       "network": "El reconocimiento de voz del panel no está disponible aquí (necesita un servicio que Word de escritorio no ofrece).",
       "audio-capture": "No se detectó ningún micrófono.",
       "no-speech": "No te escuché. Vuelve a intentarlo.",
-      "no-soportado": "El micrófono integrado no está disponible en este Word."
+      "no-soportado": "El micrófono integrado no está disponible en este Word.",
+      "sin-transcriptor": "Este Word no trae reconocimiento de voz. Para que Romus te oiga, conecta en Ajustes una IA que entienda audio: Google Gemini (gratis), OpenAI o Groq.",
+      "clave": "La clave de la IA que transcribe tu voz no es válida. Revísala en Ajustes.",
+      "transcripcion": "No pude transcribir tu voz con la IA.",
+      "cuota": "La IA que transcribe tu voz llegó a su límite de uso."
     };
     const m = mensajes[codigo] || ("Error del micrófono: " + codigo);
     if (codigo === "no-speech") { $("transcripcion").textContent = m; return; }
     agregarMensaje("sistema", `${m} Alternativa: haz clic en la caja de texto y pulsa ${esMac ? "Fn dos veces" : "Windows + H"} para dictar con el sistema.`);
     pistaSinMicrofono("");
+    if (codigo === "sin-transcriptor") { pistaSinMicrofono(""); return; }
     if (Config.get().manosLibres) { $("chkManosLibres").checked = false; Config.set({ manosLibres: false }); }
   }
 
@@ -1084,8 +1105,21 @@
 
   /* ============ Hojas: ajustes y ayuda ============ */
 
-  function abrirHoja(id) { $(id).classList.remove("oculto"); }
+  function abrirHoja(id) { $(id).classList.remove("oculto"); if (id === "panelAjustes") pintarNotaMotor(); }
   function cerrarHoja(id) { $(id).classList.add("oculto"); }
+
+  function pintarNotaMotor() {
+    const nota = $("notaMotorVoz");
+    if (!nota) return;
+    const p = window.Escucha && Escucha.perfilTranscripcion();
+    const motor = Voz.motor;
+    let t;
+    if (motor === "ia") t = `Ahora te oye el oído de Romus: cada frase se transcribe con <b>${p ? p.nombre : "tu IA"}</b> (usa un poco de su cuota).`;
+    else if (motor === "navegador") t = "Ahora usa el reconocimiento integrado. Si en Word de escritorio no funciona, Romus cambia solo a su propio oído.";
+    else t = "No hay reconocimiento disponible. Conecta Gemini (gratis), OpenAI o Groq para que Romus te oiga en Word de escritorio.";
+    if (!p) t += " Para el oído de Romus hace falta una IA que entienda audio: Gemini, OpenAI o Groq.";
+    nota.innerHTML = t;
+  }
 
   function llenarAjustes() {
     const c = Config.get();
@@ -1098,6 +1132,8 @@
     $("chkAutoenviar").checked = c.autoenviarDictado;
     $("chkManosLibres").checked = c.manosLibres;
     $("chkPalabraActivacion").checked = c.palabraActivacion;
+    $("selMotorVoz").value = c.motorVoz || "auto";
+    pintarNotaMotor();
     Voz.setPausa(c.pausa == null ? 250 : c.pausa);
     cambiarVelocidad(c.velocidad || 1, true);
     cambiarTono(c.tono || 1, true);
@@ -1158,10 +1194,21 @@
     $("enlaceClave").textContent = prov.clave ? "Obtener una clave" : "Descargar";
     $("notaProveedor").textContent = prov.nota || "";
     $("listaModelos").innerHTML = (p.modelosCargados || prov.modelos).map(m => `<option value="${escaparHTML(m)}"></option>`).join("");
+    if (p.modelosCargados) pintarSelectorModelos(p.modelosCargados); else $("selModelosCargados").classList.add("oculto");
     $("notaModelos").textContent = p.modelosCargados ? `${p.modelosCargados.length} modelos disponibles.` : "Los nombres de modelo cambian con el tiempo: usa «Cargar modelos» para ver los actuales.";
     $("btnEliminarPerfil").disabled = c.perfiles.length < 2;
     $("resultadoPrueba").textContent = "";
     actualizarChipIA();
+  }
+
+  // Lista desplegable con los modelos que devolvió el proveedor (más fiable que el autocompletado dentro de Word).
+  function pintarSelectorModelos(lista) {
+    const sel = $("selModelosCargados");
+    if (!lista || !lista.length) { sel.classList.add("oculto"); return; }
+    const utiles = lista.filter(m => !/embed|tts|image|imagen|audio|live|vision|whisper|moderation|dall|veo|aqa|learnlm/i.test(m));
+    sel.innerHTML = '<option value="">— Elige un modelo de la lista —</option>' + utiles.map(m => `<option value="${escaparHTML(m)}">${escaparHTML(m)}</option>`).join("");
+    sel.value = utiles.includes(Config.perfil().modelo) ? Config.perfil().modelo : "";
+    sel.classList.remove("oculto");
   }
 
   function editarPerfil(cambios) {
@@ -1283,6 +1330,13 @@
     $("inpUrl").addEventListener("change", (e) => editarPerfil({ url: e.target.value.trim() }));
     $("inpClave").addEventListener("change", (e) => editarPerfil({ apiKey: e.target.value.trim() }));
     $("inpModelo").addEventListener("change", (e) => editarPerfil({ modelo: e.target.value.trim() }));
+    $("inpModelo").addEventListener("input", (e) => editarPerfil({ modelo: e.target.value.trim() }));
+    $("selModelosCargados").addEventListener("change", (e) => {
+      if (!e.target.value) return;
+      $("inpModelo").value = e.target.value;
+      editarPerfil({ modelo: e.target.value });
+      $("resultadoPrueba").textContent = "Modelo elegido: " + e.target.value + ". Pulsa «Probar conexión y corrección».";
+    });
     $("chkModoBasico").addEventListener("change", (e) => editarPerfil({ modoBasico: e.target.checked }));
     $("btnVerClave").addEventListener("click", () => {
       const i = $("inpClave");
@@ -1297,7 +1351,8 @@
         const lista = await IA.listarModelos(Config.perfil());
         editarPerfil({ modelosCargados: lista });
         $("listaModelos").innerHTML = lista.map(m => `<option value="${escaparHTML(m)}"></option>`).join("");
-        n.textContent = lista.length ? `${lista.length} modelos disponibles: escribe o elige en el campo Modelo.` : "El proveedor no devolvió modelos; escribe el nombre a mano.";
+        pintarSelectorModelos(lista);
+        n.textContent = lista.length ? `${lista.length} modelos disponibles: elígelo en la lista de abajo.` : "El proveedor no devolvió modelos; escribe el nombre a mano.";
       } catch (err) { n.textContent = err.message; }
     });
     $("btnProbarClave").addEventListener("click", async () => {
@@ -1326,6 +1381,11 @@
     $("btnProbarVoz").addEventListener("click", probarVoz);
     $("rngTono").addEventListener("input", (e) => cambiarTono(parseFloat(e.target.value)));
     $("chkLeerRespuestas").addEventListener("change", (e) => Config.set({ leerRespuestas: e.target.checked }));
+    $("selMotorVoz").addEventListener("change", (e) => {
+      Config.set({ motorVoz: e.target.value, falloNavegador: false });
+      pintarNotaMotor();
+      if (Voz.escuchando) { Voz.detenerEscucha(true); empezarEscucha(); }
+    });
     $("chkPalabraActivacion").addEventListener("change", (e) => { Config.set({ palabraActivacion: e.target.checked }); sincronizarOrbe(); actualizarBotonMic(Voz.escuchando); });
     $("chkAutoenviar").addEventListener("change", (e) => Config.set({ autoenviarDictado: e.target.checked }));
     $("chkControlCambios").addEventListener("change", async (e) => {

@@ -114,7 +114,11 @@ La lectura en voz alta funciona sin IA. Para corregir, resumir y responder neces
    - «Gracias, Romus», para que quede en espera.
 5. El botón **?** del panel muestra todos los comandos.
 
-**Si el micrófono no funciona en Word de escritorio:** haz clic en la caja de texto del panel y pulsa **Windows + H** (en Mac, **Fn** dos veces). Dicta tu orden y se enviará sola cuando termines de hablar.
+**En Word de escritorio**, el navegador interno de Word no trae reconocimiento de voz. Romus lo detecta solo y usa su **propio oído**: graba cada frase y la transcribe con la IA que conectaste. Para eso necesitas en Ajustes una IA que entienda audio: **Google Gemini** (gratis), **OpenAI** o **Groq**. Puedes elegirlo a mano en **Ajustes → Voz → Reconocimiento de voz**.
+
+- Cada frase que Romus oye usa un poco de la cuota de esa IA. El plan gratuito de Gemini tiene un límite por minuto; si lo alcanzas, Romus te avisa y basta con esperar un momento.
+- Mientras Romus lee en voz alta, habla fuerte y cerca del micrófono para interrumpirlo («Ok Romus, para»), o pulsa el botón de detener.
+- Otra alternativa: haz clic en la caja de texto del panel y pulsa **Windows + H** (en Mac, **Fn** dos veces).
 
 ---
 
@@ -136,5 +140,5 @@ La lectura en voz alta funciona sin IA. Para corregir, resumir y responder neces
 | No aparece «Cargar mi complemento» | Tu organización puede tenerlo bloqueado. Usa Word para la web con una cuenta personal, o la carpeta compartida (Opción B). |
 | El panel dice «Falta conectar la IA» | Agrega una IA en Ajustes (Parte 4). |
 | «La clave no es válida» o «sin saldo» | Copia de nuevo la clave desde la consola del proveedor, o recarga créditos. |
-| Romus no responde a «Ok Romus» | Activa **Siempre atento** y permite el micrófono. En Word de escritorio usa **Windows + H**. |
+| Romus no responde a «Ok Romus» o el micrófono se apaga solo | Activa **Siempre atento**, permite el micrófono y conecta Gemini, OpenAI o Groq en Ajustes (Word de escritorio necesita una de ellas para oírte). En **Ajustes → Voz → Reconocimiento de voz** elige **Oído de Romus**. |
 | No aparecen el control de cambios ni los comentarios | Necesitas Microsoft 365, Word 2021 o Word para la web. |

@@ -245,6 +245,7 @@
               <button id="btnCargarModelos" class="boton secundario" type="button">Cargar modelos</button>
             </div>
             <datalist id="listaModelos"></datalist>
+            <select id="selModelosCargados" class="oculto" aria-label="Modelos disponibles"></select>
             <small id="notaModelos"></small>
           </label>
           <label class="interruptor"><input type="checkbox" id="chkModoBasico"><span class="riel"></span><span>Modo básico (para modelos que no manejan herramientas; más lento y menos preciso)</span></label>
@@ -268,6 +269,14 @@
         <label class="campo">Idioma del micrófono
           <select id="selIdioma"></select>
         </label>
+        <label class="campo">Reconocimiento de voz (cómo te oye Romus)
+          <select id="selMotorVoz">
+            <option value="auto">Automático (recomendado)</option>
+            <option value="navegador">Integrado del navegador (Word para la web)</option>
+            <option value="ia">Oído de Romus: transcribe con tu IA (Word de escritorio)</option>
+          </select>
+        </label>
+        <p class="nota" id="notaMotorVoz"></p>
         <p class="nota">La voz, el estilo, el tono y la velocidad se cambian en el panel principal, en la tarjeta «Voz de lectura».</p>
         <label class="interruptor"><input type="checkbox" id="chkPalabraActivacion"><span class="riel"></span><span>Cuando escucha siempre, esperar «Ok Romus» antes de cada orden (recomendado)</span></label>
         <label class="interruptor"><input type="checkbox" id="chkLeerRespuestas"><span class="riel"></span><span>Leer las respuestas en voz alta</span></label>
@@ -282,7 +291,7 @@
         <div class="fila">
           <button id="btnBorrarHistorial" class="boton secundario">Borrar conversación</button>
         </div>
-        <p class="nota">Romus para Word v2.1 · Los textos se envían a la IA que elijas solo cuando das un comando que la usa.</p>
+        <p class="nota">Romus para Word v2.2 · Los textos se envían a la IA que elijas solo cuando das un comando que la usa.</p>
       </div>
     </div>
 
@@ -336,13 +345,14 @@
           <li>«Ve a la conclusión y léela»</li>
         </ul>
         <h3>Sin micrófono en el panel</h3>
-        <p>Si el micrófono del panel no funciona en tu Word, pulsa en la caja de texto y usa el dictado del sistema: <b>Windows + H</b> en Windows o <b>Fn Fn</b> en Mac. El comando se envía solo al terminar de hablar.</p>
+        <p>En Word de escritorio Romus usa su propio oído: transcribe cada frase con Gemini, OpenAI o Groq (conéctala en Ajustes). Si aun así el micrófono no funciona, pulsa en la caja de texto y usa el dictado del sistema: <b>Windows + H</b> en Windows o <b>Fn Fn</b> en Mac.</p>
       </div>
     </div>
   </div>
 
   <script src="js/config.js"></script>
   <script src="js/voz.js"></script>
+  <script src="js/escucha.js"></script>
   <script src="js/orbe.js"></script>
   <script src="js/romus.js"></script>
   <script src="js/ia.js"></script>

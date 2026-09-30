@@ -52,7 +52,9 @@
   <div class="caja"><input id="txt" placeholder="Escribe o dicta un comando…"></div>
   <div class="pista" id="pista"></div>
 
+  <script src="js/config.js"></script>
   <script src="js/voz.js"></script>
+  <script src="js/escucha.js"></script>
   <script src="js/orbe.js"></script>
   <script src="js/romus.js"></script>
   <script>
@@ -87,10 +89,13 @@
       try {
         Voz.iniciar({
           idioma, continuo: true,
-          parcial: (t) => { if (estadoPadre === "escuchando" || !bidireccional || /^\s*(ok|okey|oye|hola|hey)?[\s,]*r[oó]m/i.test(t)) { if (estadoPadre !== "hablando") { subtitulo(t.replace(/^\s*(ok\w*|oye|hola|hey)?[\s,]*r\w+[\s,.]*/i, ""), "usuario"); orbe.nivel(0.7); } } },
+          nivel: (v) => { if (estadoPadre !== "hablando") orbe.nivel(v); },
+          parcial: (t) => { if (t === "…" || t === "(transcribiendo…)" || t === "") { $("estado").textContent = t ? (t === "…" ? "Te oigo…" : "Entendiendo…") : "Di «Ok Romus»"; return; } if (estadoPadre === "escuchando" || !bidireccional || /^\s*(ok|okey|oye|hola|hey)?[\s,]*r[oó]m/i.test(t)) { if (estadoPadre !== "hablando") { subtitulo(t.replace(/^\s*(ok\w*|oye|hola|hey)?[\s,]*r\w+[\s,.]*/i, ""), "usuario"); orbe.nivel(0.7); } } },
           final: (t) => { enviar({ tipo: "comando", texto: t, origen: "voz" }); },
           error: (e) => {
             if (e === "no-speech") return;
+            if (e === "transcripcion" || e === "cuota") { $("pista").textContent = e === "cuota" ? "Límite de la IA por minuto: espera un momento y repite." : "No te entendí, repite por favor."; return; }
+            if (e === "sin-transcriptor") { $("pista").textContent = "Para oírte en Word de escritorio, conecta Gemini, OpenAI o Groq en Ajustes del panel."; estadoLocal(); return; }
             $("pista").innerHTML = `El micrófono no está disponible aquí (${e}). Haz clic en la caja y usa ${esMac ? "Fn Fn" : "Windows + H"}.`;
             estadoLocal();
           },

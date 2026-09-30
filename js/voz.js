@@ -9,7 +9,24 @@ window.Voz = (function () {
   let continuo = false;
   let manejadores = {};
 
-  function soportaReconocimiento() { return !!SR; }
+  /* Motor de reconocimiento:
+     - "navegador": el reconocimiento integrado (Chrome/Edge, Word para la web).
+     - "ia": el oído propio de Romus (escucha.js): graba y transcribe con Gemini/OpenAI/Groq.
+     - "auto": usa el del navegador y, si no existe o falla (Word de escritorio), cambia solo al propio. */
+  let motorActual = "";
+  function cfgVoz() { return (window.Config && Config.get()) || {}; }
+  function oidoPropio() { return window.Escucha && Escucha.disponible(); }
+  function elegirMotor() {
+    const c = cfgVoz();
+    const modo = c.motorVoz || "auto";
+    if (modo === "ia") return oidoPropio() ? "ia" : (SR ? "navegador" : "");
+    if (modo === "navegador") return SR ? "navegador" : "";
+    if (SR && !c.falloNavegador) return "navegador";
+    if (oidoPropio()) return "ia";
+    return SR ? "navegador" : "";
+  }
+
+  function soportaReconocimiento() { return !!SR || !!(window.Escucha && Escucha.disponible()); }
 
   async function asegurarMicrofono() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return true; // lo decide el reconocedor
@@ -30,17 +47,38 @@ window.Voz = (function () {
   }
 
   function iniciar(opciones) {
-    if (!SR) throw new Error("no-soportado");
     detenerEscucha(true);
     manejadores = opciones;
     continuo = !!opciones.continuo;
+    const motor = elegirMotor();
+    if (!motor) throw new Error("no-soportado");
+    motorActual = motor;
+    if (motor === "ia") { iniciarPropio(); return; }
+    iniciarNavegador();
+  }
+
+  function iniciarPropio() {
+    escuchando = true;
+    Escucha.iniciar(Object.assign({}, manejadores, {
+      continuo,
+      estado: (v) => {
+        if (motorActual !== "ia") return;
+        escuchando = v;
+        if (manejadores.estado) manejadores.estado(v);
+      }
+    }));
+  }
+
+  function iniciarNavegador() {
+    let recibioAlgo = false;
     rec = new SR();
-    rec.lang = opciones.idioma || "es-CO";
+    rec.lang = manejadores.idioma || "es-CO";
     rec.interimResults = true;
     rec.continuous = continuo;
     rec.maxAlternatives = 1;
 
     rec.onresult = (e) => {
+      recibioAlgo = true;
       let parcial = "", final = "";
       for (let i = e.resultIndex; i < e.results.length; i++) {
         const t = e.results[i][0].transcript;
@@ -52,13 +90,29 @@ window.Voz = (function () {
     rec.onerror = (e) => {
       if (e.error === "no-speech" && continuo) return; // silencio normal en manos libres
       if (e.error === "aborted") return;
+      // Word de escritorio: el navegador interno no tiene servicio de voz. Se pasa al oído propio sin molestar.
+      const servicioFalla = ["network", "service-not-allowed"].includes(e.error);
+      const bloqueado = ["not-allowed", "audio-capture"].includes(e.error) && oidoPropio(); // el micrófono sí funciona, el servicio del navegador no
+      if ((servicioFalla || bloqueado) && !recibioAlgo && (cfgVoz().motorVoz || "auto") === "auto") {
+        if (window.Config) Config.set({ falloNavegador: true });
+        if (oidoPropio()) {
+          const r = rec; rec = null; motorActual = "ia";
+          try { r.onend = null; r.abort(); } catch (x) { /* nada */ }
+          iniciarPropio();
+          return;
+        }
+        if (manejadores.error) manejadores.error("sin-transcriptor");
+        continuo = false;
+        return;
+      }
       if (manejadores.error) manejadores.error(e.error);
       if (["not-allowed", "service-not-allowed", "network", "audio-capture"].includes(e.error)) {
         continuo = false; // no reintentar si el servicio no está disponible
       }
     };
     rec.onend = () => {
-      if (continuo && escuchando) {
+      if (motorActual !== "navegador") return;
+      if (continuo && escuchando && rec) {
         try { rec.start(); return; } catch (e) { /* cae al cierre */ }
       }
       escuchando = false;
@@ -71,6 +125,9 @@ window.Voz = (function () {
 
   function detenerEscucha(silencioso) {
     continuo = false;
+    const motor = motorActual;
+    motorActual = "";
+    if (motor === "ia" && window.Escucha) Escucha.detener(true);
     if (rec) {
       const r = rec;
       rec = null;
@@ -249,6 +306,7 @@ window.Voz = (function () {
   return {
     soportaReconocimiento, asegurarMicrofono, iniciar, detenerEscucha,
     get escuchando() { return escuchando; },
+    get motor() { return motorActual || elegirMotor(); },
     cargarVoces, elegirVoz,
     get voces() { return voces; },
     setVelocidad(v) { velocidad = Math.min(2, Math.max(0.5, v)); return velocidad; },

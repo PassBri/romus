@@ -13,7 +13,7 @@ window.Config = (function () {
       modelos: ["gpt-5-mini", "gpt-5", "gpt-4.1-mini"], clave: true,
       enlaceClave: "https://platform.openai.com/api-keys", nota: "" },
     { id: "gemini", nombre: "Google Gemini", tipo: "openai", url: "https://generativelanguage.googleapis.com/v1beta/openai",
-      modelos: ["gemini-2.5-flash", "gemini-2.5-pro"], clave: true,
+      modelos: ["gemini-flash-latest", "gemini-2.5-flash", "gemini-pro-latest"], clave: true,
       enlaceClave: "https://aistudio.google.com/apikey", nota: "Tiene un plan gratuito con límites de uso." },
     { id: "groq", nombre: "Groq", tipo: "openai", url: "https://api.groq.com/openai/v1",
       modelos: ["llama-3.3-70b-versatile"], clave: true,
@@ -86,6 +86,8 @@ window.Config = (function () {
   delete cfg.apiKey; delete cfg.modelo;
   // v1.5: Romus queda siempre atento a «Ok Romus» (una sola vez, luego respeta lo que elija el usuario).
   if ((cfg.versionConfig || 0) < 5) { cfg.manosLibres = true; cfg.palabraActivacion = true; cfg.versionConfig = 5; }
+  // v2.2: Romus tiene oído propio; se vuelve a encender «Siempre atento» (antes se apagaba al fallar el micrófono en Word de escritorio).
+  if (cfg.versionConfig < 6) { cfg.manosLibres = true; cfg.falloNavegador = false; cfg.versionConfig = 6; }
   if (!cfg.perfiles.some(p => p.id === cfg.perfilActivo)) cfg.perfilActivo = cfg.perfiles[0].id;
 
   function nuevoPerfil(proveedorId, extra) {

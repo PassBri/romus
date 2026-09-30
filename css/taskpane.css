@@ -256,6 +256,7 @@ textarea::placeholder { color: var(--tenue); }
 .campo input[type=password], .campo input[type=text], .campo select { font: inherit; font-weight: 400; color: var(--texto); background: var(--superficie); border: 1px solid var(--linea-2); border-radius: 6px; padding: 6px 9px; width: 100%; min-width: 0; }
 .campo input:focus, .campo select:focus { outline: none; border-color: var(--acento); box-shadow: 0 0 0 1px var(--acento); }
 .con-boton { display: flex; gap: 6px; }
+#selModelosCargados { margin-top: 6px; font: inherit; font-weight: 400; color: var(--texto); background: var(--superficie); border: 1px solid var(--linea-2); border-radius: 6px; padding: 6px 8px; width: 100%; }
 .fila { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0; }
 .boton { border-radius: 6px; padding: 5px 12px; border: 1px solid var(--linea-2); background: var(--superficie); font-size: 12px; white-space: nowrap; color: var(--texto); }
 .boton:hover { background: var(--hover); }
