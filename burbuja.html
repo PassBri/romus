@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Romus</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <style>
+    :root { --fondo:#f4f8ff; --texto:#1f2328; --texto-2:#5b6370; --boton:#fff; --borde:#dde1e7; --acento:#185abd; }
+    @media (prefers-color-scheme: dark) { :root { --fondo:#0d0f14; --texto:#f0f0f0; --texto-2:#a9b1bd; --boton:#1f242d; --borde:#2f3540; --acento:#6ea3ee; } }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: "Segoe UI", -apple-system, Roboto, sans-serif; color: var(--texto);
+      background: radial-gradient(120% 75% at 50% 35%, color-mix(in srgb, var(--acento) 16%, var(--fondo)) 0%, var(--fondo) 72%);
+      display: flex; flex-direction: column; align-items: center; padding: 10px 14px 12px; gap: 8px; overflow: hidden; user-select: none;
+    }
+    body.noche { --fondo:#fafafa; --texto:#1f2328; --texto-2:#5b6370; --boton:#fff; --borde:#dbe3ef; --acento:#185abd; --rejilla: rgba(24,90,189,.055); background: var(--fondo); }
+    @media (prefers-color-scheme: dark) {
+      body.noche { --fondo:#111317; --texto:#e9f1ff; --texto-2:#8ea3c2; --boton:#1a1d23; --borde:#373c46; --acento:#4f9bff; --rejilla: rgba(0,229,255,.045); }
+      body.noche #sub span.actual { color: #041018; }
+    }
+    body.noche #sub.usuario { color: #c239b3; }
+    
+    canvas { width: min(82vw, 62vh); height: min(82vw, 62vh); flex-shrink: 0; cursor: pointer; }
+    #estado { font-weight: 600; font-size: 14px; text-align: center; min-height: 20px; }
+    #sub { flex: 1; min-height: 0; overflow-y: auto; font-size: 13.5px; line-height: 1.55; text-align: center; color: var(--texto-2); width: 100%; }
+    #sub span { border-radius: 4px; padding: 0 1px; }
+    #sub span.leida { color: var(--texto); }
+    #sub span.actual { background: var(--acento); color: #fff; }
+    #sub.usuario { font-style: italic; color: var(--texto); }
+    .fila { display: flex; gap: 12px; align-items: center; }
+    button { font: inherit; cursor: pointer; }
+    .redondo { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--borde); background: var(--boton); color: var(--texto); display: grid; place-items: center; }
+    .redondo.activo { background: #d13438; border-color: #d13438; color: #fff; }
+    .redondo.cerrar:hover { background: #d13438; color: #fff; border-color: #d13438; }
+    svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .caja { width: 100%; display: flex; gap: 6px; }
+    .caja input { flex: 1; min-width: 0; font: inherit; font-size: 13px; padding: 7px 10px; border-radius: 10px; border: 1px solid var(--borde); background: var(--boton); color: var(--texto); }
+    .pista { font-size: 11px; color: var(--texto-2); text-align: center; }
+  </style>
+</head>
+<body>
+  <canvas id="orbe" title="Romus"></canvas>
+  <div id="estado">Conectando…</div>
+  <div id="sub"></div>
+  <div class="fila">
+    <button id="mic" class="redondo" title="Micrófono" aria-label="Micrófono"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
+    <button id="parar" class="redondo" title="Detener lectura" aria-label="Detener"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg></button>
+    <button id="cerrar" class="redondo cerrar" title="Cerrar burbuja" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="caja"><input id="txt" placeholder="Escribe o dicta un comando…"></div>
+  <div class="pista" id="pista"></div>
+
+  <script src="js/voz.js"></script>
+  <script src="js/orbe.js"></script>
+  <script src="js/romus.js"></script>
+  <script>
+  (function () {
+    const $ = (id) => document.getElementById(id);
+    let apariencia = "romus";
+    let orbe, idioma = "es-CO", estadoPadre = "reposo", bidireccional = false, palabras = [], ultimaTecla = 0, temporizador = null, detenerMedidor = null;
+    const esMac = /Mac/i.test(navigator.platform || navigator.userAgent);
+
+    function enviar(obj) { try { Office.context.ui.messageParent(JSON.stringify(obj)); } catch (e) { /* sin conexión con el panel */ } }
+
+    function subtitulo(texto, quien) {
+      const d = $("sub");
+      d.innerHTML = "";
+      d.className = quien === "usuario" ? "usuario" : "";
+      palabras = texto.split(/\s+/).filter(Boolean);
+      palabras.forEach((p, k) => { const s = document.createElement("span"); s.textContent = p; s.dataset.k = k; d.appendChild(s); d.appendChild(document.createTextNode(" ")); });
+    }
+    function resaltar(k) { $("sub").querySelectorAll("span").forEach(s => { const i = +s.dataset.k; s.className = i < k ? "leida" : i === k ? "actual" : ""; }); }
+
+    function estadoLocal() {
+      if (!bidireccional) {
+        orbe.estado(Voz.escuchando ? "escuchando" : "reposo");
+        $("estado").textContent = Voz.escuchando ? "Di «Ok Romus»" : "Micrófono en pausa";
+      }
+      $("mic").classList.toggle("activo", Voz.escuchando);
+      enviar({ tipo: "escuchando", valor: Voz.escuchando });
+    }
+
+    function escuchar() {
+      if (!Voz.soportaReconocimiento()) { $("txt").focus(); return; }
+      try {
+        Voz.iniciar({
+          idioma, continuo: true,
+          parcial: (t) => { if (estadoPadre === "escuchando" || !bidireccional || /^\s*(ok|okey|oye|hola|hey)?[\s,]*r[oó]m/i.test(t)) { if (estadoPadre !== "hablando") { subtitulo(t.replace(/^\s*(ok\w*|oye|hola|hey)?[\s,]*r\w+[\s,.]*/i, ""), "usuario"); orbe.nivel(0.7); } } },
+          final: (t) => { enviar({ tipo: "comando", texto: t, origen: "voz" }); },
+          error: (e) => {
+            if (e === "no-speech") return;
+            $("pista").innerHTML = `El micrófono no está disponible aquí (${e}). Haz clic en la caja y usa ${esMac ? "Fn Fn" : "Windows + H"}.`;
+            estadoLocal();
+          },
+          estado: estadoLocal
+        });
+      } catch (e) { $("pista").textContent = "No se pudo iniciar el micrófono."; }
+    }
+
+    function alMensaje(arg) {
+      let m; try { m = JSON.parse(arg.message); } catch (e) { return; }
+      if (m.tipo === "config" || m.tipo === "apariencia") {
+        if (m.idioma) idioma = m.idioma;
+        if (m.tipo === "config") bidireccional = true;
+        if (m.apariencia && m.apariencia !== apariencia) {
+          apariencia = m.apariencia;
+          orbe.detener();
+          orbe = crearOrbe($("orbe"), apariencia);
+          orbe.estado(estadoPadre);
+          document.body.classList.toggle("noche", apariencia === "romus");
+        }
+      }
+      else if (m.tipo === "estado") { estadoPadre = m.estado; orbe.estado(m.estado); $("estado").textContent = m.etiqueta; }
+      else if (m.tipo === "subtitulo") subtitulo(m.texto, m.quien);
+      else if (m.tipo === "palabra") resaltar(m.k);
+      else if (m.tipo === "pulso") orbe.pulso();
+      else if (m.tipo === "texto" && (m.quien === "accion" || m.quien === "error")) subtitulo(m.texto, "ia");
+    }
+
+    Office.onReady(async () => {
+      orbe = crearOrbe($("orbe"), apariencia);
+      document.body.classList.toggle("noche", apariencia === "romus");
+      try { Office.context.ui.addHandlerAsync(Office.EventType.DialogParentMessageReceived, alMensaje); } catch (e) { /* DialogApi 1.2 no disponible */ }
+      enviar({ tipo: "lista" });
+      subtitulo("Hola, soy Romus. Di «Ok Romus» y lo que necesitas.");
+      if (Voz.soportaReconocimiento()) {
+        $("pista").textContent = "Di «Ok Romus» y tu orden. Mueve esta ventana donde quieras.";
+        escuchar();
+      } else {
+        $("pista").innerHTML = `Haz clic en la caja y usa ${esMac ? "Fn Fn" : "Windows + H"} para dictar.`;
+      }
+      estadoLocal();
+      detenerMedidor = await Orbe.medirMicrofono((v) => { if (estadoPadre !== "hablando") orbe.nivel(v); });
+    });
+
+    $("orbe").addEventListener("click", () => {
+      if (!Voz.escuchando) escuchar();
+      enviar({ tipo: "despertar" }); // clic en la esfera = «Ok Romus» (y si estaba hablando, lo interrumpe)
+    });
+    $("mic").addEventListener("click", () => { if (Voz.escuchando) Voz.detenerEscucha(false); else escuchar(); });
+    $("parar").addEventListener("click", () => enviar({ tipo: "interrumpir" }));
+    $("cerrar").addEventListener("click", () => { Voz.detenerEscucha(true); if (detenerMedidor) detenerMedidor(); enviar({ tipo: "cerrar" }); });
+
+    const txt = $("txt");
+    function mandarCaja() { clearTimeout(temporizador); const v = txt.value.trim(); txt.value = ""; if (v) { subtitulo(v, "usuario"); enviar({ tipo: "comando", texto: v, origen: "texto" }); } }
+    txt.addEventListener("keydown", (e) => { ultimaTecla = Date.now(); if (e.key === "Enter") { e.preventDefault(); mandarCaja(); } });
+    txt.addEventListener("input", () => {
+      clearTimeout(temporizador);
+      if (Date.now() - ultimaTecla > 1200 && txt.value.trim()) temporizador = setTimeout(mandarCaja, 2800); // dictado del sistema
+    });
+  })();
+  </script>
+</body>
+</html>

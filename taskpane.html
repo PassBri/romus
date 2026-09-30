@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Romus</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <link rel="stylesheet" href="css/taskpane.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Encabezado -->
+    <header class="barra">
+      <div class="marca">
+        <img class="logo-img logo-claro" src="assets/logo/marca-claro-simple.svg" alt="" width="22" height="22"><img class="logo-img logo-oscuro" src="assets/logo/marca-oscuro-simple.svg" alt="" width="22" height="22">
+        <span class="marca-txt">Romus</span>
+      </div>
+      <div class="acciones-barra">
+        <span id="estado" class="estado" title="Estado">Listo</span>
+        <button id="btnModoVoz" class="icono" title="Modo voz a pantalla completa" aria-label="Modo voz">
+          <svg viewBox="0 0 24 24"><path d="M4 9V5h4M20 9V5h-4M4 15v4h4M20 15v4h-4"/><circle cx="12" cy="12" r="3.2"/></svg>
+        </button>
+        <button id="btnAbrirBurbuja" class="icono" title="Burbuja flotante" aria-label="Burbuja flotante">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="15.5" cy="13.5" r="3"/></svg>
+        </button>
+        <button id="btnAyuda" class="icono" title="Qué puedo decir" aria-label="Ayuda">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.2-2.5 3.9"/><circle cx="12" cy="17.2" r=".6" class="relleno"/></svg>
+        </button>
+        <button id="btnAjustes" class="icono" title="Ajustes" aria-label="Ajustes">
+          <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="principal">
+      <div id="avisoFueraWord" class="aviso oculto">
+        Este panel funciona dentro de Microsoft Word. Cárgalo como complemento con el archivo <b>manifest.xml</b>.
+      </div>
+
+      <div id="avisoClave" class="aviso oculto">
+        <div><b>Falta conectar la IA de Romus.</b> La lectura en voz alta ya funciona; para corregir y responder conecta una IA en Ajustes.</div>
+        <button id="btnIrAjustes" class="boton primario">Conectar una IA</button>
+      </div>
+
+      <!-- 01 · Núcleo: Romus vivo -->
+      <section class="nucleo" aria-label="Romus">
+        <div class="escena">
+          <canvas id="orbePanel" class="orbe-panel" title="Romus"></canvas>
+        </div>
+        <div id="micEtiqueta" class="nucleo-estado">Pulsa para hablar</div>
+        <div class="nucleo-info"><span id="roIA">—</span><span class="sep">·</span><span id="roVoz">—</span></div>
+        <div id="transcripcion" class="transcripcion">Prueba: «Ok Romus, corrige la ortografía»</div>
+        <div class="nucleo-controles">
+          <button id="btnMic" class="mic" aria-label="Hablar"><span class="onda"></span><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg><span class="mic-txt">Hablar</span></button>
+          <label class="interruptor pequeno">
+            <input type="checkbox" id="chkManosLibres">
+            <span class="riel"></span>
+            <span>Siempre atento</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Lectura en curso -->
+      <section id="lector" class="tarjeta lector oculto" aria-label="Lectura en voz alta">
+        <div class="seccion-cab">Leyendo<span class="seccion-der" id="lectorPosicion">…</span></div>
+        <div class="lector-barra"><i id="lectorProgreso"></i></div>
+        <div id="lectorTexto" class="subtitulo" aria-live="off"></div>
+        <div class="lector-botones">
+          <button id="btnAnterior" class="icono" title="Párrafo anterior" aria-label="Anterior"><svg viewBox="0 0 24 24"><path d="M6 5v14M18 5l-9 7 9 7z"/></svg></button>
+          <button id="btnPausa" class="icono grande" title="Pausar / continuar" aria-label="Pausar"><svg viewBox="0 0 24 24" id="icoPausa"><path d="M8 5v14M16 5v14"/></svg></button>
+          <button id="btnDetener" class="icono" title="Detener" aria-label="Detener"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg></button>
+          <button id="btnSiguiente" class="icono" title="Párrafo siguiente" aria-label="Siguiente"><svg viewBox="0 0 24 24"><path d="M18 5v14M6 5l9 7-9 7z"/></svg></button>
+        </div>
+        <label class="velocidad"><span>VEL</span><input type="range" id="rngVelocidadLector" min="0.5" max="2" step="0.05"><b id="velValor">1.0×</b></label>
+      </section>
+
+      <!-- Progreso de tareas largas -->
+      <section id="progreso" class="tarjeta progreso oculto" aria-live="polite">
+        <div class="progreso-cabecera">
+          <span id="progresoTexto">Trabajando…</span>
+          <button id="btnCancelar" class="enlace">Cancelar</button>
+        </div>
+        <div class="barra-progreso"><div id="progresoBarra"></div></div>
+      </section>
+
+      <!-- 02 · Telemetría del documento -->
+      <section class="seccion telemetria" aria-label="Documento">
+        <div class="seccion-cab">Documento<button id="btnRefrescar" class="seccion-der enlace-sutil" title="Actualizar">Actualizar</button></div>
+        <div class="metricas">
+          <div class="metrica"><b id="mPalabras">—</b><span>palabras</span></div>
+          <div class="metrica"><b id="mEscucha">—</b><span>min escucha</span></div>
+          <div class="metrica"><b id="mParrafos">—</b><span>párrafos</span></div>
+          <div class="metrica"><b id="mCambios">—</b><span>cambios</span></div>
+        </div>
+        <div class="legibilidad">
+          <div class="leg-cab"><span>Legibilidad</span><b id="mLegTexto">—</b></div>
+          <div class="leg-barra"><i id="mLegRelleno"></i><em id="mLegMarca"></em></div>
+        </div>
+      </section>
+
+      <!-- 03 · Mapa del documento -->
+      <section class="seccion mapa" aria-label="Mapa del documento">
+        <div class="seccion-cab">Estructura<span class="seccion-der" id="mapaSeccion">—</span></div>
+        <div id="mapaDoc" class="mapa-doc"></div>
+        <div id="mapaTip" class="mapa-tip">Toca una barra para ir a ese párrafo</div>
+      </section>
+
+      <!-- 04 · Comandos -->
+      <section class="seccion comandos" aria-label="Acciones">
+        <div class="seccion-cab">Acciones</div>
+        <div class="rapidas">
+          <button class="chip" data-cmd="lee el documento" title="Di: «lee el documento»"><svg viewBox="0 0 24 24"><path d="M4 10v4h3l4 4V6L7 10H4zM15 9a4 4 0 0 1 0 6M17.5 6.5a7.5 7.5 0 0 1 0 11"/></svg><span>Leer</span></button>
+          <button class="chip" data-cmd="lee la selección" title="Di: «lee esto»"><svg viewBox="0 0 24 24"><path d="M4 10v4h3l4 4V6L7 10H4zM15 9a4 4 0 0 1 0 6"/><path d="M19 4v4M17 6h4"/></svg><span>Leer selección</span></button>
+          <button class="chip" data-cmd="corrige la ortografía" title="Di: «corrige esto»"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg><span>Corregir</span></button>
+          <button class="chip" data-cmd="revisa con comentarios" title="Di: «revisa con comentarios»"><svg viewBox="0 0 24 24"><path d="M5 5h14v10H9l-4 4z"/></svg><span>Revisar</span></button>
+          <button class="chip" data-cmd="resume el documento en pocas frases" title="Di: «resume el documento»"><svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h10M5 17h6"/></svg><span>Resumir</span></button>
+          <button class="chip" data-cmd="explícame lo que tengo seleccionado con palabras sencillas" title="Di: «explícame esto»"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span>Explicar</span></button>
+          <button class="chip" data-cmd="reescribe la selección con un lenguaje más sencillo" title="Di: «hazlo más sencillo»"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg><span>Simplificar</span></button>
+          <button class="chip" data-cmd="reescribe la selección con un tono más formal y académico" title="Di: «hazlo más formal»"><svg viewBox="0 0 24 24"><path d="M3 9l9-5 9 5-9 5zM7 11.5V16c3 2 7 2 10 0v-4.5"/></svg><span>Más formal</span></button>
+          <button class="chip" data-cmd="modo dictado" title="Di: «modo dictado»"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 20h14"/></svg><span>Dictar</span></button>
+          <button class="chip" data-cmd="modo voz" title="Di: «modo voz»"><svg viewBox="0 0 24 24"><path d="M4 9V5h4M20 9V5h-4M4 15v4h4M20 15v4h-4"/><circle cx="12" cy="12" r="3.2"/></svg><span>Modo voz</span></button>
+        </div>
+      </section>
+
+      <!-- 05 · Voz de lectura -->
+      <details id="tarjetaVoz" class="seccion tarjeta-voz">
+        <summary class="seccion-cab">Voz de lectura<span id="resumenVoz" class="seccion-der resumen-voz"></span></summary>
+        <div class="voz-cuerpo">
+          <div class="con-boton">
+            <select id="selVoz" aria-label="Voz"></select>
+            <button id="btnProbarVoz" class="icono borde" type="button" title="Escuchar muestra" aria-label="Probar voz">
+              <svg viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z"/></svg>
+            </button>
+          </div>
+          <div class="estilos" id="estilos" role="radiogroup" aria-label="Estilo de voz"></div>
+          <label class="deslizador">
+            <span class="deslizador-cab"><span>Velocidad</span><b id="velAjuste">1.00×</b></span>
+            <input type="range" id="rngVelocidad" min="0.5" max="2" step="0.05">
+            <span class="marcas"><span>Lenta</span><span class="centro" style="left:33.3%">Normal</span><span>Rápida</span></span>
+          </label>
+          <label class="deslizador">
+            <span class="deslizador-cab"><span>Tono</span><b id="tonoValor">Normal</b></span>
+            <input type="range" id="rngTono" min="0.5" max="1.5" step="0.05">
+            <span class="marcas"><span>Grave</span><span class="centro" style="left:50%">Normal</span><span>Agudo</span></span>
+          </label>
+          <p class="nota" id="notaVoz">Los cambios se aplican al instante, incluso mientras lee.</p>
+        </div>
+      </details>
+
+      <!-- 06 · Registro -->
+      <section class="seccion registro" aria-label="Actividad">
+        <div class="seccion-cab">Actividad</div>
+        <section id="conversacion" class="conversacion" aria-live="polite">
+          <div class="mensaje sistema" data-meta="Romus">Di «Ok Romus» y lo que necesitas: «léeme el segundo párrafo», «corrige esto», «pon el título en negrita» o «¿de qué trata el documento?».</div>
+        </section>
+      </section>
+    </main>
+
+    <!-- Barra de comandos -->
+    <footer class="compositor">
+      <div id="avisoModoDictado" class="aviso-modo oculto">
+        <span class="punto-rojo"></span> Dictando: lo que digas se escribe en el documento
+        <button id="btnSalirDictado" class="enlace">Terminar</button>
+      </div>
+      <div id="avisoDictado" class="aviso-dictado oculto"></div>
+      <div class="caja">
+                <textarea id="txtComando" rows="1" placeholder="Escribe o di «Ok Romus»…"></textarea>
+        <button id="btnMicMini" class="mic-mini" aria-label="Hablar" title="Hablar (Ctrl + Espacio)"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
+        <button id="btnEnviar" class="enviar" aria-label="Enviar" title="Enviar (Enter)">
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+      <div class="pie-compositor">
+        <div id="pistaDictado" class="pista"></div>
+        <button id="chipIA" class="chip-ia" title="Cambiar de IA"></button>
+      </div>
+    </footer>
+
+    <!-- Modo voz: orbe de cielo -->
+    <div id="modoVoz" class="modo-voz oculto" role="dialog" aria-label="Modo voz">
+      <div class="mv-arriba">
+        <span class="mv-marca" id="mvMarca">VozDoc IA</span>
+        <span class="mv-derecha">
+        <button id="mvApariencia" class="icono" title="Cambiar apariencia (Romus / Cielo)" aria-label="Cambiar apariencia">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.2"/><circle cx="5" cy="8" r="1"/><circle cx="18" cy="6" r="1"/><circle cx="19" cy="15" r="1"/><circle cx="7" cy="18" r="1"/><circle cx="12" cy="4" r=".8"/></svg>
+        </button>
+        <button id="mvBurbuja" class="icono" title="Pasar a burbuja flotante" aria-label="Burbuja flotante">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="15.5" cy="13.5" r="3"/></svg>
+        </button>
+        </span>
+      </div>
+      <canvas id="orbe" class="orbe" title="Romus"></canvas>
+      <div id="mvEstado" class="mv-estado">Te escucho…</div>
+      <div id="mvSubtitulo" class="subtitulo grande" aria-live="polite"></div>
+      <div class="mv-controles">
+        <button id="mvMic" class="mv-boton" title="Activar o silenciar micrófono" aria-label="Micrófono">
+          <svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>
+        </button>
+        <button id="mvPausa" class="mv-boton oculto" title="Pausar o detener" aria-label="Pausa">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg>
+        </button>
+        <button id="mvCerrar" class="mv-boton cerrar" title="Salir del modo voz" aria-label="Salir">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <p class="mv-pista">Di «Ok Romus» y tu orden: «Ok Romus, lee el documento», «Ok Romus, corrige esto». Para terminar: «gracias, Romus».</p>
+    </div>
+
+    <!-- Ajustes -->
+    <div id="panelAjustes" class="hoja oculto" role="dialog" aria-label="Ajustes">
+      <div class="hoja-cabecera">
+        <h2>Ajustes</h2>
+        <button id="btnCerrarAjustes" class="icono" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
+      <div class="hoja-cuerpo">
+        <h3>Inteligencia artificial</h3>
+        <label class="campo">IA en uso
+          <div class="con-boton">
+            <select id="selPerfil"></select>
+            <button id="btnNuevoPerfil" class="boton secundario" type="button" title="Agregar otra IA">+ Agregar</button>
+          </div>
+          <small>Puedes guardar varias IA y cambiar entre ellas, también por voz: «usa Gemini», «usa la IA local».</small>
+        </label>
+        <div class="tarjeta-perfil">
+          <label class="campo">Proveedor
+            <select id="selProveedor"></select>
+          </label>
+          <p id="notaProveedor" class="nota"></p>
+          <label class="campo">Nombre para reconocerla
+            <input type="text" id="inpNombrePerfil" spellcheck="false">
+          </label>
+          <label class="campo">Dirección de la API
+            <input type="text" id="inpUrl" placeholder="https://.../v1" spellcheck="false" autocomplete="off">
+          </label>
+          <label class="campo" id="campoClave">Clave de API
+            <div class="con-boton">
+              <input type="password" id="inpClave" placeholder="Pega aquí tu clave" autocomplete="off" spellcheck="false">
+              <button id="btnVerClave" class="boton secundario" type="button">Ver</button>
+            </div>
+            <small>Se guarda solo en este equipo. <a id="enlaceClave" href="#" target="_blank" rel="noopener">Obtener una clave</a></small>
+          </label>
+          <label class="campo">Modelo
+            <div class="con-boton">
+              <input type="text" id="inpModelo" list="listaModelos" spellcheck="false" autocomplete="off">
+              <button id="btnCargarModelos" class="boton secundario" type="button">Cargar modelos</button>
+            </div>
+            <datalist id="listaModelos"></datalist>
+            <small id="notaModelos"></small>
+          </label>
+          <label class="interruptor"><input type="checkbox" id="chkModoBasico"><span class="riel"></span><span>Modo básico (para modelos que no manejan herramientas; más lento y menos preciso)</span></label>
+          <div class="fila">
+            <button id="btnProbarClave" class="boton secundario">Probar conexión y corrección</button>
+            <button id="btnEliminarPerfil" class="boton secundario peligro" type="button">Eliminar</button>
+          </div>
+          <p id="resultadoPrueba" class="nota"></p>
+        </div>
+
+        <h3>Apariencia del asistente</h3>
+        <label class="campo">Estilo visual del modo voz y de la burbuja
+          <select id="selApariencia">
+            <option value="romus">Romus: holograma futurista con núcleo dorado</option>
+            <option value="cielo">Cielo: esfera con nubes en movimiento</option>
+          </select>
+          <small>También por voz: «apariencia Romus» o «apariencia cielo».</small>
+        </label>
+
+        <h3>Voz</h3>
+        <label class="campo">Idioma del micrófono
+          <select id="selIdioma"></select>
+        </label>
+        <p class="nota">La voz, el estilo, el tono y la velocidad se cambian en el panel principal, en la tarjeta «Voz de lectura».</p>
+        <label class="interruptor"><input type="checkbox" id="chkPalabraActivacion"><span class="riel"></span><span>Cuando escucha siempre, esperar «Ok Romus» antes de cada orden (recomendado)</span></label>
+        <label class="interruptor"><input type="checkbox" id="chkLeerRespuestas"><span class="riel"></span><span>Leer las respuestas en voz alta</span></label>
+        <label class="interruptor"><input type="checkbox" id="chkAutoenviar"><span class="riel"></span><span>Enviar solo al dictar con el teclado de voz del sistema</span></label>
+
+        <h3>Documento</h3>
+        <label class="interruptor"><input type="checkbox" id="chkControlCambios"><span class="riel"></span><span>Hacer los cambios con control de cambios (recomendado)</span></label>
+        <div class="fila">
+          <button id="btnAceptarTodo" class="boton secundario">Aceptar todos los cambios</button>
+          <button id="btnRechazarTodo" class="boton secundario">Rechazar todos</button>
+        </div>
+        <div class="fila">
+          <button id="btnBorrarHistorial" class="boton secundario">Borrar conversación</button>
+        </div>
+        <p class="nota">Romus para Word v2.1 · Los textos se envían a la IA que elijas solo cuando das un comando que la usa.</p>
+      </div>
+    </div>
+
+    <!-- Ayuda -->
+    <div id="panelAyuda" class="hoja oculto" role="dialog" aria-label="Ayuda">
+      <div class="hoja-cabecera">
+        <h2>Qué puedo decir</h2>
+        <button id="btnCerrarAyuda" class="icono" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
+      <div class="hoja-cuerpo ayuda">
+        <h3>Lectura (sin IA, inmediato)</h3>
+        <ul>
+          <li>«Lee el documento» · «lee la selección» · «lee desde aquí»</li>
+          <li>«Para» / «detente» · «pausa» · «continúa»</li>
+          <li>«Siguiente» · «anterior» · «más rápido» · «más lento»</li>
+        </ul>
+        <h3>Activación</h3>
+        <ul>
+          <li>Di <b>«Ok Romus»</b> (o «Oye Romus», «Hola Romus») y tu orden en la misma frase: «Ok Romus, léeme la conclusión».</li>
+          <li>Si solo dices «Ok Romus», suena un aviso y Romus queda escuchando.</li>
+          <li>Después de responder, sigue atento unos segundos para que continúes sin repetir su nombre.</li>
+          <li>«Gracias, Romus» o «eso es todo» lo pone en espera. «Para», «pausa» y «siguiente» funcionan siempre mientras lee.</li>
+        </ul>
+        <h3>Modos</h3>
+        <ul>
+          <li>«Modo voz» · «abre la burbuja»</li>
+          <li>«Modo dictado»: escribe lo que dices. Di «punto», «coma», «dos puntos», «nuevo párrafo», «abre/cierra interrogación», «abre/cierra comillas», «borra eso» y «termina dictado».</li>
+        </ul>
+        <h3>Voz de lectura</h3>
+        <ul>
+          <li>«Estilo narrador» · «modo calmado» · «voz enérgica» · «lectura rápida» · «estilo natural»</li>
+          <li>«Voz de mujer» · «voz de hombre» · «cambia la voz»</li>
+          <li>«Más grave» · «más aguda» · «tono normal» · «velocidad normal»</li>
+        </ul>
+        <h3>Corrección</h3>
+        <ul>
+          <li>«Corrige la ortografía» (selección o documento completo)</li>
+          <li>«Corrige el documento completo» · «corrige este párrafo»</li>
+          <li>«Revisa con comentarios» · «corrige también el estilo»</li>
+          <li>«Acepta todos los cambios» · «rechaza todos los cambios»</li>
+          <li>«Activa / desactiva el control de cambios»</li>
+        </ul>
+        <h3>Con IA, en lenguaje natural</h3>
+        <ul>
+          <li>«¿De qué trata el documento?» · «resume la introducción»</li>
+          <li>«Explícame este párrafo» · «¿qué dice sobre la evaluación?»</li>
+          <li>«Hazlo más formal» · «simplifica el tercer párrafo»</li>
+          <li>«Cambia "alumnos" por "estudiantes" en todo el documento»</li>
+          <li>«Pon el título en negrita y centrado» · «resalta en amarillo la conclusión»</li>
+          <li>«Escribe una conclusión al final» · «tradúcelo al inglés»</li>
+          <li>«Ve a la conclusión y léela»</li>
+        </ul>
+        <h3>Sin micrófono en el panel</h3>
+        <p>Si el micrófono del panel no funciona en tu Word, pulsa en la caja de texto y usa el dictado del sistema: <b>Windows + H</b> en Windows o <b>Fn Fn</b> en Mac. El comando se envía solo al terminar de hablar.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/voz.js"></script>
+  <script src="js/orbe.js"></script>
+  <script src="js/romus.js"></script>
+  <script src="js/ia.js"></script>
+  <script src="js/documento.js"></script>
+  <script src="js/panel.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
