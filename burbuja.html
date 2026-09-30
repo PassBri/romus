@@ -8,9 +8,13 @@
   <style>
     /* Burbuja transparente: sin tarjeta ni fondo; solo la esfera de Romus flotando y controles de vidrio. */
     :root { --texto:#1b1d21; --texto-2:#5c6370; --vidrio:rgba(255,255,255,.55); --borde:rgba(24,90,189,.18); --acento:#185abd; --magenta:#c239b3; }
-    @media (prefers-color-scheme: dark) { :root { --texto:#eef3ff; --texto-2:#9fb0c8; --vidrio:rgba(26,29,35,.5); --borde:rgba(95,179,255,.22); --acento:#4f9bff; --magenta:#ff3dcb; } }
+    :root[data-tema="oscuro"] { --texto:#eef3ff; --texto-2:#9fb0c8; --vidrio:rgba(26,29,35,.5); --borde:rgba(95,179,255,.22); --acento:#4f9bff; --magenta:#ff3dcb; }
+    :root[data-tema="claro"] { --texto:#1b1d21; --texto-2:#5c6370; --vidrio:rgba(255,255,255,.55); --borde:rgba(24,90,189,.18); --acento:#185abd; --magenta:#c239b3; }
+    @media (prefers-color-scheme: dark) { :root:not([data-tema]) { --texto:#eef3ff; --texto-2:#9fb0c8; --vidrio:rgba(26,29,35,.5); --borde:rgba(95,179,255,.22); --acento:#4f9bff; --magenta:#ff3dcb; } }
     * { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; background: transparent; }
+    /* En oscuro, Word pinta la ventana de blanco si no se le da un fondo: se usa un negro azulado muy sutil. */
+    :root[data-tema="oscuro"], :root[data-tema="oscuro"] body { background: #14161b; }
     body {
       font-family: "Segoe UI Variable Text", "Segoe UI", -apple-system, Roboto, sans-serif; color: var(--texto);
       display: flex; flex-direction: column; align-items: center; padding: 4px 10px 10px; gap: 4px; overflow: hidden; user-select: none;
@@ -108,11 +112,12 @@
 
     function alMensaje(arg) {
       let m; try { m = JSON.parse(arg.message); } catch (e) { return; }
+      if (m.tema) document.documentElement.dataset.tema = m.tema;
       if (m.tipo === "config" || m.tipo === "apariencia") {
         if (m.idioma) idioma = m.idioma;
         if (m.tipo === "config") bidireccional = true;
       }
-      else if (m.tipo === "estado") { estadoPadre = m.estado; orbe.estado(m.estado); $("estado").textContent = m.etiqueta; }
+      else if (m.tipo === "estado") { estadoPadre = m.estado; window.romusHablando = m.estado === "hablando"; orbe.estado(m.estado); $("estado").textContent = m.etiqueta; }
       else if (m.tipo === "subtitulo") subtitulo(m.texto, m.quien);
       else if (m.tipo === "palabra") resaltar(m.k);
       else if (m.tipo === "pulso") orbe.pulso();

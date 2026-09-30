@@ -151,6 +151,27 @@ window.Voz = (function () {
   let pausado = false;
   let alHablar = null;
   let alPalabraGlobal = null;
+  const dichos = []; // lo que Romus dijo hace poco (para reconocer su propio eco)
+
+  const sinTildes = (t) => String(t).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const RELLENO = /^(ok|okey|oye|hola|hey|romus|ramos|romu)$/;
+  /** ¿Lo que se oyó es Romus oyéndose a sí mismo por los parlantes? */
+  function esEco(oido) {
+    const ahora = Date.now();
+    const recientes = dichos.filter(d => ahora - d.t < 90000).map(d => " " + sinTildes(d.texto).replace(/[^a-zñ0-9 ]+/g, " ").replace(/\s+/g, " ") + " ");
+    if (!recientes.length) return false;
+    const palabras = sinTildes(oido).replace(/[^a-zñ0-9 ]+/g, " ").split(/\s+/).filter(w => w && !RELLENO.test(w));
+    if (!palabras.length) return false;
+    const utiles = palabras.filter(w => w.length >= 3);
+    if (!utiles.length) return false;
+    const todo = recientes.join(" ");
+    const presentes = utiles.filter(w => todo.includes(" " + w + " ")).length;
+    const ratio = presentes / utiles.length;
+    if (utiles.length >= 3) return ratio >= 0.85;
+    // Frases cortas: eco solo si aparecen seguidas dentro de lo que Romus dijo («¿qué te parece?»).
+    const frase = " " + palabras.join(" ") + " ";
+    return recientes.some(r => r.includes(frase));
+  }
 
   function cargarVoces() {
     return new Promise((resolve) => {
@@ -245,6 +266,8 @@ window.Voz = (function () {
     if (!sintesis) return false;
     const ficha = fichaCancelacion;
     const trozos = trocear(texto);
+    dichos.push({ t: Date.now(), texto: String(texto) });
+    while (dichos.length > 12) dichos.shift();
     hablando = true;
     if (alHablar) alHablar(true);
     for (let k = 0; k < trozos.length;) {
@@ -316,7 +339,7 @@ window.Voz = (function () {
     setPausa(ms) { pausaMs = Math.max(0, ms); },
     get vozActual() { return vozElegida; },
     aplicarAhora, generoVoz, etiquetaVoz,
-    decir, callar, pausar, reanudar,
+    decir, callar, pausar, reanudar, esEco,
     get hablando() { return hablando; },
     get pausado() { return pausado; },
     setManejadorHablando(fn) { alHablar = fn; },

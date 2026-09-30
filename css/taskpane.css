@@ -304,3 +304,8 @@ textarea::placeholder { color: var(--tenue); }
 @keyframes onda { from { transform: scale(1); opacity: .7; } to { transform: scale(1.15, 1.5); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 @media (max-width: 290px) { .rapidas { grid-template-columns: 1fr; } .metricas { grid-template-columns: 1fr 1fr; row-gap: 10px; } }
+
+/* Botón de tema: luna en claro, sol en oscuro */
+#btnTema .ico-sol { display: none; }
+:root[data-tema="oscuro"] #btnTema .ico-sol { display: block; }
+:root[data-tema="oscuro"] #btnTema .ico-luna { display: none; }

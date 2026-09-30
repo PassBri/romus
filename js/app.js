@@ -413,6 +413,12 @@
   /* ============ Comandos locales (lectura, cambios, ayuda) ============ */
 
   function comandoLocal(n) {
+    // Tema claro / oscuro
+    const mt = n.match(/^((pon|activa|cambia|cambia a|usa|pasa a) )?(el )?(modo|tema) (oscuro|noche|nocturno|claro|dia|diurno)$/);
+    if (mt) return () => {
+      const t = cambiarTema(/^(oscuro|noche|nocturno)$/.test(mt[5]) ? "oscuro" : "claro");
+      agregarMensaje("sistema", t === "oscuro" ? "Modo oscuro activado." : "Modo claro activado.");
+    };
     // Lectura
     let m = n.match(/^(lee|leeme|leer|lea|leelo|leemelo)( (el|la|lo|todo|toda|esto|este|aqui|desde|el cursor|documento|documento completo|texto|seleccion|seleccionado|completo|todo el documento|en voz alta))*$/);
     if (m) {
@@ -477,6 +483,18 @@
     texto = (texto || "").trim();
     if (!texto) return;
     let n = normalizar(texto);
+
+    // Eco: el micrófono oyó a Romus por los parlantes (p. ej. «He añadido un párrafo…»). No es una orden.
+    if ((origen === "voz" || origen === "voz-directa") && Voz.esEco(texto)) {
+      $("transcripcion").textContent = ""; $("transcripcion").classList.remove("viva");
+      return;
+    }
+
+    // Si al pulsar el micrófono igual dijo «Ok Romus, …», se quita el saludo.
+    if (origen === "voz-directa" || origen === "texto") {
+      const w = quitarPalabraActivacion(texto);
+      if (w.desperto && w.resto) { texto = w.resto; n = normalizar(texto); }
+    }
 
     // Palabra de activación: en escucha continua, Romus solo obedece después de «Ok Romus».
     if (origen === "voz" && Config.get().palabraActivacion && !estado.dictado) {
@@ -855,7 +873,7 @@
         let m;
         try { m = JSON.parse(arg.message); } catch (e) { return; }
         if (m.tipo === "lista") {
-          enviarBurbuja({ tipo: "config", idioma: Config.get().idioma, bidireccional: true });
+          enviarBurbuja({ tipo: "config", idioma: Config.get().idioma, tema: temaEfectivo(), bidireccional: true });
           estado.ultimoEstadoOrbe = "";
           sincronizarOrbe();
         } else if (m.tipo === "comando") {
@@ -1125,6 +1143,7 @@
     $("chkManosLibres").checked = c.manosLibres;
     $("chkPalabraActivacion").checked = c.palabraActivacion;
     $("selMotorVoz").value = c.motorVoz || "auto";
+    $("selTema").value = c.tema || "auto";
     pintarNotaMotor();
     Voz.setPausa(c.pausa == null ? 250 : c.pausa);
     cambiarVelocidad(c.velocidad || 1, true);
@@ -1370,6 +1389,8 @@
     $("btnProbarVoz").addEventListener("click", probarVoz);
     $("rngTono").addEventListener("input", (e) => cambiarTono(parseFloat(e.target.value)));
     $("chkLeerRespuestas").addEventListener("change", (e) => Config.set({ leerRespuestas: e.target.checked }));
+    $("btnTema").addEventListener("click", () => cambiarTema(temaEfectivo() === "oscuro" ? "claro" : "oscuro"));
+    $("selTema").addEventListener("change", (e) => cambiarTema(e.target.value));
     $("selMotorVoz").addEventListener("change", (e) => {
       Config.set({ motorVoz: e.target.value, falloNavegador: false });
       pintarNotaMotor();
@@ -1401,7 +1422,22 @@
     });
   }
 
+  function temaEfectivo() { return document.documentElement.dataset.tema === "oscuro" ? "oscuro" : "claro"; }
+
+  function cambiarTema(tema) {
+    Config.set({ tema });
+    aplicarTema();
+    if ($("selTema")) $("selTema").value = tema;
+    return temaEfectivo();
+  }
+
   function aplicarTema() {
+    const elegido = Config.get().tema || "auto";
+    if (elegido === "claro" || elegido === "oscuro") {
+      document.documentElement.dataset.tema = elegido;
+      avisarTema();
+      return;
+    }
     let oscuro = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
     try {
       const tema = Office.context.officeTheme;
@@ -1412,6 +1448,13 @@
       }
     } catch (e) { /* sin tema de Office */ }
     document.documentElement.dataset.tema = oscuro ? "oscuro" : "claro";
+    avisarTema();
+  }
+
+  function avisarTema() {
+    const t = temaEfectivo();
+    if ($("btnTema")) $("btnTema").title = t === "oscuro" ? "Cambiar a modo claro" : "Cambiar a modo oscuro";
+    if (estado.burbuja) enviarBurbuja({ tipo: "tema", tema: t });
   }
 
   async function iniciar(info) {

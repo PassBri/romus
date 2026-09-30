@@ -241,12 +241,20 @@ Reglas:
     return system.map(b => b.text).join("\n\n");
   }
 
+  const ESFUERZO_GEMINI = {}; // modelo → "none" | "low" | "" (sin parámetro), según lo que acepte
+  const ES_RAZONAMIENTO = /reasoning|thinking|budget/i;
+
   function aOpenAI(cuerpo, perfil, prov) {
     const mensajes = [];
     const sis = aTextoSistema(cuerpo.system);
     if (sis) mensajes.push({ role: "system", content: sis });
     (cuerpo.messages || []).forEach(m => mensajes.push({ role: m.role, content: typeof m.content === "string" ? m.content : m.content.map(b => b.text || "").join("\n") }));
     const p = { model: perfil.modelo, messages: mensajes };
+    // Gemini «piensa» antes de responder y eso lo hace lento; para órdenes cortas se le pide razonar lo mínimo.
+    if (prov.id === "gemini") {
+      const r = ESFUERZO_GEMINI[perfil.modelo];
+      if (r !== "") p.reasoning_effort = r || "none";
+    }
     const tope = cuerpo.max_tokens || 8000;
     if (prov.id === "openai") p.max_completion_tokens = tope; else p.max_tokens = tope;
     if (cuerpo.tools) {
@@ -332,6 +340,14 @@ Reglas:
         const j = await pedir(base(perfil.url) + "/chat/completions", { method: "POST", signal, headers: cabeceras(prov, perfil), body: JSON.stringify(aOpenAI(c, perfil, prov)) }, prov, perfil);
         respuesta = desdeOpenAI(j);
       } catch (e) {
+        // Gemini: si el modelo no acepta ese nivel de razonamiento, se prueba el siguiente y se recuerda.
+        if (prov.id === "gemini" && e.status === 400 && ES_RAZONAMIENTO.test(e.detalle || "")) {
+          const actual = ESFUERZO_GEMINI[perfil.modelo];
+          if (actual !== "") {
+            ESFUERZO_GEMINI[perfil.modelo] = actual === "low" ? "" : "low";
+            return llamar(cuerpo, signal, perfilForzado);
+          }
+        }
         // Si el modelo no admite herramientas, se reintenta automáticamente en modo básico.
         if (!basico && cuerpo.tools && e.status === 400 && NO_SOPORTA_HERRAMIENTAS.test(e.detalle || "")) {
           const r = await llamar(cuerpo, signal, Object.assign({}, perfil, { modoBasico: true }));

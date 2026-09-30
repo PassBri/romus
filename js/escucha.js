@@ -10,7 +10,8 @@ window.Escucha = (function () {
   let flujo = null, ctx = null, fuente = null, proc = null;
   let activo = false, continuo = false, op = {};
   let grabando = false, trozos = [], previo = [], silencioMs = 0, vozMs = 0, totalMs = 0, esperaMs = 0;
-  let pisoRuido = 0.006, enviando = 0, ficha = 0, modeloBueno = "";
+  let pisoRuido = 0.006, enviando = 0, ficha = 0, modeloBueno = "", finHabla = 0;
+  const sinPensarOk = {};
 
   /* ---------- ¿Con qué IA se transcribe? ---------- */
   function perfilTranscripcion() {
@@ -68,14 +69,17 @@ window.Escucha = (function () {
     const modelos = [modeloBueno, "gemini-flash-lite-latest", p.modelo, "gemini-flash-latest"].filter((m, i, a) => m && a.indexOf(m) === i);
     let ultimo = null;
     for (const m of modelos) {
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:generateContent`, {
+      const pedir = (sinPensar) => fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:generateContent`, {
         method: "POST",
         headers: { "content-type": "application/json", "x-goog-api-key": p.apiKey },
         body: JSON.stringify({
           contents: [{ role: "user", parts: [{ text: PISTA }, { inline_data: { mime_type: "audio/wav", data: datos } }] }],
-          generationConfig: { temperature: 0, maxOutputTokens: 200 }
+          // Sin «pensar»: transcribir no lo necesita y así responde mucho más rápido.
+          generationConfig: Object.assign({ temperature: 0, maxOutputTokens: 200 }, sinPensar ? { thinkingConfig: { thinkingBudget: 0 } } : {})
         })
       });
+      let r = await pedir(sinPensarOk[m] !== false);
+      if (r.status === 400 && sinPensarOk[m] !== false) { sinPensarOk[m] = false; r = await pedir(false); }
       if (r.ok) {
         modeloBueno = m;
         const j = await r.json();
@@ -125,8 +129,11 @@ window.Escucha = (function () {
 
     // Mientras Romus habla solo se toma en cuenta una voz fuerte y cercana (para decir «Ok Romus, para»),
     // así no se transcribe su propia lectura por los parlantes.
-    const romusHabla = !!(window.Voz && Voz.hablando && !Voz.pausado);
-    const umbral = romusHabla ? Math.max(0.07, pisoRuido * 9) : Math.max(0.015, pisoRuido * 3.2);
+    const hablaAhora = !!((window.Voz && Voz.hablando && !Voz.pausado) || window.romusHablando);
+    if (hablaAhora) finHabla = performance.now();
+    // La cola de su voz (eco de la sala) sigue sonando un momento después de callar.
+    const romusHabla = hablaAhora || performance.now() - finHabla < 700;
+    const umbral = romusHabla ? Math.max(0.12, pisoRuido * 12) : Math.max(0.015, pisoRuido * 3.2);
     const hayVoz = rms > umbral;
     if (!grabando) {
       if (!romusHabla) pisoRuido = pisoRuido * 0.97 + rms * 0.03; // se adapta al ruido del ambiente
@@ -138,7 +145,7 @@ window.Escucha = (function () {
     trozos.push(copia);
     totalMs += ms;
     if (hayVoz) { vozMs += ms; silencioMs = 0; } else silencioMs += ms;
-    if (silencioMs > 850 || totalMs > 14000) terminarFrase();
+    if (silencioMs > 650 || totalMs > 14000) terminarFrase();
   }
 
   function cancelarFrase() { grabando = false; trozos = []; silencioMs = 0; vozMs = 0; totalMs = 0; }
