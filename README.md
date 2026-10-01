@@ -14,7 +14,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, resumir, redact
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-2.2-185abd" alt="versión 2.2">
+  <img src="https://img.shields.io/badge/versión-2.3-185abd" alt="versión 2.3">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -46,6 +46,37 @@ Romus nace como proyecto personal de Brian Gonzalo Suárez Acevedo, docente e in
 | 🌗 | **Modo claro y oscuro**. | «Ok Romus, modo oscuro» |
 
 <p align="center"><img src="assets/capturas/burbuja.png" width="560" alt="Burbuja flotante de Romus en modo claro y oscuro"></p>
+
+## Modo investigación · método Kuetz
+
+Romus acompaña proyectos de investigación y tesis de **pregrado, especialización, maestría, doctorado y posdoctorado**, con enfoque **cuantitativo, cualitativo o mixto**. Todo ocurre dentro de Word y también se puede pedir por voz.
+
+| | Función | Di… |
+|---|---|---|
+| 💡 | **Idear**: lleva una idea a título, problema, tres preguntas posibles, objetivos, enfoque y riesgos. | «Ok Romus, ayúdame a idear un proyecto sobre…» |
+| 🧱 | **Estructura por nivel**: inserta los apartados con títulos navegables. La metodología se ajusta al enfoque y cada apartado trae una guía en comentario. | «Ok Romus, inserta la estructura de la tesis» |
+| 🔗 | **Matriz de coherencia**: revisa la cadena problema → pregunta → objetivos → metodología → resultados y detecta los conceptos del objetivo que la metodología no cubre. | «Ok Romus, revisa la coherencia» |
+| 📚 | **Literatura real**: busca en OpenAlex (más de 250 millones de trabajos), cita en el cursor y agrega la referencia en APA 7 en orden alfabético. Nunca inventa fuentes. | «Ok Romus, busca literatura sobre…» y «cita el uno» |
+| 📊 | **Autoevaluación con rúbrica** por nivel y enfoque. | «Ok Romus, evalúa con la rúbrica» |
+| 🛡️ | **Declaración de uso de IA** con el registro de todo lo que hizo Romus en el documento. | «Ok Romus, declaración de uso de IA» |
+
+**Trust Label.** Cada resultado indica su origen:
+
+- *Basado en tu documento*: Romus comprobó que la evidencia aparece literalmente.
+- *Fuente verificable*: viene de OpenAlex.
+- *Rúbrica Romus*: puntaje calculado por reglas fijas, no por la opinión de la IA.
+- *Inferencia de la IA*: hay que verificarla.
+
+Si la IA dice que algo se cumple pero la evidencia no aparece en el documento, el ítem cuenta solo como parcial.
+
+### Base metodológica
+
+Los criterios, las estructuras y las rúbricas se construyeron a partir de:
+
+- Hernández Sampieri, R., Fernández Collado, C. y Baptista Lucio, M. P. (2014). *Metodología de la investigación* (6.ª ed.). McGraw-Hill.
+- Martínez Miguélez, M. (2004). *Epistemología y metodología cualitativa en las ciencias sociales*. Trillas.
+
+Romus aplica sus conceptos con palabras propias: rutas, alcances, hipótesis y variables, diseños, muestreo, confiabilidad y validez, rigor cualitativo y posicionamiento epistemológico. Las obras no se incluyen en el repositorio.
 
 ## Instalación rápida
 
@@ -119,6 +150,7 @@ romus/
 │   ├── ia.js             conexión con cualquier IA y personalidad de Romus
 │   ├── documento.js      lectura y edición del documento (Word API)
 │   ├── panel.js          estadísticas y estructura del documento
+│   ├── investigacion.js  modo investigación: niveles, coherencia, literatura, rúbrica, Trust Label
 │   ├── romus.js          la esfera holográfica de Romus
 │   ├── orbe.js           medidor del micrófono
 │   └── config.js         ajustes guardados en tu equipo
@@ -140,4 +172,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word · v2.2</sub></p>
+<p align="center"><sub>Romus para Word · v2.3</sub></p>

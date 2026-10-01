@@ -30,6 +30,8 @@ Cómo hablas (esto es lo que más se nota):
 - Para negrita, cursiva, subrayado, resaltado, tamaño o convertir en título usa "dar_formato".
 - Para leer en voz alta una parte concreta del documento usa "leer_parrafos".
 - Nunca inventes información que no esté en el documento; si algo no aparece, dilo.
+- Nunca inventes referencias bibliográficas, autores, años ni DOI. Si piden fuentes, usa la herramienta "investigacion" con accion "literatura".
+- Si el documento es un proyecto de investigación o una tesis, actúa también como asesor metodológico (base: Hernández Sampieri et al., 2014; Martínez Miguélez): orienta, señala vacíos y explica; si te piden redactar un apartado completo, hazlo como borrador para que el autor lo adapte.
 - Puedes llamar varias herramientas en orden si el comando lo requiere.`;
 
   const ESTILOS_RESPUESTA = {
@@ -196,6 +198,18 @@ Reglas:
         type: "object",
         properties: { parrafo_inicio: { type: "integer" }, parrafo_fin: { type: "integer" } },
         required: ["parrafo_inicio"]
+      }
+    },
+    {
+      name: "investigacion",
+      description: "Funciones del modo investigación de Romus. Úsalo cuando pidan: buscar literatura, autores o antecedentes reales (accion=literatura, tema=palabras clave); revisar la coherencia del proyecto (accion=coherencia); evaluar el proyecto con la rúbrica (accion=rubrica); insertar la estructura de la tesis o proyecto (accion=estructura); idear o formular un proyecto a partir de una idea (accion=idear, tema=la idea); o agregar la declaración de uso de IA (accion=declaracion). NUNCA inventes referencias: para fuentes usa accion=literatura.",
+      input_schema: {
+        type: "object",
+        properties: {
+          accion: { type: "string", enum: ["literatura", "coherencia", "rubrica", "estructura", "idear", "declaracion"] },
+          tema: { type: "string" }
+        },
+        required: ["accion"]
       }
     }
   ];
@@ -459,5 +473,5 @@ Reglas:
     return { segundos, total: correcciones.length, validas: validas.length, herramientas: !!llamada };
   }
 
-  return { interpretar, revisarLote, probarConexion, listarModelos };
+  return { interpretar, revisarLote, probarConexion, listarModelos, llamar, herramientasDe: llamadasDeHerramienta, textoLibre };
 })();

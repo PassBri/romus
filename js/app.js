@@ -552,6 +552,8 @@
 
     agregarMensaje("usuario", texto);
     textoOriginalActual = texto;
+    const inv = window.Inv && Inv.comando(n, texto);
+    if (inv) { await inv(); return; }
     const local = comandoLocal(n);
     try {
       if (local) { await local(); return; }
@@ -601,6 +603,7 @@
     for (const { nombre, datos } of llamadas) {
       const r = await ejecutarHerramienta(nombre, datos, sel);
       if (r && r.resumen) resumenes.push(r.resumen);
+      if (window.Inv && nombre !== "investigacion" && nombre !== "leer_parrafos") Inv.registrar({ responder: "Consulta a la IA", corregir: "Corrección", aplicar_correcciones: "Corrección puntual", buscar_y_reemplazar: "Reemplazo", reescribir_parrafos: "Reescritura", insertar_texto: "Redacción de texto", comentar: "Comentarios", dar_formato: "Formato" }[nombre] || nombre, comando, "modelo");
       if (r && r.leer) lecturaPendiente = r.leer;
     }
     estado.historial.push({ role: "user", content: mensajeUsuario });
@@ -612,8 +615,19 @@
 
   async function ejecutarHerramienta(nombre, d, sel) {
     switch (nombre) {
+      case "investigacion": {
+        const a = d.accion;
+        if (a === "literatura") await Inv.literatura(d.tema || "");
+        else if (a === "coherencia") await Inv.coherencia(estado.abort && estado.abort.signal);
+        else if (a === "rubrica") await Inv.evaluarRubrica(estado.abort && estado.abort.signal);
+        else if (a === "estructura") await Inv.insertarEstructura();
+        else if (a === "idear") await Inv.idear(d.tema || "", estado.abort && estado.abort.signal);
+        else if (a === "declaracion") await Inv.declaracion();
+        return { resumen: "Modo investigación: " + a + (d.tema ? " (" + d.tema + ")" : "") };
+      }
       case "responder": {
-        agregarMensaje("ia", d.texto || "");
+        const m = agregarMensaje("ia", d.texto || "");
+        if (window.Inv) m.appendChild(Inv.etiqueta("modelo"));
         hablar(d.texto);
         return { resumen: d.texto };
       }
@@ -1317,7 +1331,12 @@
       if (e.target.checked) empezarEscucha();
     });
 
-    document.querySelectorAll(".chip").forEach(b => b.addEventListener("click", () => manejarComando(b.dataset.cmd, "boton")));
+    document.querySelectorAll(".chip").forEach(b => b.addEventListener("click", () => {
+      if (b.dataset.prefijo) { const t = $("txtComando"); t.value = b.dataset.prefijo; t.focus(); t.setSelectionRange(t.value.length, t.value.length); ajustarAltura(); return; }
+      manejarComando(b.dataset.cmd, "boton");
+    }));
+    $("selNivel").addEventListener("change", (e) => Inv.fijarNivel(e.target.value));
+    $("selEnfoque").addEventListener("change", (e) => Inv.fijarEnfoque(e.target.value));
 
     $("btnPausa").addEventListener("click", alternarPausa);
     $("btnDetener").addEventListener("click", () => detenerLectura(true));
@@ -1502,6 +1521,11 @@
       if (estado.orbePanel && !Voz.hablando) estado.orbePanel.nivel(estado.nivelSintetico);
     }, 150);
     if (window.Panel) Panel.iniciar(estado.enWord);
+    if (window.Inv) {
+      Inv.conectar({ agregarMensaje, hablar, confirmar, ocupar, mostrarError });
+      $("selNivel").value = Inv.nivel().id;
+      $("selEnfoque").value = Inv.enfoque().id;
+    }
     llenarAjustes();
     actualizarAvisoClave();
     conectarEventos();

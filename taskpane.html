@@ -126,6 +126,33 @@
         </div>
       </section>
 
+      <section class="seccion investigacion" aria-label="Investigación">
+        <div class="seccion-cab">Investigación<span class="seccion-der">método Kuetz</span></div>
+        <div class="inv-selectores">
+          <select id="selNivel" title="Nivel del proyecto" aria-label="Nivel">
+            <option value="pregrado">Pregrado</option>
+            <option value="especializacion">Especialización</option>
+            <option value="maestria">Maestría</option>
+            <option value="doctorado">Doctorado</option>
+            <option value="posdoctorado">Posdoctorado</option>
+          </select>
+          <select id="selEnfoque" title="Enfoque (Hernández Sampieri et al., 2014)" aria-label="Enfoque">
+            <option value="cuantitativo">Cuantitativo</option>
+            <option value="cualitativo">Cualitativo</option>
+            <option value="mixto">Mixto</option>
+          </select>
+        </div>
+        <div class="rapidas">
+          <button class="chip" data-prefijo="Ayúdame a idear un proyecto sobre " title="Di: «ayúdame a idear un proyecto sobre…»"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg><span>Idear</span></button>
+          <button class="chip" data-cmd="inserta la estructura" title="Di: «inserta la estructura de la tesis»"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h10M8 15h12M8 20h8"/></svg><span>Estructura</span></button>
+          <button class="chip" data-cmd="revisa la coherencia" title="Di: «revisa la coherencia»"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="12" cy="18" r="2"/><path d="M6.5 10.5l4-3M13.5 7.5l4 3M17.5 13.5l-4 3M10.5 16.5l-4-3"/></svg><span>Coherencia</span></button>
+          <button class="chip" data-prefijo="Busca literatura sobre " title="Di: «busca literatura sobre…»"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M9 7h6M9 11h4"/></svg><span>Literatura</span></button>
+          <button class="chip" data-cmd="evalúa con la rúbrica" title="Di: «evalúa mi proyecto»"><svg viewBox="0 0 24 24"><path d="M5 20V10M10 20V4M15 20v-7M20 20V8"/></svg><span>Rúbrica</span></button>
+          <button class="chip" data-cmd="declaración de uso de IA" title="Di: «declaración de uso de IA»"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Uso de IA</span></button>
+        </div>
+        <div id="invResultado" class="inv-resultado oculto" aria-live="polite"></div>
+      </section>
+
       <!-- 05 · Voz de lectura -->
       <details id="tarjetaVoz" class="seccion tarjeta-voz">
         <summary class="seccion-cab">Voz de lectura<span id="resumenVoz" class="seccion-der resumen-voz"></span></summary>
@@ -307,7 +334,7 @@
         <div class="fila">
           <button id="btnBorrarHistorial" class="boton secundario">Borrar conversación</button>
         </div>
-        <p class="nota">Romus para Word v2.2 · Los textos se envían a la IA que elijas solo cuando das un comando que la usa.</p>
+        <p class="nota">Romus para Word v2.3 · Los textos se envían a la IA que elijas solo cuando das un comando que la usa.</p>
       </div>
     </div>
 
@@ -323,6 +350,14 @@
           <li>«Lee el documento» · «lee la selección» · «lee desde aquí»</li>
           <li>«Para» / «detente» · «pausa» · «continúa»</li>
           <li>«Siguiente» · «anterior» · «más rápido» · «más lento»</li>
+        </ul>
+        <h3>Investigación (método Kuetz)</h3>
+        <ul>
+          <li>«Nivel maestría» · «enfoque cualitativo»</li>
+          <li>«Ayúdame a idear un proyecto sobre…» · «inserta la estructura de la tesis»</li>
+          <li>«Revisa la coherencia» · «evalúa con la rúbrica»</li>
+          <li>«Busca literatura sobre…» y luego «cita el uno» (APA 7, fuentes reales de OpenAlex)</li>
+          <li>«Declaración de uso de IA»</li>
         </ul>
         <h3>Activación</h3>
         <ul>
@@ -374,6 +409,7 @@
   <script src="js/ia.js"></script>
   <script src="js/documento.js"></script>
   <script src="js/panel.js"></script>
+  <script src="js/investigacion.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
