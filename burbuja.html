@@ -6,97 +6,58 @@
   <title>Romus</title>
   <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
   <style>
-    /* Burbuja holográfica. Office no deja que una ventana sea realmente transparente,
-       así que se simula un «vidrio acrílico» (como las ventanas de Windows 11) con profundidad:
-       fondo de vidrio con grano, halo de luz que respira con tu voz, proyector y piso holográfico. */
+    /* Mismo estilo que el modo voz del panel: fondo limpio, la esfera sola, tipografía de Word. */
     :root {
-      --texto:#14171d; --texto-2:#4a5260; --acento:#185abd; --acento-rgb:24,90,189; --magenta:#c239b3; --oro:255,196,60;
-      --vidrio:rgba(255,255,255,.72); --vidrio-borde:rgba(24,90,189,.28); --sombra:0 6px 20px rgba(20,40,80,.14);
-      --fondo-a:#ffffff; --fondo-b:#eef3fb; --fondo-c:#dde6f3; --grano:.05; --rejilla:rgba(24,90,189,.22); --nivel:0;
+      --bg:#fafafa; --superficie:#ffffff; --hover:#f0f2f5; --linea-2:#d4d8de;
+      --texto:#1b1d21; --texto-2:#5c6370; --tenue:#8b919c; --acento:#185abd; --magenta:#b4009e; --error:#c42b1c; --sobre-acento:#fff;
     }
     :root[data-tema="oscuro"] {
-      --texto:#eef4ff; --texto-2:#a9b8d0; --acento:#4f9bff; --acento-rgb:79,155,255; --magenta:#ff3dcb;
-      --vidrio:rgba(18,26,42,.72); --vidrio-borde:rgba(95,179,255,.35); --sombra:0 6px 24px rgba(0,0,0,.45);
-      --fondo-a:#12305e; --fondo-b:#0a1428; --fondo-c:#04060b; --grano:.09; --rejilla:rgba(0,229,255,.28);
+      --bg:#111317; --superficie:#1a1d23; --hover:#262a32; --linea-2:#373c46;
+      --texto:#eceef2; --texto-2:#a4abb8; --tenue:#737b88; --acento:#4f9bff; --magenta:#ef6ad8; --error:#ff7b72; --sobre-acento:#0b1220;
     }
     @media (prefers-color-scheme: dark) { :root:not([data-tema]) {
-      --texto:#eef4ff; --texto-2:#a9b8d0; --acento:#4f9bff; --acento-rgb:79,155,255; --magenta:#ff3dcb;
-      --vidrio:rgba(18,26,42,.72); --vidrio-borde:rgba(95,179,255,.35); --sombra:0 6px 24px rgba(0,0,0,.45);
-      --fondo-a:#12305e; --fondo-b:#0a1428; --fondo-c:#04060b; --grano:.09; --rejilla:rgba(0,229,255,.28);
+      --bg:#111317; --superficie:#1a1d23; --hover:#262a32; --linea-2:#373c46;
+      --texto:#eceef2; --texto-2:#a4abb8; --tenue:#737b88; --acento:#4f9bff; --magenta:#ef6ad8; --error:#ff7b72; --sobre-acento:#0b1220;
     } }
     * { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; }
+    html, body { height: 100%; margin: 0; background: var(--bg); }
     body {
-      font-family: "Segoe UI Variable Text", "Segoe UI", -apple-system, Roboto, sans-serif; color: var(--texto);
-      background: radial-gradient(120% 90% at 50% 34%, var(--fondo-a) 0%, var(--fondo-b) 45%, var(--fondo-c) 100%);
-      display: flex; flex-direction: column; align-items: center; padding: 8px 12px 12px; gap: 6px; overflow: hidden; user-select: none;
-      position: relative; transition: background .4s;
+      font-family: "Segoe UI Variable Text", "Segoe UI", -apple-system, Roboto, sans-serif; font-size: 13px; color: var(--texto);
+      display: flex; flex-direction: column; align-items: center; padding: 8px 16px 14px; gap: 10px; overflow: hidden; user-select: none;
+      -webkit-font-smoothing: antialiased; transition: background .3s;
     }
-    /* Capas de profundidad (detrás de todo) */
-    .capa { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-    #grano { opacity: var(--grano); mix-blend-mode: overlay;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
-    #brillo { background: linear-gradient(160deg, rgba(255,255,255,.18) 0%, transparent 38%, transparent 70%, rgba(255,255,255,.06) 100%); }
-    #piso { top: auto; height: 46%; opacity: .55;
-      background:
-        repeating-linear-gradient(90deg, var(--rejilla) 0 1px, transparent 1px 34px),
-        repeating-linear-gradient(0deg, var(--rejilla) 0 1px, transparent 1px 34px);
-      transform: perspective(260px) rotateX(64deg) scale(2.2); transform-origin: 50% 0%;
-      -webkit-mask-image: radial-gradient(60% 70% at 50% 0%, #000 0%, transparent 75%); mask-image: radial-gradient(60% 70% at 50% 0%, #000 0%, transparent 75%); }
-    #marco { border-radius: 0; box-shadow: inset 0 0 0 1px rgba(var(--acento-rgb),.18), inset 0 0 60px rgba(var(--acento-rgb),.10); }
-
-    .escena { position: relative; z-index: 1; width: min(94vw, 60vh); aspect-ratio: 1; flex-shrink: 0; display: grid; place-items: center; }
-    #halo { position: absolute; inset: 6%; border-radius: 50%;
-      background: radial-gradient(circle, rgba(var(--acento-rgb),.34) 0%, rgba(var(--acento-rgb),.12) 38%, transparent 68%);
-      transform: scale(calc(.92 + var(--nivel) * .22)); filter: blur(6px); transition: transform .12s linear; animation: respirar 5s ease-in-out infinite; }
-    #nucleoLuz { position: absolute; width: 22%; aspect-ratio: 1; border-radius: 50%;
-      background: radial-gradient(circle, rgba(var(--oro),.45) 0%, transparent 70%); filter: blur(4px); opacity: calc(.55 + var(--nivel) * .45); }
-    #proyector { position: absolute; bottom: -4%; width: 62%; height: 12%; border-radius: 50%;
-      background: radial-gradient(ellipse at center, rgba(var(--acento-rgb),.45) 0%, rgba(var(--acento-rgb),.12) 45%, transparent 72%); filter: blur(3px); }
-    #proyector::after { content: ""; position: absolute; left: 18%; right: 18%; top: 38%; height: 24%; border-radius: 50%; border: 1px solid rgba(var(--acento-rgb),.55); }
-    canvas { position: relative; width: 100%; height: 100%; cursor: pointer; background: transparent;
-      filter: drop-shadow(0 0 10px rgba(var(--acento-rgb),.35)); animation: flotar 6s ease-in-out infinite; }
-    @keyframes flotar { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-    @keyframes respirar { 0%,100% { opacity: .85; } 50% { opacity: 1; } }
-
-    .barra { position: absolute; top: 8px; right: 10px; z-index: 2; display: flex; gap: 6px; }
-    #estado { position: relative; z-index: 1; font-size: 11px; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; color: var(--acento); text-align: center; min-height: 16px; margin-top: -2px;
-      text-shadow: 0 0 12px rgba(var(--acento-rgb),.45); }
-    #sub { position: relative; z-index: 1; flex: 0 1 auto; min-height: 1.5em; max-height: 4.5em; overflow: hidden; font-size: 13.5px; line-height: 1.5; text-align: center; color: var(--texto); width: 100%;
-      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
-    #sub span { border-radius: 4px; padding: 0 1px; color: var(--texto-2); transition: color .15s; }
+    .barra { width: 100%; display: flex; justify-content: flex-end; min-height: 28px; }
+    .escena { width: min(84vw, 46vh); aspect-ratio: 1; flex-shrink: 0; }
+    canvas { width: 100%; height: 100%; display: block; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    #estado { font-size: 17px; font-weight: 600; letter-spacing: -.01em; text-align: center; min-height: 24px; }
+    #sub { flex-shrink: 0; max-height: 4.8em; overflow: hidden; font-size: 14px; line-height: 1.6; text-align: center; color: var(--tenue); width: 100%; padding: 0 4px; }
+    #sub span { border-radius: 3px; padding: 0 1px; transition: color .12s, background .12s; }
     #sub span.leida { color: var(--texto); }
-    #sub span.actual { background: var(--acento); color: #fff; }
-    #sub.usuario span { font-style: italic; color: var(--magenta); }
-    .controles { position: relative; z-index: 1; margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
-    .fila { display: flex; gap: 10px; align-items: center; }
+    #sub span.actual { color: var(--sobre-acento); background: var(--acento); }
+    #sub.usuario { font-style: italic; color: var(--magenta); }
+    .controles { margin-top: auto; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .fila { display: flex; gap: 16px; align-items: center; }
     button { font: inherit; cursor: pointer; }
-    .redondo { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--vidrio-borde); background: var(--vidrio); color: var(--texto);
-      display: grid; place-items: center; box-shadow: var(--sombra); backdrop-filter: blur(12px) saturate(1.4); -webkit-backdrop-filter: blur(12px) saturate(1.4);
-      transition: background .15s, color .15s, border-color .15s, box-shadow .15s; }
-    .redondo:hover { border-color: var(--acento); color: var(--acento); box-shadow: var(--sombra), 0 0 0 3px rgba(var(--acento-rgb),.15); }
-    .redondo.activo { background: var(--acento); border-color: var(--acento); color: #fff; box-shadow: 0 0 18px rgba(var(--acento-rgb),.55); }
-    .redondo.cerrar:hover { background: #d13438; color: #fff; border-color: #d13438; }
-    .redondo.chico { width: 30px; height: 30px; box-shadow: none; }
-    .redondo.chico svg { width: 15px; height: 15px; }
-    svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .redondo { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--linea-2); background: var(--superficie); color: var(--texto); display: grid; place-items: center; transition: background .15s, filter .15s; }
+    .redondo:hover { background: var(--hover); }
+    .redondo.activo { background: var(--acento); border-color: var(--acento); color: var(--sobre-acento); }
+    .redondo.cerrar { background: var(--error); border-color: var(--error); color: #fff; }
+    .redondo.cerrar:hover { filter: brightness(.92); }
+    .redondo.chico { width: 30px; height: 30px; border: none; background: transparent; color: var(--texto-2); }
+    .redondo.chico:hover { background: var(--hover); color: var(--texto); }
+    .redondo.chico svg { width: 17px; height: 17px; }
+    svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
     #btnTema .ico-sol { display: none; }
     :root[data-tema="oscuro"] #btnTema .ico-sol { display: block; }
     :root[data-tema="oscuro"] #btnTema .ico-luna { display: none; }
     .caja { width: 100%; display: flex; }
-    .caja input { flex: 1; min-width: 0; font: inherit; font-size: 13px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--vidrio-borde);
-      background: var(--vidrio); color: var(--texto); box-shadow: var(--sombra); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); outline: none; }
-    .caja input:focus { border-color: var(--acento); box-shadow: var(--sombra), 0 0 0 3px rgba(var(--acento-rgb),.15); }
-    .caja input::placeholder { color: var(--texto-2); }
-    .pista { font-size: 11px; color: var(--texto-2); text-align: center; min-height: 14px; }
+    .caja input { flex: 1; min-width: 0; font: inherit; font-size: 13px; padding: 9px 14px; border-radius: 10px; border: 1px solid var(--linea-2); background: var(--superficie); color: var(--texto); outline: none; }
+    .caja input:focus { border-color: var(--acento); }
+    .caja input::placeholder { color: var(--tenue); }
+    .pista { font-size: 11.5px; color: var(--tenue); text-align: center; line-height: 1.5; min-height: 14px; }
   </style>
 </head>
 <body>
-  <div class="capa" id="piso"></div>
-  <div class="capa" id="grano"></div>
-  <div class="capa" id="brillo"></div>
-  <div class="capa" id="marco"></div>
-
   <div class="barra">
     <button id="btnTema" class="redondo chico" title="Modo claro u oscuro" aria-label="Modo claro u oscuro">
       <svg viewBox="0 0 24 24" class="ico-luna"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
@@ -105,9 +66,6 @@
   </div>
 
   <div class="escena">
-    <div id="halo"></div>
-    <div id="proyector"></div>
-    <div id="nucleoLuz"></div>
     <canvas id="orbe" title="Toca la esfera para hablar con Romus"></canvas>
   </div>
   <div id="estado">Conectando…</div>

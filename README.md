@@ -109,7 +109,7 @@ romus/
 ├── manifest.xml          manifiesto del complemento (Word lo carga)
 ├── index.html            página de inicio: descarga tu manifiesto configurado
 ├── taskpane.html         panel de Romus
-├── burbuja.html          burbuja flotante holográfica
+├── burbuja.html          burbuja flotante
 ├── commands.html         archivo técnico que exige Word
 ├── css/taskpane.css      diseño del panel (claro y oscuro)
 ├── js/
