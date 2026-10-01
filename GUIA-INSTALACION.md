@@ -55,9 +55,11 @@ Funciona con una cuenta gratuita de Microsoft y es donde mejor funciona el micr�
 
 ### Opción B. Word de escritorio en Windows
 
-**Primero prueba el camino rápido:** en **Inicio → Complementos → Más complementos**, busca **Mis complementos → Cargar mi complemento**. Si aparece, sigue los pasos 4 a 6 de la Opción A.
+**Lo recomendado: el instalador.** Descarga [Instalar-Romus.exe](https://github.com/PassBri/romus/raw/main/descargas/Instalar-Romus.exe), cierra Word y ábrelo. Romus queda registrado de forma permanente para tu usuario, sin permisos de administrador. Si algún día desaparece, abre el menú Inicio de Windows → **Romus → Reparar Romus**.
 
-**Si no aparece, usa una carpeta compartida:**
+> No uses «Cargar mi complemento» en Word de escritorio: Word puede olvidar el complemento al cerrarse.
+
+**Sin instalador: carpeta compartida (también permanente)**
 
 1. Crea la carpeta `C:\RomusWord` y copia allí tu `manifest.xml`.
 2. Clic derecho sobre la carpeta → **Propiedades** → pestaña **Compartir** → **Compartir…** → elige tu usuario → **Compartir** → **Listo**.

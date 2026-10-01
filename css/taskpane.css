@@ -18,6 +18,7 @@
   --acento-suave: #eef3fb;
   --magenta: #b4009e;
   --oro: #b8860b;
+  --cian: #0078d4;
   --ok: #107c41;
   --error: #c42b1c;
   --sobre-acento: #ffffff;
@@ -41,6 +42,7 @@
   --acento-suave: rgba(79, 155, 255, .12);
   --magenta: #ef6ad8;
   --oro: #e0b04a;
+  --cian: #22d3ee;
   --ok: #54c28a;
   --error: #ff7b72;
   --sobre-acento: #0b1220;
@@ -528,3 +530,20 @@ main > .lector, main > .progreso { position: sticky; top: 0; z-index: 3; box-sha
   .nucleo .nucleo-info, .nucleo .transcripcion { display: none; }
   .nucleo .nucleo-controles { margin-top: 4px; }
 }
+
+/* ---------- v2.9.1 · Estado de Romus de un vistazo ---------- */
+.nucleo { --estado: var(--tenue); }
+.nucleo[data-estado="escuchando"], .modo-voz[data-estado="escuchando"] { --estado: var(--magenta); }
+.nucleo[data-estado="pensando"], .modo-voz[data-estado="pensando"] { --estado: var(--oro); }
+.nucleo[data-estado="hablando"], .modo-voz[data-estado="hablando"] { --estado: var(--cian); }
+.nucleo .nucleo-estado { display: flex; align-items: center; gap: 7px; color: var(--texto); transition: color .25s; }
+.nucleo .nucleo-estado::before { content: ""; width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: var(--estado); box-shadow: 0 0 0 3px color-mix(in srgb, var(--estado) 22%, transparent); transition: background .25s, box-shadow .25s; }
+.nucleo[data-estado="escuchando"] .nucleo-estado::before { animation: latePunto 1s ease-in-out infinite; }
+.nucleo[data-estado="pensando"] .nucleo-estado::before { animation: latePunto .6s ease-in-out infinite; }
+.nucleo:not([data-estado="reposo"]):not([data-estado=""]) .nucleo-estado { color: var(--estado); }
+.nucleo[data-estado="reposo"] .nucleo-estado, .nucleo:not([data-estado]) .nucleo-estado { color: var(--texto); }
+@keyframes latePunto { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--estado) 10%, transparent); } }
+.modo-voz .mv-estado { color: var(--estado, var(--texto)); transition: color .25s; }
+.leyenda-estados { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; margin: 6px 0 4px; padding: 0; list-style: none; }
+.leyenda-estados li { display: flex; align-items: center; gap: 7px; font-size: 12px; }
+.leyenda-estados i { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }

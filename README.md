@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-2.9-185abd" alt="versión 2.9">
+  <img src="https://img.shields.io/badge/versión-2.9.1-185abd" alt="versión 2.9.1">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -46,7 +46,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 
 ## Instalación en 2 minutos
 
-**Windows (Word de escritorio):** descarga **[Instalar-Romus.exe](https://github.com/PassBri/romus/raw/main/descargas/Instalar-Romus.exe)**, cierra Word y ábrelo. Si Windows dice «Windows protegió su PC», pulsa *Más información → Ejecutar de todas formas*: aparece porque el instalador es nuevo y no tiene firma comercial. El instalador no pide permisos de administrador. Registra Romus en Word, limpia la caché de complementos y agrega la guía y un desinstalador al menú Inicio.
+**Windows (Word de escritorio):** descarga **[Instalar-Romus.exe](https://github.com/PassBri/romus/raw/main/descargas/Instalar-Romus.exe)**, cierra Word y ábrelo. Si Windows dice «Windows protegió su PC», pulsa *Más información → Ejecutar de todas formas*: aparece porque el instalador es nuevo y no tiene firma comercial. El instalador no pide permisos de administrador. Registra Romus en Word **de forma permanente** (aparece cada vez que abres Word) y agrega al menú Inicio la guía, **Reparar Romus** y el desinstalador. No cargues el manifiesto a mano con «Cargar mi complemento» en Word de escritorio: Word puede olvidarlo al cerrarse.
 
 **Word para la web o Mac:** descarga tu manifiesto en [passbri.github.io/romus](https://passbri.github.io/romus/) y cárgalo como explica el **[tutorial](https://passbri.github.io/romus/tutorial.html#instalar)**.
 
@@ -287,6 +287,12 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 
 ## Novedades
 
+### v2.9.1 · Romus permanente y estados de un vistazo
+- **Instalación permanente** en Word de escritorio: el instalador registra Romus con el mismo formato que usa Microsoft y pide a Word que lo recargue al abrir. Nuevo acceso **Reparar Romus** en el menú Inicio.
+- **Cada estado tiene su color y su movimiento**: azul tenue que respira (reposo), magenta que late con tu voz (te escucha), dorado que gira (piensa) y cian con ondas (habla). Un punto del mismo color acompaña el estado en el panel y en Ayuda está la leyenda.
+
+<p align="center"><img src="assets/capturas/estados.png" width="900" alt="Estados de Romus: reposo, escucha, piensa y habla, en modo claro y oscuro"></p>
+
 ### v2.9 · Panel más fácil
 - **Tres pestañas**: **Inicio** (hablar, acciones rápidas y conversación), **Investigar** (asesor y herramientas) y **Documento** (estadísticas, estructura y voz de lectura).
 - **Romus siempre a la vista**: la esfera, el estado y el micrófono quedan fijos arriba en todas las pestañas.
@@ -356,4 +362,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word · v2.9</sub></p>
+<p align="center"><sub>Romus para Word · v2.9.1</sub></p>

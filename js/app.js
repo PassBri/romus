@@ -858,6 +858,8 @@
     const [e, etiqueta] = estadoActualOrbe();
     if (estado.orbe) estado.orbe.estado(e);
     if (estado.orbePanel) estado.orbePanel.estado(e);
+    const nuc = document.querySelector(".nucleo"); if (nuc) nuc.dataset.estado = e;
+    if ($("modoVoz")) $("modoVoz").dataset.estado = e;
     if ($("mvEstado")) $("mvEstado").textContent = etiqueta;
     if ($("mvPausa")) $("mvPausa").classList.toggle("oculto", !(Voz.hablando || Voz.pausado));
     const clave = e + "|" + etiqueta;

@@ -138,11 +138,77 @@ window.OrbeRomus = (function () {
       ctx.clearRect(0, 0, W, H);
       ctx.lineCap = "round";
 
+      this._aura(ctx, P, t, dt, "fondo");
       this._hud(ctx, P, t);
       this._malla(ctx, P);
       this._puntos(ctx, P, t);
       this._escaneo(ctx, P, t);
       this._nucleo(ctx, P, t, dt);
+      this._aura(ctx, P, t, dt, "anillo");
+    }
+
+    /* Aura de estado: un color y un movimiento propios para cada estado, legibles de un vistazo.
+       reposo = azul tenue que respira · escuchando = magenta que late con tu voz
+       pensando = dorado que gira · hablando = cian con ondas hacia afuera */
+    _aura(ctx, P, t, dt, capa) {
+      const { cx, cy, R, dpr } = this, e = this.est;
+      const meta = e === "escuchando" ? P.humano : e === "pensando" ? P.oro : e === "hablando" ? P.cian : P.linea;
+      if (capa === "fondo") {
+        if (!this.colAura) this.colAura = meta.slice();
+        const k = Math.min(1, dt * 6);
+        for (let i = 0; i < 3; i++) this.colAura[i] += (meta[i] - this.colAura[i]) * k;
+        this.fuerzaAura = (this.fuerzaAura || 0) + (((e === "reposo") ? 0 : 1) - (this.fuerzaAura || 0)) * Math.min(1, dt * 4);
+      }
+      const c = this.colAura.map(Math.round), f = this.fuerzaAura, oscuro = this.tema === "oscuro";
+      const rr = R * 1.3;
+      if (capa === "fondo") {
+        // resplandor detrás de la esfera, del color del estado
+        const g = ctx.createRadialGradient(cx, cy, R * 0.55, cx, cy, R * 1.5);
+        g.addColorStop(0, rgba(c, 0));
+        g.addColorStop(0.6, rgba(c, (oscuro ? 0.1 : 0.06) + f * (oscuro ? 0.16 : 0.12)));
+        g.addColorStop(1, rgba(c, 0));
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(cx, cy, R * 1.5, 0, TAU); ctx.fill();
+        return;
+      }
+      ctx.save();
+      if (e === "escuchando") {
+        const n = this.nivelAct;
+        ctx.lineWidth = (1.8 + n * 3.2) * dpr;
+        ctx.strokeStyle = rgba(c, 0.9);
+        ctx.beginPath(); ctx.arc(cx, cy, rr, 0, TAU); ctx.stroke();
+        ctx.lineWidth = 1.2 * dpr;
+        ctx.strokeStyle = rgba(c, 0.25 + n * 0.5);
+        ctx.beginPath(); ctx.arc(cx, cy, rr + R * (0.05 + n * 0.12), 0, TAU); ctx.stroke();
+      } else if (e === "pensando") {
+        ctx.lineWidth = 1.2 * dpr;
+        ctx.strokeStyle = rgba(c, 0.2);
+        ctx.beginPath(); ctx.arc(cx, cy, rr, 0, TAU); ctx.stroke();
+        const a0 = t * 4.2;
+        for (let k = 0; k < 6; k++) { // cometa que gira con estela
+          ctx.lineWidth = (2.8 - k * 0.35) * dpr;
+          ctx.strokeStyle = rgba(c, 0.95 - k * 0.15);
+          ctx.beginPath(); ctx.arc(cx, cy, rr, a0 - (k + 1) * 0.16, a0 - k * 0.16); ctx.stroke();
+        }
+        ctx.lineWidth = 2 * dpr;
+        ctx.strokeStyle = rgba(c, 0.55);
+        ctx.beginPath(); ctx.arc(cx, cy, rr, a0 + Math.PI - 0.5, a0 + Math.PI); ctx.stroke();
+      } else if (e === "hablando") {
+        ctx.lineWidth = (1.8 + this.pulsoAct * 1.5) * dpr;
+        ctx.strokeStyle = rgba(c, 0.85);
+        ctx.beginPath(); ctx.arc(cx, cy, rr, 0, TAU); ctx.stroke();
+        for (let k = 0; k < 2; k++) { // ondas que salen, como la voz
+          const fase = ((t / 0.9) + k * 0.5) % 1;
+          ctx.lineWidth = 1.4 * dpr * (1 - fase);
+          ctx.strokeStyle = rgba(c, 0.6 * (1 - fase));
+          ctx.beginPath(); ctx.arc(cx, cy, rr + fase * R * 0.22, 0, TAU); ctx.stroke();
+        }
+      } else {
+        ctx.lineWidth = 1.1 * dpr;
+        ctx.strokeStyle = rgba(c, (oscuro ? 0.3 : 0.24) + Math.sin(t * 1.0) * 0.06);
+        ctx.beginPath(); ctx.arc(cx, cy, rr * (1 + Math.sin(t * 1.0) * 0.012), 0, TAU); ctx.stroke();
+      }
+      ctx.restore();
     }
 
     /* Anillos de interfaz: arcos segmentados, marcas y ecualizador de voz */

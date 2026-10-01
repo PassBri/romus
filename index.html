@@ -38,23 +38,24 @@
 
   <section>
     <h2>Windows: instalador en un clic</h2>
-    <p style="margin:0 0 14px">Cierra Word, descarga el instalador y ábrelo. Registra Romus en Word y agrega la guía al menú Inicio.</p>
+    <p style="margin:0 0 14px">Cierra Word, descarga el instalador y ábrelo. Romus queda <b>instalado de forma permanente</b>: aparece en la pestaña Inicio cada vez que abres Word.</p>
     <a class="boton" href="https://github.com/PassBri/romus/raw/main/descargas/Instalar-Romus.exe">⬇ Descargar Instalar-Romus.exe</a>
-    <p class="nota">¿Primera vez? Lee el <a href="tutorial.html">tutorial paso a paso</a>.</p>
+    <p class="nota">En Word de escritorio usa siempre el instalador. Si cargas el manifiesto a mano con «Cargar mi complemento», Word puede olvidarlo al cerrarse. ¿Primera vez? Lee el <a href="tutorial.html">tutorial paso a paso</a>.</p>
   </section>
 
   <section>
-    <h2>1. Descarga tu manifiesto (Word para la web o Mac)</h2>
+    <h2>Otra opción: Word para la web o Mac</h2>
+    <h3 style="margin:0 0 8px">1. Descarga tu manifiesto</h3>
     <p style="margin:0 0 14px">Este botón crea el archivo <code>manifest.xml</code> con la dirección de esta página, listo para cargar en Word. No tienes que editar nada.</p>
     <button class="boton" id="btnManifiesto">Descargar mi manifest.xml</button>
     <p class="nota" id="notaManifiesto">Dirección detectada: <span id="base">…</span></p>
   </section>
 
   <section>
-    <h2>2. Cárgalo en Word</h2>
+    <h3 style="margin:0 0 8px">2. Cárgalo en Word</h3>
     <ol>
-      <li><b>Word para la web</b> (office.com): abre un documento → <b>Inicio → Complementos → Más complementos → Mis complementos → Cargar mi complemento</b> → elige el archivo → <b>Cargar</b>.</li>
-      <li><b>Word de escritorio (Windows o Mac)</b>: sigue la guía <code>GUIA-INSTALACION.md</code> del repositorio.</li>
+      <li><b>Word para la web</b> (office.com): abre un documento → <b>Inicio → Complementos → Más complementos → Mis complementos → Cargar mi complemento</b> → elige el archivo → <b>Cargar</b>. Queda guardado en ese navegador: si borras sus datos o usas otro navegador, cárgalo de nuevo.</li>
+      <li><b>Word de escritorio en Windows</b>: usa el instalador de arriba. <b>En Mac</b>: copia el manifiesto en <code>~/Library/Containers/com.microsoft.Word/Data/Documents/wef</code> (crea la carpeta si no existe); así queda permanente.</li>
     </ol>
   </section>
 
@@ -63,7 +64,7 @@
     <p style="margin:0">Pulsa <b>Romus</b> en la pestaña <b>Inicio</b>, abre <b>Ajustes</b> (ícono de controles, arriba a la derecha) → <b>+ Agregar</b>, elige tu IA (Claude, ChatGPT, Gemini, una IA local…), pega la clave y pulsa <b>Probar conexión y corrección</b>.</p>
   </section>
 
-  <footer>Romus para Word v2.9 · Brian Gonzalo Suárez Acevedo</footer>
+  <footer>Romus para Word v2.9.1 · Brian Gonzalo Suárez Acevedo</footer>
 </main>
 <script>
   // Carpeta donde está publicada esta página (por ejemplo https://usuario.github.io/romus)
