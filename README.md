@@ -16,7 +16,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-2.4-185abd" alt="versión 2.4">
+  <img src="https://img.shields.io/badge/versión-2.5-185abd" alt="versión 2.5">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -80,12 +80,22 @@ Cuando tengas una duda de metodología, pregúntale a Romus. Responde con su **g
 - **«Revisar mi documento con esto»** aplica el tema que estás leyendo a tu proyecto.
 - **El tutorial** recorre el proceso completo según tu enfoque: 22 pasos en el cuantitativo, 20 en el cualitativo y 21 en el mixto. Cada paso trae un botón para actuar sobre tu documento.
 
+### Teoría · biblioteca de Brian Suárez
+
+El botón **Teoría** abre el libro *Teoría: conocimiento científico* (Suárez Acevedo, 2025), incluido en Romus con autorización del autor. Tiene dos partes:
+
+- **Elementos del conocimiento** (32 temas del capítulo 2): axiomas, postulados, definiciones, corolarios, simulaciones, paradojas, teoremas, tesis, hipótesis, constructos, modelos, teorías, leyes, metateorías, paradigmas, supuestos, inferencias, principios, proposiciones, conceptos, problema científico, enunciados, argumentos, premisas, fenómeno, variables, operacionalización, indicadores, observación y razonamientos lógicos. Cada uno incluye su definición, características, tipos, cómo se construye, sus partes, un ejemplo y ejemplos por nivel académico.
+- **Modelos del autor:** ciclo vital del ecosistema cognitivo, ecosistema multicognitivo, Modelo Integrado de Construcción de Conocimiento (MICC), modelo Cebolla, bosques cognitivos interconectados, niveles de complejidad y cognición sintética evolutiva.
+
+**Constructor teórico.** Romus sigue los pasos y las partes que define el libro para construir el elemento a la medida de tu proyecto. Por ejemplo: «Ok Romus, ayúdame a construir un axioma para mi tesis», «formula un constructo sobre la motivación» o «crea un postulado». Luego lo insertas en el documento con un clic.
+
 **Trust Label.** Cada resultado indica su origen:
 
 - *Basado en tu documento*: Romus comprobó que la evidencia aparece literalmente.
 - *Fuente verificable*: viene de OpenAlex.
 - *Rúbrica Romus*: puntaje calculado por reglas fijas, no por la opinión de la IA.
 - *Guía Romus*: viene de la guía metodológica, con el capítulo de referencia.
+- *Teoría · Suárez (2025)*: viene del libro de Brian Suárez, con la sección.
 - *Inferencia de la IA*: hay que verificarla.
 
 Si la IA dice que algo se cumple pero la evidencia no aparece en el documento, el ítem cuenta solo como parcial.
@@ -96,6 +106,7 @@ Los criterios, las estructuras y las rúbricas se construyeron a partir de:
 
 - Hernández Sampieri, R., Fernández Collado, C. y Baptista Lucio, M. P. (2014). *Metodología de la investigación* (6.ª ed.). McGraw-Hill.
 - Martínez Miguélez, M. (2004). *Epistemología y metodología cualitativa en las ciencias sociales*. Trillas.
+- Suárez Acevedo, B. G. (2025). *Teoría: conocimiento científico* (2.ª ed.). RouteToTop. Se incluye en Romus con autorización del autor.
 
 Romus aplica sus conceptos con palabras propias: rutas, alcances, hipótesis y variables, diseños, muestreo, confiabilidad y validez, rigor cualitativo y posicionamiento epistemológico. La guía está escrita con palabras propias en `js/guia.js` y remite al capítulo correspondiente. Las obras no se incluyen en el repositorio porque tienen derechos de autor. Para profundizar, consulta los libros.
 
@@ -123,6 +134,7 @@ Con **Siempre atento** activado, empieza cada orden con «Ok Romus». Después d
 | Editar | «resume la introducción», «simplifica este párrafo», «tradúcelo al inglés» |
 | Escribir | «modo dictado» (y luego «termina dictado») |
 | Cambiar de IA | «usa Gemini», «usa Claude», «usa la IA local» |
+| Teoría (Brian Suárez) | «abre la teoría», «¿qué es un postulado?», «¿qué es el MICC?», «ayúdame a construir un axioma para mi tesis» |
 | Resolver dudas | «¿qué es…?», «¿cómo hago…?», «abre la guía», «modo tutorial», «siguiente paso» |
 | Investigar | «nivel maestría», «enfoque cualitativo», «ayúdame a idear un proyecto sobre…», «inserta la estructura», «revisa la coherencia», «busca literatura sobre…», «cita el uno», «evalúa con la rúbrica», «declaración de uso de IA» |
 | Ajustar cómo habla | «habla más formal», «sé breve», «a partir de ahora trátame de usted» |
@@ -175,6 +187,7 @@ romus/
 │   ├── panel.js          estadísticas y estructura del documento
 │   ├── investigacion.js  modo investigación: niveles, coherencia, literatura, rúbrica, Trust Label, tutorial
 │   ├── guia.js           guía metodológica: 32 temas, buscador y rutas del tutorial
+│   ├── teoria.js         biblioteca «Teoría: conocimiento científico» (Suárez, 2025): 39 temas
 │   ├── romus.js          la esfera holográfica de Romus
 │   ├── orbe.js           medidor del micrófono
 │   └── config.js         ajustes guardados en tu equipo
@@ -190,6 +203,11 @@ Todo es HTML, CSS y JavaScript puro: no hace falta compilar nada. Para publicar 
 Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canvas 2D · APIs de Anthropic, OpenAI y Gemini, más cualquier API compatible con OpenAI · GitHub Pages.
 
 ## Novedades
+
+### v2.5 · Teoría de Brian Suárez
+- Nueva biblioteca **Teoría** con 32 elementos del conocimiento y 7 modelos del autor (MICC, Cebolla, bosques cognitivos…).
+- **Constructor teórico**: axiomas, postulados, constructos, modelos y más, construidos para tu proyecto según los pasos del libro.
+- Las dudas por voz buscan a la vez en la guía metodológica y en la Teoría.
 
 ### v2.4 · Guía metodológica y modo tutorial
 - **Guía** con 32 temas en 7 categorías, redactada a partir de Hernández Sampieri et al. (2014) y Martínez Miguélez (2004), con capítulo de referencia.
@@ -224,4 +242,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word · v2.4</sub></p>
+<p align="center"><sub>Romus para Word · v2.5</sub></p>

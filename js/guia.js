@@ -258,7 +258,10 @@ window.Guia = (function () {
   /* ---------- Búsqueda ---------- */
   const norm = (t) => String(t || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9ñ ]+/g, " ").replace(/\s+/g, " ").trim();
   const VACIAS = new Set("que es son como se hace hago una uno unos unas el la los las de del al en y o a para por con sin sobre mi mis tu su sus me te lo le les esto este esta eso cual cuales cuando donde quien explica explicame dime ayuda ayudame guia tutorial significa significan sirve hacer hacerlo redacto redactar formulo formular escribo escribir elijo elegir defino definir calculo calcular diferencia entre tipos tipo romus ok porfa favor por favor quiero saber necesito".split(" "));
-  const INDICE = TEMAS.map(t => ({ t, frases: [norm(t.titulo)].concat(t.claves.map(norm)), texto: " " + norm([t.titulo, t.claves.join(" "), t.resumen, t.puntos.join(" ")].join(" ")) + " " }));
+  const indexar = (t) => ({ t, frases: [norm(t.titulo)].concat(t.claves.map(norm)), texto: " " + norm([t.titulo, t.claves.join(" "), t.resumen, t.puntos.join(" "), (t.tipos || []).join(" ")].join(" ")) + " " });
+  let INDICE = TEMAS.map(indexar);
+  /** Agrega temas de otra biblioteca (por ejemplo, la Teoría de Brian Suárez). */
+  function agregar(temas) { temas.forEach(t => { if (!TEMAS.some(x => x.id === t.id)) { TEMAS.push(t); INDICE.push(indexar(t)); } }); }
   const raiz = (w) => w.length > 6 ? w.slice(0, w.length - 2) : w;
 
   /** Devuelve [{t, puntos}] ordenados por relevancia. */
@@ -283,8 +286,10 @@ window.Guia = (function () {
 
   /** Texto plano de un tema (para la IA o para leer en voz alta). */
   function textoPlano(t) {
-    return `${t.titulo}\n${t.resumen}\n- ${t.puntos.join("\n- ")}\nEjemplo: ${t.ejemplo}\nError frecuente: ${t.error}\nFuente: ${t.fuente}`;
+    const lista = (nombre, xs) => xs && xs.length ? `\n${nombre}:\n- ${xs.join("\n- ")}` : "";
+    return `${t.titulo}\n${t.resumen}${lista("Puntos clave", t.puntos)}${lista("Tipos", t.tipos)}${lista("Cómo se construye", t.pasos)}${lista("Partes", t.partes)}${lista("Ejemplos por nivel", t.niveles)}` +
+      (t.ejemplo ? `\nEjemplo: ${t.ejemplo}` : "") + (t.error ? `\nError frecuente: ${t.error}` : "") + `\nFuente: ${t.fuente}`;
   }
 
-  return { TEMAS, RUTAS, buscar, tema, categorias, textoPlano, norm };
+  return { TEMAS, RUTAS, buscar, tema, categorias, textoPlano, norm, agregar };
 })();

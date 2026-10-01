@@ -8,6 +8,7 @@
    - Trust Label en cada resultado y registro de uso de IA para la declaración del documento. */
 window.Inv = (function () {
   const $ = (id) => document.getElementById(id);
+  if (window.TEORIA && window.Guia) Guia.agregar(window.TEORIA); // biblioteca «Teoría» de Brian Suárez
   let ui = {}; // funciones del panel: agregarMensaje, hablar, confirmar, ocupar, mostrarError
 
   /* ================= Niveles y estructuras ================= */
@@ -166,7 +167,8 @@ window.Inv = (function () {
     rubrica: { txt: "Rúbrica Romus · puntaje por reglas", cls: "rubrica" },
     modelo: { txt: "Inferencia de la IA · verifícala", cls: "modelo" },
     plantilla: { txt: "Plantilla del nivel", cls: "rubrica" },
-    guia: { txt: "Guía Romus", cls: "guia" }
+    guia: { txt: "Guía Romus", cls: "guia" },
+    teoria: { txt: "Teoría · Suárez (2025)", cls: "teoria" }
   };
   function etiqueta(origen, extra) {
     const o = ORIGENES[origen] || ORIGENES.modelo;
@@ -178,6 +180,7 @@ window.Inv = (function () {
       fuente: "Dato tomado de una base académica abierta (OpenAlex). Revisa el formato de los nombres.",
       rubrica: "Calculado con criterios fijos, no por la opinión de la IA.",
       modelo: "Propuesta generada por la IA. No está comprobada en tu documento ni en fuentes: revísala.",
+      teoria: "Contenido del libro «Teoría: conocimiento científico» de Brian Gonzalo Suárez Acevedo (2025).",
       guia: "Explicación de la guía metodológica de Romus, redactada a partir de Hernández Sampieri et al. (2014) y Martínez Miguélez (2004)."
     }[o.cls] || "";
     return s;
@@ -772,7 +775,9 @@ Reglas:
   /** Tarjeta de un tema de la guía. ruta/paso: si viene del tutorial. */
   function mostrarTema(t, ruta, paso, hablarlo) {
     const c = el("div", "inv-cuerpo guia");
-    c.appendChild(etiqueta("guia", t.fuente));
+    const esTeoria = /^Teoría/.test(t.cat);
+    c.appendChild(etiqueta(esTeoria ? "teoria" : "guia", esTeoria ? t.fuente.replace(/^.*?, (?=§|Cap|Ecos)/, "") : t.fuente));
+    if (t.complejidad) c.appendChild(el("span", "guia-nivel", "Nivel de complejidad: " + t.complejidad));
     if (ruta) {
       const total = Guia.RUTAS[ruta].length;
       const prog = el("div", "guia-progreso");
@@ -781,11 +786,22 @@ Reglas:
       c.appendChild(prog);
     }
     c.appendChild(el("p", "guia-resumen", t.resumen));
-    const ul = el("ul", "guia-puntos"); t.puntos.forEach(x => ul.appendChild(el("li", "", x))); c.appendChild(ul);
-    const ej = el("div", "guia-caja ejemplo"); ej.appendChild(el("b", "", "Ejemplo")); ej.appendChild(el("span", "", t.ejemplo)); c.appendChild(ej);
-    const er = el("div", "guia-caja error"); er.appendChild(el("b", "", "Error frecuente")); er.appendChild(el("span", "", t.error)); c.appendChild(er);
+    if (t.puntos && t.puntos.length) { const ul = el("ul", "guia-puntos"); t.puntos.forEach(x => ul.appendChild(el("li", "", x))); c.appendChild(ul); }
+    const desplegable = (titulo, xs, ordenada, abierto) => {
+      if (!xs || !xs.length) return;
+      const d = el("details", "guia-mas"); if (abierto) d.open = true;
+      d.appendChild(el("summary", "", titulo));
+      const l = el(ordenada ? "ol" : "ul", "guia-puntos"); xs.forEach(x => l.appendChild(el("li", "", x))); d.appendChild(l);
+      c.appendChild(d);
+    };
+    desplegable("Tipos", t.tipos);
+    desplegable("Cómo se construye", t.pasos, true, esTeoria);
+    desplegable("Partes", t.partes, true);
+    desplegable("Ejemplos por nivel académico", t.niveles);
+    if (t.ejemplo) { const ej = el("div", "guia-caja ejemplo"); ej.appendChild(el("b", "", "Ejemplo")); ej.appendChild(el("span", "", t.ejemplo)); c.appendChild(ej); }
+    if (t.error) { const er = el("div", "guia-caja error"); er.appendChild(el("b", "", "Error frecuente")); er.appendChild(el("span", "", t.error)); c.appendChild(er); }
     const acc = el("div", "inv-acciones");
-    const bEsc = el("button", "boton secundario", "Escuchar"); bEsc.onclick = () => ui.hablar(`${t.titulo}. ${t.resumen} ${t.puntos.join(" ")}`);
+    const bEsc = el("button", "boton secundario", "Escuchar"); bEsc.onclick = () => ui.hablar(`${t.titulo}. ${t.resumen} ${(t.puntos || []).join(" ")}`);
     acc.appendChild(bEsc);
     if (!Config.faltaClave()) {
       const bAp = el("button", "boton secundario", "Revisar mi documento con esto");
@@ -793,6 +809,11 @@ Reglas:
       acc.appendChild(bAp);
     }
     const bx = botonAccion(t); if (bx) acc.appendChild(bx);
+    if (esTeoria && ((t.pasos && t.pasos.length) || (t.partes && t.partes.length)) && !Config.faltaClave()) {
+      const bc = el("button", "boton primario", "Construir uno para mi proyecto");
+      bc.onclick = () => ejecutar(() => construir(t, ""));
+      acc.appendChild(bc);
+    }
     c.appendChild(acc);
     if (ruta) {
       const nav = el("div", "inv-acciones guia-nav");
@@ -813,23 +834,26 @@ Reglas:
   }
 
   /** Índice de la guía con buscador. */
-  function indiceGuia() {
+  function indiceGuia(soloTeoria) {
     const c = el("div", "inv-cuerpo guia");
-    c.appendChild(el("p", "inv-nota", "Guía metodológica de Romus, redactada a partir de Hernández Sampieri et al. (2014) y Martínez Miguélez (2004). Pregunta con la voz («Ok Romus, ¿qué es la saturación?») o elige un tema."));
+    c.appendChild(el("p", "inv-nota", soloTeoria
+      ? "«Teoría: conocimiento científico» de Brian Gonzalo Suárez Acevedo (2025): los elementos con los que se construye el conocimiento (axiomas, postulados, constructos, modelos, teorías…) y los modelos del autor. Pregunta («Ok Romus, ¿qué es un postulado?») o pide «ayúdame a construir un axioma para mi tesis»."
+      : "Guía metodológica de Romus, redactada a partir de Hernández Sampieri et al. (2014) y Martínez Miguélez (2004), más la Teoría de Brian Suárez. Pregunta con la voz («Ok Romus, ¿qué es la saturación?») o elige un tema."));
     const fila = el("div", "guia-buscar");
     const inp = el("input"); inp.placeholder = "¿Qué quieres saber? Ej.: tipos de muestreo";
     const b = el("button", "boton primario", "Buscar");
     const ir = () => { const v = inp.value.trim(); if (v) ejecutar(() => preguntar(v)); };
     b.onclick = ir; inp.onkeydown = (e) => { if (e.key === "Enter") ir(); };
     fila.append(inp, b); c.appendChild(fila);
-    const tut = el("button", "boton secundario", `▶ Tutorial paso a paso (${enfoque().nombre.toLowerCase()})`); tut.onclick = () => iniciarTutorial(); c.appendChild(tut);
-    Guia.categorias().forEach(cat => {
+    if (!soloTeoria) { const tut = el("button", "boton secundario", `▶ Tutorial paso a paso (${enfoque().nombre.toLowerCase()})`); tut.onclick = () => iniciarTutorial(); c.appendChild(tut); }
+    Guia.categorias().filter(cat => !soloTeoria || /^Teoría/.test(cat)).forEach(cat => {
       const d = el("details", "guia-cat");
       d.appendChild(el("summary", "", cat));
       Guia.TEMAS.filter(t => t.cat === cat).forEach(t => { const a = el("button", "guia-tema", t.titulo); a.onclick = () => mostrarTema(t); d.appendChild(a); });
       c.appendChild(d);
     });
-    tarjeta("Guía metodológica", c);
+    if (soloTeoria) c.querySelectorAll(".guia-cat").forEach(d => d.open = true);
+    tarjeta(soloTeoria ? "Teoría · Brian Suárez" : "Guía metodológica", c);
     setTimeout(() => inp.focus(), 50);
   }
 
@@ -855,7 +879,8 @@ Reglas:
       }, required: ["respuesta", "cubierto_por_guia"] },
       `Duda del usuario: «${pregunta}»\n\nGUÍA DE ROMUS (fuente principal; respétala):\n${contexto}\n\nDOCUMENTO DEL USUARIO (contexto, puede estar vacío):\n${(doc.texto || "").slice(0, 15000)}\n\nSi la guía no cubre la duda, respóndela con tu conocimiento y marca cubierto_por_guia=false.`, signal);
     const c = el("div", "inv-cuerpo guia");
-    c.appendChild(etiqueta(d.cubierto_por_guia ? "guia" : "modelo", d.cubierto_por_guia ? res[0].t.fuente : ""));
+    const deTeoria = /^Teoría/.test(res[0].t.cat);
+    c.appendChild(etiqueta(d.cubierto_por_guia ? (deTeoria ? "teoria" : "guia") : "modelo", d.cubierto_por_guia ? res[0].t.fuente : ""));
     c.appendChild(el("p", "guia-resumen", d.respuesta));
     if (d.aplicacion) { const ap = el("div", "guia-caja ejemplo"); ap.appendChild(el("b", "", "En tu proyecto")); ap.appendChild(el("span", "", d.aplicacion)); c.appendChild(ap); }
     const r = el("div", "guia-relacionados"); r.appendChild(el("span", "", "Ver en la guía:"));
@@ -864,6 +889,50 @@ Reglas:
     tarjeta(pregunta.length > 60 ? pregunta.slice(0, 57) + "…" : pregunta, c);
     ui.hablar(d.respuesta);
   }
+
+  /** Construye un elemento (axioma, postulado, constructo, modelo…) para el proyecto del usuario, siguiendo la Teoría. */
+  function singular(t) {
+    const k = Object.keys(ELEMENTOS_VOZ).find(x => ELEMENTOS_VOZ[x] === t.id);
+    const n = k ? k.replace("enunciado empirico", "enunciado empírico").replace("enunciado teorico", "enunciado teórico").replace("definicion", "definición").replace("simulacion", "simulación").replace("hipotesis", "hipótesis").replace("teoria", "teoría").replace("metateoria", "metateoría").replace("inferencia", "inferencia").replace("proposicion", "proposición") : t.titulo;
+    return n.charAt(0).toUpperCase() + n.slice(1);
+  }
+
+  async function construir(t, tema, signal) {
+    const doc = await documentoNumerado().catch(() => ({ texto: "", parrafos: [] }));
+    const partes = (t.partes || []).map(p => p.split(":")[0].trim()).filter(Boolean);
+    const d = await pedirHerramienta("construir_elemento", `Construye ${t.titulo.toLowerCase()} para el proyecto del usuario siguiendo la Teoría de Brian Suárez.`,
+      { type: "object", properties: {
+        partes: { type: "array", items: { type: "object", properties: { parte: { type: "string" }, contenido: { type: "string" } }, required: ["parte", "contenido"] },
+          description: partes.length ? "Una entrada por cada parte: " + partes.join(", ") : "Las partes que correspondan" },
+        enunciado: { type: "string", description: "El elemento redactado de forma completa y lista para insertar" },
+        verificacion: { type: "array", items: { type: "string" }, description: "Cómo se cumplen los pasos o criterios de construcción" }
+      }, required: ["partes", "enunciado"] },
+      `Elemento a construir según la Teoría:\n${Guia.textoPlano(t)}\n\n` +
+      (tema ? `Tema que indica el usuario: «${tema}»\n` : "") +
+      `Nivel: ${nivel().nombre}. Enfoque: ${enfoque().nombre}.\n\nDOCUMENTO DEL USUARIO (úsalo para que el elemento encaje con su proyecto):\n${(doc.texto || "(vacío)").slice(0, 20000)}`, signal);
+    const c = el("div", "inv-cuerpo guia");
+    c.appendChild(etiqueta("modelo", "con la Teoría de Suárez (2025)"));
+    const enun = el("div", "guia-caja ejemplo"); enun.appendChild(el("b", "", singular(t) + " · propuesta")); enun.appendChild(el("span", "", d.enunciado)); c.appendChild(enun);
+    const tabla = el("div", "guia-partes");
+    (d.partes || []).forEach(p => { const f = el("div", ""); f.appendChild(el("b", "", p.parte)); f.appendChild(el("span", "", p.contenido)); tabla.appendChild(f); });
+    c.appendChild(tabla);
+    if (d.verificacion && d.verificacion.length) { const dd = el("details", "guia-mas"); dd.appendChild(el("summary", "", "Cómo cumple los pasos de construcción")); const l = el("ul", "guia-puntos"); d.verificacion.forEach(x => l.appendChild(el("li", "", x))); dd.appendChild(l); c.appendChild(dd); }
+    const acc = el("div", "inv-acciones");
+    const bi = el("button", "boton primario", "Insertar en el documento");
+    bi.onclick = () => ejecutar(async () => {
+      const lineas = [`${singular(t)}: ${d.enunciado}`].concat((d.partes || []).map(p => `${p.parte}: ${p.contenido}`));
+      await Doc.insertarTexto({ posicion: "en_cursor", texto: lineas.join("\n") });
+      registrar("Inserción de " + t.titulo.toLowerCase(), d.enunciado, "modelo");
+      ui.confirmar("Lo inserté en el cursor. Revísalo y ajústalo con tu voz de autor.");
+    });
+    const bv = el("button", "boton secundario", "← Ver la teoría"); bv.onclick = () => mostrarTema(t);
+    acc.append(bi, bv); c.appendChild(acc);
+    tarjeta("Construir · " + t.titulo, c);
+    registrar("Construcción de " + t.titulo.toLowerCase(), d.enunciado, "modelo");
+    ui.hablar(`Te propongo: ${d.enunciado}`);
+  }
+
+  const ELEMENTOS_VOZ = { axioma: "teo-axiomas", postulado: "teo-postulados", definicion: "teo-definiciones", corolario: "teo-corolarios", simulacion: "teo-simulaciones", paradoja: "teo-paradojas", teorema: "teo-teoremas", tesis: "teo-la-tesis-afirmacion-principal", hipotesis: "teo-hipotesis-segun-la-teoria", constructo: "teo-constructos-teoricos", modelo: "teo-modelos-cientificos", teoria: "teo-teorias-cientificas", ley: "teo-leyes-cientificas", metateoria: "teo-metateorias", paradigma: "teo-paradigmas-segun-la-teoria", supuesto: "teo-supuestos", inferencia: "teo-inferencias", principio: "teo-principios", proposicion: "teo-proposiciones", concepto: "teo-conceptos", problema: "teo-el-problema-cientifico", "enunciado empirico": "teo-enunciados-empiricos", "enunciado teorico": "teo-enunciados-teoricos", argumento: "teo-argumentos-cientificos", premisa: "teo-premisas", variable: "teo-variables-segun-la-teoria", indicador: "teo-indicadores" };
 
   async function aplicarTema(t, signal) {
     const doc = await documentoNumerado();
@@ -938,6 +1007,13 @@ Reglas:
     if (m) { const todas = /\b(todas las [ée]pocas|cl[aá]sic[oa]s|sin l[ií]mite)\b/i.test(m[1]); return tarea(() => literatura(m[1].replace(/[.?!]+$/, ""), { todas })); }
     m = n.match(/^cita (el |la )?(articulo |trabajo |numero |referencia )?(uno|una|primero|primera|dos|segundo|segunda|tres|tercero|tercera|cuatro|cuarto|cuarta|cinco|quinto|quinta|seis|sexto|sexta|[1-6])$/);
     if (m) return tarea(() => citar(NUM[m[3]]));
+    m = n.match(/^(ayudame a |quiero |puedes )?(construir|formular|crear|redactar|plantear|elaborar|proponer|hacer|disenar)(me)? (un |una |el |la |mi |mis |unos |unas |los |las )?(axioma|postulado|definicion|corolario|simulacion|paradoja|teorema|tesis|hipotesis|constructo|modelo|teoria|ley|metateoria|paradigma|supuesto|inferencia|principio|proposicion|concepto|problema cientifico|enunciado empirico|enunciado teorico|argumento|premisa|variable|indicador)(e?s)?( cientific[oa]s?| teoric[oa]s?)?\b ?(para|sobre|de|acerca de|con)? ?(.*)$/);
+    if (m && !Config.faltaClave()) {
+      const clave = m[5].replace(" cientifico", "");
+      const t = Guia.tema(ELEMENTOS_VOZ[clave] || ELEMENTOS_VOZ[m[5]]);
+      if (t) return tarea(() => construir(t, m[9] || "", signal));
+    }
+    if (/^((abre|muestra|ver) (la )?)?(teoria|libro de teoria|biblioteca)( de brian( suarez)?| del autor)?$/.test(n)) return () => indiceGuia(true);
     m = original.match(/^\s*(?:ay[uú]dame a\s+)?(?:idear|formular|plantear|convertir)\s*(?:un proyecto|una tesis|una investigaci[oó]n|una pregunta|la idea|mi idea)?\s*(?:sobre|de|acerca de|con|:)?\s*(.*)$/i);
     if (m && /^(ayudame a )?(idear|formular|plantear|convertir)/.test(n)) return tarea(() => idear(m[1], signal));
     if (/(declaracion|registro) (de )?(uso de )?(la )?(ia|inteligencia artificial)/.test(n)) return tarea(declaracion);
@@ -958,7 +1034,7 @@ Reglas:
   return {
     NIVELES, ENFOQUES, nivel, fijarNivel, enfoque, fijarEnfoque, secciones, conectar, comando, etiqueta, registrar, leerRegistro,
     insertarEstructura, idear, coherencia, literatura, citar, evaluarRubrica, declaracion,
-    preguntar, indiceGuia, mostrarTema, iniciarTutorial, pasoTutorial, salirTutorial,
+    preguntar, indiceGuia, mostrarTema, construir, iniciarTutorial, pasoTutorial, salirTutorial,
     _apa: apa, _verificar: verificar, _partirNombre: partirNombre
   };
 })();
