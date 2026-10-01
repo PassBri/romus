@@ -29,7 +29,8 @@ window.TEORIA = [
   "tipos": [],
   "pasos": [],
   "partes": [],
-  "niveles": []
+  "niveles": [],
+  "sencillo": "Una metáfora para entender cómo se alimenta y crece el conocimiento, como un árbol en un bosque."
  },
  {
   "id": "teo-ecosistema",
@@ -60,7 +61,8 @@ window.TEORIA = [
   "tipos": [],
   "pasos": [],
   "partes": [],
-  "niveles": []
+  "niveles": [],
+  "sencillo": "El conocimiento no solo lo producen las personas: también está en la naturaleza, la materia y las máquinas."
  },
  {
   "id": "teo-micc",
@@ -90,7 +92,8 @@ window.TEORIA = [
   "tipos": [],
   "pasos": [],
   "partes": [],
-  "niveles": []
+  "niveles": [],
+  "sencillo": "Un mapa de 15 pasos para pasar de una idea a una teoría, explicado como el crecimiento de un árbol."
  },
  {
   "id": "teo-cebolla",
@@ -119,7 +122,8 @@ window.TEORIA = [
   "tipos": [],
   "pasos": [],
   "partes": [],
-  "niveles": []
+  "niveles": [],
+  "sencillo": "Una técnica para hacer preguntas cada vez más profundas, capa por capa, como al pelar una cebolla."
  },
  {
   "id": "teo-bosques",
@@ -148,7 +152,8 @@ window.TEORIA = [
   "tipos": [],
   "pasos": [],
   "partes": [],
-  "niveles": []
+  "niveles": [],
+  "sencillo": "Las disciplinas son árboles que se conectan y forman un bosque; de esas conexiones nacen ideas nuevas."
  },
  {
   "id": "teo-complejidad",
@@ -177,7 +182,8 @@ window.TEORIA = [
   "tipos": [],
   "pasos": [],
   "partes": [],
-  "niveles": []
+  "niveles": [],
+  "sencillo": "Un mapa que ordena las piezas del conocimiento de la más simple (una idea) a la más compleja (un paradigma)."
  },
  {
   "id": "teo-cognicion-sintetica",
@@ -205,7 +211,8 @@ window.TEORIA = [
   "tipos": [],
   "pasos": [],
   "partes": [],
-  "niveles": []
+  "niveles": [],
+  "sencillo": "La idea de que las máquinas también pueden aprender y crear conocimiento, y lo que eso implica."
  },
  {
   "id": "teo-preguntas-cientificas",
@@ -226,7 +233,8 @@ window.TEORIA = [
   "niveles": [],
   "complejidad": "Muy alto",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.2",
-  "error": ""
+  "error": "",
+  "sencillo": "Es lo que quieres averiguar. Toda investigación empieza con una buena pregunta."
  },
  {
   "id": "teo-axiomas",
@@ -272,7 +280,8 @@ window.TEORIA = [
   "niveles": [],
   "complejidad": "Básico",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.3",
-  "error": ""
+  "error": "",
+  "sencillo": "Una verdad de partida que no necesitas demostrar porque es evidente; sobre ella construyes lo demás. Ej.: «el todo es mayor que cualquiera de sus partes»."
  },
  {
   "id": "teo-postulados",
@@ -320,7 +329,8 @@ window.TEORIA = [
   ],
   "complejidad": "Básico",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.4",
-  "error": ""
+  "error": "",
+  "sencillo": "Una regla que aceptas como punto de partida de tu teoría o modelo, aunque no la demuestres. Es como una regla del juego."
  },
  {
   "id": "teo-definiciones",
@@ -359,7 +369,8 @@ window.TEORIA = [
   ],
   "complejidad": "Básico",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.5",
-  "error": ""
+  "error": "",
+  "sencillo": "Decir con precisión qué significa una palabra clave en tu trabajo, para que todos la entiendan igual."
  },
  {
   "id": "teo-corolarios",
@@ -408,7 +419,8 @@ window.TEORIA = [
   ],
   "complejidad": "",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.4 (corolarios)",
-  "error": ""
+  "error": "",
+  "sencillo": "Una conclusión que sale casi automáticamente de algo que ya demostraste."
  },
  {
   "id": "teo-simulaciones",
@@ -464,7 +476,8 @@ window.TEORIA = [
   ],
   "complejidad": "Alto",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.6",
-  "error": ""
+  "error": "",
+  "sencillo": "Probar en un modelo (en computador o en papel) qué pasaría, antes o en lugar de probarlo en la realidad."
  },
  {
   "id": "teo-paradojas",
@@ -516,7 +529,8 @@ window.TEORIA = [
   ],
   "complejidad": "",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.4",
-  "error": ""
+  "error": "",
+  "sencillo": "Un razonamiento que parece correcto pero lleva a una contradicción; sirve para descubrir fallas en una teoría."
  },
  {
   "id": "teo-teoremas",
@@ -560,7 +574,8 @@ window.TEORIA = [
   ],
   "complejidad": "Moderado",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.7",
-  "error": ""
+  "error": "",
+  "sencillo": "Una afirmación que se demuestra paso a paso a partir de axiomas y postulados."
  },
  {
   "id": "teo-la-tesis-afirmacion-principal",
@@ -603,7 +618,8 @@ window.TEORIA = [
   ],
   "complejidad": "Moderado",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.8",
-  "error": ""
+  "error": "",
+  "sencillo": "La idea central que tu trabajo defiende, dicha en una frase."
  },
  {
   "id": "teo-hipotesis-segun-la-teoria",
@@ -644,7 +660,8 @@ window.TEORIA = [
   ],
   "complejidad": "Intermedio",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.9",
-  "error": ""
+  "error": "",
+  "sencillo": "Una respuesta provisional a tu pregunta, que luego pones a prueba."
  },
  {
   "id": "teo-constructos-teoricos",
@@ -693,7 +710,8 @@ window.TEORIA = [
   "niveles": [],
   "complejidad": "Moderado",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.10",
-  "error": ""
+  "error": "",
+  "sencillo": "Un concepto que no se ve directamente (como la motivación o la autoestima) y que defines y mides con indicadores."
  },
  {
   "id": "teo-modelos-cientificos",
@@ -751,7 +769,8 @@ window.TEORIA = [
   ],
   "complejidad": "Intermedio",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.11",
-  "error": ""
+  "error": "",
+  "sencillo": "Una representación simplificada (un esquema, una fórmula, un diagrama) de cómo funciona algo."
  },
  {
   "id": "teo-teorias-cientificas",
@@ -808,7 +827,8 @@ window.TEORIA = [
   ],
   "complejidad": "Muy alto",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.12",
-  "error": ""
+  "error": "",
+  "sencillo": "Una explicación amplia y probada que conecta muchos hechos, leyes y modelos."
  },
  {
   "id": "teo-leyes-cientificas",
@@ -864,7 +884,8 @@ window.TEORIA = [
   ],
   "complejidad": "Intermedio",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.13",
-  "error": ""
+  "error": "",
+  "sencillo": "Un patrón que se repite siempre en las mismas condiciones y que se ha comprobado muchas veces."
  },
  {
   "id": "teo-metateorias",
@@ -917,7 +938,8 @@ window.TEORIA = [
   ],
   "complejidad": "Muy alto",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.14",
-  "error": ""
+  "error": "",
+  "sencillo": "Una teoría sobre las teorías: reflexiona sobre cómo se construyen y se validan."
  },
  {
   "id": "teo-paradigmas-segun-la-teoria",
@@ -972,7 +994,8 @@ window.TEORIA = [
   ],
   "complejidad": "Muy alto",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.15",
-  "error": ""
+  "error": "",
+  "sencillo": "La «forma de ver» compartida por una comunidad científica, que dice qué preguntas y métodos son válidos."
  },
  {
   "id": "teo-supuestos",
@@ -1021,7 +1044,8 @@ window.TEORIA = [
   ],
   "complejidad": "",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.16",
-  "error": ""
+  "error": "",
+  "sencillo": "Algo que das por cierto en tu estudio para poder avanzar (por ejemplo, que los encuestados responden con sinceridad)."
  },
  {
   "id": "teo-inferencias",
@@ -1072,7 +1096,8 @@ window.TEORIA = [
   ],
   "complejidad": "",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.17",
-  "error": ""
+  "error": "",
+  "sencillo": "Sacar una conclusión a partir de datos o de otras afirmaciones."
  },
  {
   "id": "teo-principios",
@@ -1124,7 +1149,8 @@ window.TEORIA = [
   ],
   "complejidad": "",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.18",
-  "error": ""
+  "error": "",
+  "sencillo": "Una idea fundamental que guía cómo se razona o se actúa en una disciplina."
  },
  {
   "id": "teo-proposiciones",
@@ -1176,7 +1202,8 @@ window.TEORIA = [
   ],
   "complejidad": "",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.19",
-  "error": ""
+  "error": "",
+  "sencillo": "Una afirmación que puede ser verdadera o falsa y que relaciona conceptos."
  },
  {
   "id": "teo-conceptos",
@@ -1230,7 +1257,8 @@ window.TEORIA = [
   ],
   "complejidad": "",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.20",
-  "error": ""
+  "error": "",
+  "sencillo": "Una idea con nombre (por ejemplo, «convivencia») que usas para pensar y describir la realidad."
  },
  {
   "id": "teo-el-problema-cientifico",
@@ -1282,7 +1310,8 @@ window.TEORIA = [
   ],
   "complejidad": "",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.21",
-  "error": ""
+  "error": "",
+  "sencillo": "Lo que no se sabe o no funciona bien, y que tu investigación quiere resolver o explicar."
  },
  {
   "id": "teo-enunciados-empiricos",
@@ -1335,7 +1364,8 @@ window.TEORIA = [
   ],
   "complejidad": "",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.22",
-  "error": ""
+  "error": "",
+  "sencillo": "Una afirmación que se puede comprobar observando o midiendo."
  },
  {
   "id": "teo-enunciados-teoricos",
@@ -1388,7 +1418,8 @@ window.TEORIA = [
   ],
   "complejidad": "",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.23",
-  "error": ""
+  "error": "",
+  "sencillo": "Una afirmación general sobre conceptos que no se observa directamente."
  },
  {
   "id": "teo-argumentos-cientificos",
@@ -1440,7 +1471,8 @@ window.TEORIA = [
   ],
   "complejidad": "",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.24",
-  "error": ""
+  "error": "",
+  "sencillo": "Razones y evidencias organizadas para sostener una conclusión."
  },
  {
   "id": "teo-premisas",
@@ -1491,7 +1523,8 @@ window.TEORIA = [
   ],
   "complejidad": "",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.25",
-  "error": ""
+  "error": "",
+  "sencillo": "Las afirmaciones de partida de un argumento, de las que sale la conclusión."
  },
  {
   "id": "teo-fenomeno",
@@ -1533,7 +1566,8 @@ window.TEORIA = [
   "niveles": [],
   "complejidad": "",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.26",
-  "error": ""
+  "error": "",
+  "sencillo": "Aquello que observas y quieres entender o explicar."
  },
  {
   "id": "teo-variables-segun-la-teoria",
@@ -1574,7 +1608,8 @@ window.TEORIA = [
   ],
   "complejidad": "",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.27",
-  "error": ""
+  "error": "",
+  "sencillo": "Una característica que cambia y que puedes medir (edad, rendimiento, motivación)."
  },
  {
   "id": "teo-operacionalizacion-de-variables",
@@ -1620,7 +1655,8 @@ window.TEORIA = [
   ],
   "complejidad": "",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.28",
-  "error": ""
+  "error": "",
+  "sencillo": "Convertir un concepto en algo medible: decir con qué indicadores, instrumento y escala lo vas a medir."
  },
  {
   "id": "teo-indicadores",
@@ -1660,7 +1696,8 @@ window.TEORIA = [
   ],
   "complejidad": "",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.30",
-  "error": ""
+  "error": "",
+  "sencillo": "La señal concreta y medible que te dice cómo está una variable."
  },
  {
   "id": "teo-observacion-empirica",
@@ -1699,7 +1736,8 @@ window.TEORIA = [
   ],
   "complejidad": "Alto",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.31",
-  "error": ""
+  "error": "",
+  "sencillo": "Mirar, registrar y medir la realidad de forma sistemática."
  },
  {
   "id": "teo-razonamientos-logicos",
@@ -1743,6 +1781,7 @@ window.TEORIA = [
   ],
   "complejidad": "",
   "fuente": "Suárez Acevedo (2025), Teoría: conocimiento científico, §2.33",
-  "error": ""
+  "error": "",
+  "sencillo": "Formas correctas de pensar para llegar a conclusiones: deducir, inducir o proponer la mejor explicación."
  }
 ];

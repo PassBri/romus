@@ -7,30 +7,57 @@
 Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar formato<br>y formular proyectos de investigación de pregrado a posdoctorado.</p>
 
 <p align="center">
-  <a href="https://passbri.github.io/romus/">Página de instalación</a> ·
-  <a href="GUIA-INSTALACION.md">Guía paso a paso</a> ·
-  <a href="#modo-investigación--método-kuetz">Modo investigación</a> ·
-  <a href="#comandos-de-voz">Comandos</a> ·
-  <a href="#conectar-una-ia">Conectar una IA</a> ·
-  <a href="#novedades">Novedades</a>
+  <a href="https://github.com/PassBri/romus/raw/main/descargas/Instalar-Romus.exe"><img src="https://img.shields.io/badge/⬇%20Descargar%20instalador-Windows-185abd?style=for-the-badge" alt="Descargar instalador para Windows"></a>
+  <a href="https://passbri.github.io/romus/tutorial.html"><img src="https://img.shields.io/badge/📘%20Tutorial-paso%20a%20paso-c239b3?style=for-the-badge" alt="Tutorial paso a paso"></a>
+  <a href="https://passbri.github.io/romus/"><img src="https://img.shields.io/badge/Word%20web%20y%20Mac-manifiesto-2b579a?style=for-the-badge" alt="Instalar en Word para la web o Mac"></a>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-2.5-185abd" alt="versión 2.5">
+  <img src="https://img.shields.io/badge/versión-2.6-185abd" alt="versión 2.6">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
 </p>
 
+<p align="center">
+  <a href="#instalación-en-2-minutos">Instalación</a> ·
+  <a href="https://passbri.github.io/romus/tutorial.html">Tutorial</a> ·
+  <a href="#el-asesor-de-investigación">Asesor de investigación</a> ·
+  <a href="#lo-que-hace-a-romus-insustituible">Lo insustituible</a> ·
+  <a href="#comandos-de-voz">Comandos</a> ·
+  <a href="#novedades">Novedades</a>
+</p>
+
 ---
 
-<p align="center"><img src="assets/capturas/panel.png" width="720" alt="Panel de Romus en modo claro y oscuro"></p>
+<table>
+<tr>
+<td width="44%" align="center"><img src="assets/gif/romus-demo.gif" width="300" alt="Romus verificando referencias y haciendo un simulacro de sustentación"></td>
+<td>
+<b>Romus en 20 segundos</b><br><br>
+1. «Ok Romus, <b>verifica las referencias</b>»: cruza citas y lista, revisa APA 7 y comprueba en OpenAlex que cada fuente exista.<br><br>
+2. «Ok Romus, <b>simulacro de sustentación</b>»: hace de jurado, te pregunta en voz alta y evalúa tus respuestas.<br><br>
+<img src="assets/gif/romus-esfera.gif" width="120" alt="La esfera de Romus"><br>
+<sub>La esfera de Romus: escucha en magenta, habla en azul, piensa en anillos.</sub>
+</td>
+</tr>
+</table>
+
+## Instalación en 2 minutos
+
+**Windows (Word de escritorio):** descarga **[Instalar-Romus.exe](https://github.com/PassBri/romus/raw/main/descargas/Instalar-Romus.exe)**, cierra Word y ábrelo. Si Windows dice «Windows protegió su PC», pulsa *Más información → Ejecutar de todas formas*: aparece porque el instalador es nuevo y no tiene firma comercial. El instalador no pide permisos de administrador. Registra Romus en Word, limpia la caché de complementos y agrega la guía y un desinstalador al menú Inicio.
+
+**Word para la web o Mac:** descarga tu manifiesto en [passbri.github.io/romus](https://passbri.github.io/romus/) y cárgalo como explica el **[tutorial](https://passbri.github.io/romus/tutorial.html#instalar)**.
+
+Después, en Word: **Inicio → Romus → Ajustes → + Agregar → Google Gemini** (clave gratis en [aistudio.google.com/apikey](https://aistudio.google.com/apikey)). Todo esto, con imágenes, está en el **[📘 tutorial paso a paso](https://passbri.github.io/romus/tutorial.html)**.
 
 ## ¿Qué es Romus?
 
 Romus es un complemento (add-in) de Microsoft Word que convierte el procesador de texto en un espacio de trabajo por voz. Su identidad visual es una **esfera holográfica de partículas con un núcleo dorado**: respira en reposo, escucha con los puntos magenta, habla con los azules y se ordena en anillos cuando trabaja.
 
 Romus nace como proyecto personal de Brian Gonzalo Suárez Acevedo, docente. Lo creó para que leer, revisar y escribir documentos sea más accesible y rápido. Desde la versión 2.3 integra el **método Kuetz**: un asesor metodológico que acompaña proyectos de investigación y tesis dentro de Word.
+
+<p align="center"><img src="assets/capturas/panel.png" width="720" alt="Panel de Romus en modo claro y oscuro"></p>
 
 ## Lo que puede hacer
 
@@ -50,6 +77,34 @@ Romus nace como proyecto personal de Brian Gonzalo Suárez Acevedo, docente. Lo 
 
 <p align="center"><img src="assets/capturas/burbuja.png" width="560" alt="Burbuja flotante de Romus en modo claro y oscuro"></p>
 
+## El asesor de investigación
+
+**No necesitas saber metodología.** En el panel, sección **Investigación**, toca **Asesor de investigación** o di «Ok Romus, asesor» (también «no sé por dónde empezar»). Romus te pregunta dónde estás y te lleva al siguiente paso:
+
+| Si estás aquí… | Romus te ofrece… |
+|---|---|
+| 🌱 No sé nada de investigación | Un tutorial desde cero, paso a paso («siguiente paso»). |
+| 💡 Tengo una idea | Convertirla en pregunta, problema y objetivos. |
+| 🧱 Quiero empezar el documento | La estructura de tu nivel, con una guía en cada apartado. |
+| 🔎 Ya tengo un borrador | Coherencia, referencias y rúbrica, con comentarios en Word. |
+| 🎓 Voy a sustentar | Un simulacro con jurado por voz. |
+| 🌳 Quiero construir teoría | Axiomas, supuestos, constructos y modelos con la Teoría de Brian Suárez. |
+
+Cada tema trae un recuadro **«En palabras sencillas»** para quien empieza.
+
+<p align="center"><img src="assets/capturas/asesor.png" width="900" alt="Asesor de investigación, explicación en palabras sencillas y sección Teoría"></p>
+
+## Lo que hace a Romus insustituible
+
+Otras herramientas escriben. Romus **verifica, acompaña y prepara**, dentro de Word y por voz:
+
+1. **Simulacro de sustentación por voz.** Romus lee tu documento y hace de jurado. Te pregunta en voz alta sobre tu metodología, tu aporte y tus limitaciones. Tú respondes hablando y él evalúa cada respuesta con criterios, te dice qué faltó, te muestra una respuesta más sólida y al final te indica qué repasar. Es un ensayo de sustentación disponible a cualquier hora.
+2. **Verificador de citas y referencias.** Cruza cada cita del texto con la lista de referencias, revisa el formato APA 7 y el orden alfabético, y comprueba en OpenAlex que cada fuente exista. Detecta las referencias que inventa una IA antes de que las vea el jurado.
+3. **Trust Label.** Cada resultado dice de dónde sale: de tu documento, de una fuente real, de reglas fijas, de la guía, de la Teoría o de la IA. Así sabes qué verificar.
+4. **Declaración de uso de IA.** Romus registra lo que hizo y redacta la declaración que piden las universidades.
+
+<p align="center"><img src="assets/capturas/sustentacion-referencias.png" width="900" alt="Verificador de referencias y simulacro de sustentación"></p>
+
 ## Modo investigación · método Kuetz
 
 Romus acompaña proyectos de investigación y tesis de **pregrado, especialización, maestría, doctorado y posdoctorado**, con enfoque **cuantitativo, cualitativo o mixto**. Todo ocurre dentro de Word y también se puede pedir por voz. En el panel está en la sección **Investigación**: dos selectores (nivel y enfoque) y seis botones.
@@ -67,7 +122,7 @@ Romus acompaña proyectos de investigación y tesis de **pregrado, especializaci
 
 ### Guía metodológica y modo tutorial
 
-Cuando tengas una duda de metodología, pregúntale a Romus. Responde con su **guía metodológica**: 32 temas redactados a partir de los dos libros base, cada uno con explicación, puntos clave, un ejemplo, el error más frecuente y el capítulo donde ampliarlo.
+Cuando tengas una duda de metodología, pregúntale a Romus. Responde con su **guía metodológica (método Kuetz)**: 32 temas escritos para Romus, cada uno con explicación, puntos clave, un ejemplo, el error más frecuente, la conexión con la Teoría de Brian Suárez y lecturas para profundizar.
 
 | Quieres… | Di… |
 |---|---|
@@ -135,6 +190,9 @@ Con **Siempre atento** activado, empieza cada orden con «Ok Romus». Después d
 | Escribir | «modo dictado» (y luego «termina dictado») |
 | Cambiar de IA | «usa Gemini», «usa Claude», «usa la IA local» |
 | Teoría (Brian Suárez) | «abre la teoría», «¿qué es un postulado?», «¿qué es el MICC?», «ayúdame a construir un axioma para mi tesis» |
+| Asesor | «Ok Romus, asesor», «no sé por dónde empezar», «ayúdame con mi tesis» |
+| Sustentación | «simulacro de sustentación» (responde hablando y di «terminé»), «siguiente», «repite la pregunta», «salir del simulacro» |
+| Referencias | «verifica las referencias» |
 | Resolver dudas | «¿qué es…?», «¿cómo hago…?», «abre la guía», «modo tutorial», «siguiente paso» |
 | Investigar | «nivel maestría», «enfoque cualitativo», «ayúdame a idear un proyecto sobre…», «inserta la estructura», «revisa la coherencia», «busca literatura sobre…», «cita el uno», «evalúa con la rúbrica», «declaración de uso de IA» |
 | Ajustar cómo habla | «habla más formal», «sé breve», «a partir de ahora trátame de usted» |
@@ -174,6 +232,8 @@ Romus funciona con **cualquier IA que tenga API**. En *Ajustes → IA en uso →
 romus/
 ├── manifest.xml          manifiesto del complemento (Word lo carga)
 ├── index.html            página de inicio: descarga tu manifiesto configurado
+├── tutorial.html         tutorial ilustrado (passbri.github.io/romus/tutorial.html)
+├── descargas/            Instalar-Romus.exe (Windows)
 ├── taskpane.html         panel de Romus
 ├── burbuja.html          burbuja flotante
 ├── commands.html         archivo técnico que exige Word
@@ -186,12 +246,13 @@ romus/
 │   ├── documento.js      lectura y edición del documento (Word API)
 │   ├── panel.js          estadísticas y estructura del documento
 │   ├── investigacion.js  modo investigación: niveles, coherencia, literatura, rúbrica, Trust Label, tutorial
+│   ├── jurado.js         simulacro de sustentación y verificador de citas y referencias
 │   ├── guia.js           guía metodológica: 32 temas, buscador y rutas del tutorial
 │   ├── teoria.js         biblioteca «Teoría: conocimiento científico» (Suárez, 2025): 39 temas
 │   ├── romus.js          la esfera holográfica de Romus
 │   ├── orbe.js           medidor del micrófono
 │   └── config.js         ajustes guardados en tu equipo
-├── assets/               logo, íconos y capturas
+├── assets/               logo, íconos, capturas y GIF
 ├── GUIA-INSTALACION.md   instalación paso a paso
 └── LEEME.md              notas técnicas ampliadas
 ```
@@ -203,6 +264,13 @@ Todo es HTML, CSS y JavaScript puro: no hace falta compilar nada. Para publicar 
 Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canvas 2D · APIs de Anthropic, OpenAI y Gemini, más cualquier API compatible con OpenAI · GitHub Pages.
 
 ## Novedades
+
+### v2.6 · Asesor, sustentación y verificador
+- **Asesor de investigación**: guía según dónde estés, pensado para quien no sabe nada de investigación.
+- **Simulacro de sustentación por voz** con jurado, evaluación por criterios y resultado final.
+- **Verificador de citas y referencias**: cruce cita↔referencia, formato APA 7 y existencia real en OpenAlex.
+- «En palabras sencillas» en cada elemento de la Teoría.
+- **Instalador para Windows** (`descargas/Instalar-Romus.exe`) y **[tutorial ilustrado](https://passbri.github.io/romus/tutorial.html)**.
 
 ### v2.5 · Teoría de Brian Suárez
 - Nueva biblioteca **Teoría** con 32 elementos del conocimiento y 7 modelos del autor (MICC, Cebolla, bosques cognitivos…).
@@ -242,4 +310,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word · v2.5</sub></p>
+<p align="center"><sub>Romus para Word · v2.6</sub></p>

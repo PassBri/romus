@@ -1,5 +1,6 @@
-/* Romus · Guía metodológica (ayuda y modo tutorial).
-   Contenido ORIGINAL redactado para Romus a partir de los conceptos de:
+/* Romus · Guía metodológica (método Kuetz) — ayuda y modo tutorial.
+   © 2026 Brian Gonzalo Suárez Acevedo. Texto ORIGINAL escrito para Romus.
+   Lecturas recomendadas para profundizar (se citan en cada tema, como exige la ética académica):
    - Hernández Sampieri, R., Fernández Collado, C. y Baptista Lucio, M. P. (2014). Metodología de la investigación (6.ª ed.). McGraw-Hill. [HS]
    - Martínez Miguélez, M. (2004). Epistemología y metodología cualitativa en las ciencias sociales. Trillas, cap. 3. [MM]
    No reproduce texto de las obras: explica sus ideas con palabras propias e indica dónde ampliarlas. */

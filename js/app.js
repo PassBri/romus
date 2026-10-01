@@ -517,6 +517,13 @@
       return;
     }
 
+    // Simulacro de sustentación: todo lo que dices es tu respuesta al jurado (sin «Ok Romus»).
+    if (window.Jurado && Jurado.activo() && origen !== "boton") {
+      agregarMensaje("usuario", texto);
+      try { await Jurado.recibir(texto); } catch (e) { mostrarError(e); }
+      return;
+    }
+
     // Si al pulsar el micrófono igual dijo «Ok Romus, …», se quita el saludo.
     if (origen === "voz-directa" || origen === "texto") {
       const w = quitarPalabraActivacion(texto);
@@ -1066,7 +1073,7 @@
             $("transcripcion").textContent = t === "…" ? "Te oigo…" : "Entendiendo…"; $("transcripcion").classList.add("viva");
             return;
           }
-          const dirigido = !esperandoPalabra() || RE_ACTIVACION.test(t);
+          const dirigido = !esperandoPalabra() || RE_ACTIVACION.test(t) || (window.Jurado && Jurado.activo());
           if (!dirigido) return; // no se muestra lo que no va dirigido a Romus
           $("transcripcion").textContent = t; $("transcripcion").classList.add("viva");
           estado.nivelSintetico = 0.75;
@@ -1338,6 +1345,7 @@
       if (b.dataset.prefijo) { const t = $("txtComando"); t.value = b.dataset.prefijo; t.focus(); t.setSelectionRange(t.value.length, t.value.length); ajustarAltura(); return; }
       manejarComando(b.dataset.cmd, "boton");
     }));
+    $("btnAsesor").addEventListener("click", () => Inv.asesor());
     $("selNivel").addEventListener("change", (e) => Inv.fijarNivel(e.target.value));
     $("selEnfoque").addEventListener("change", (e) => Inv.fijarEnfoque(e.target.value));
 

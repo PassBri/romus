@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tutorial de Romus</title>
+<link rel="icon" href="assets/iconos/icon-32.png">
+<style>
+  :root { --bg:#fafafa; --sup:#fff; --sup2:#f3f4f6; --linea:#e3e6eb; --texto:#1b1d21; --texto2:#5c6370; --acento:#185abd; --suave:#eef3fb; --oro:#b8860b; --ok:#107c41; --mag:#b4009e; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#111317; --sup:#1a1d23; --sup2:#22262d; --linea:#2c3139; --texto:#eceef2; --texto2:#a4abb8; --acento:#4f9bff; --suave:rgba(79,155,255,.12); --oro:#e0b04a; --ok:#54c28a; --mag:#ef6ad8; } }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: "Segoe UI Variable Text","Segoe UI",-apple-system,Roboto,sans-serif; background: var(--bg); color: var(--texto); line-height: 1.6; font-size: 16px; }
+  header.portada { background: radial-gradient(120% 120% at 80% 30%, #13305e 0%, #0a1530 45%, #05070d 100%); color: #eef4ff; padding: 56px 16px 48px; }
+  .ancho { max-width: 860px; margin: 0 auto; }
+  .portada .ancho { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; }
+  .portada img.logo { width: 92px; height: 92px; }
+  .portada h1 { margin: 0; font-weight: 300; letter-spacing: .35em; font-size: 40px; }
+  .portada p { margin: 6px 0 0; color: #a9b8d0; max-width: 560px; }
+  .portada .cta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+  .boton { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; }
+  .boton.prim { background: #4f9bff; color: #06101f; }
+  .boton.sec { border: 1px solid rgba(255,255,255,.3); color: #eef4ff; }
+  nav.indice { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--linea); }
+  nav.indice .ancho { display: flex; gap: 4px; overflow-x: auto; padding: 8px 16px; scrollbar-width: none; }
+  nav.indice a { white-space: nowrap; padding: 6px 10px; border-radius: 999px; color: var(--texto2); text-decoration: none; font-size: 13.5px; }
+  nav.indice a:hover { background: var(--sup2); color: var(--texto); }
+  main { padding: 8px 16px 64px; }
+  section { padding-top: 40px; }
+  h2 { font-size: 26px; letter-spacing: -.01em; margin: 0 0 6px; display: flex; gap: 12px; align-items: baseline; }
+  h2 .num { font-size: 14px; font-weight: 700; color: var(--acento); border: 1.5px solid var(--acento); border-radius: 999px; padding: 1px 10px; }
+  h3 { font-size: 18px; margin: 26px 0 6px; }
+  .bajada { color: var(--texto2); margin: 0 0 18px; }
+  .pasos { counter-reset: p; list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .pasos > li { counter-increment: p; background: var(--sup); border: 1px solid var(--linea); border-radius: 12px; padding: 14px 16px 14px 56px; position: relative; }
+  .pasos > li::before { content: counter(p); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--acento); color: #fff; font-weight: 700; font-size: 13px; display: grid; place-items: center; }
+  .pasos b { font-weight: 600; }
+  .caja { background: var(--suave); border-left: 4px solid var(--acento); border-radius: 10px; padding: 12px 16px; margin: 16px 0; }
+  .caja.oro { border-left-color: var(--oro); background: color-mix(in srgb, var(--oro) 10%, transparent); }
+  .caja strong:first-child { display: block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--acento); }
+  .caja.oro strong:first-child { color: var(--oro); }
+  .di { display: inline-block; background: var(--sup2); border: 1px solid var(--linea); border-radius: 999px; padding: 1px 10px; margin: 2px 2px; font-size: 14px; }
+  figure { margin: 18px 0; text-align: center; }
+  figure img { max-width: 100%; border-radius: 12px; border: 1px solid var(--linea); box-shadow: 0 6px 24px rgba(0,0,0,.08); }
+  figcaption { font-size: 13px; color: var(--texto2); margin-top: 6px; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14.5px; background: var(--sup); border-radius: 10px; overflow: hidden; border: 1px solid var(--linea); }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--linea); vertical-align: top; }
+  th { background: var(--sup2); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  code, kbd { font-family: "Cascadia Code", Consolas, monospace; font-size: .9em; background: var(--sup2); border: 1px solid var(--linea); border-radius: 5px; padding: 1px 6px; }
+  .rejilla { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .tarjeta { background: var(--sup); border: 1px solid var(--linea); border-radius: 12px; padding: 14px 16px; }
+  .tarjeta h4 { margin: 0 0 4px; font-size: 15.5px; }
+  .tarjeta p { margin: 0; color: var(--texto2); font-size: 14px; }
+  .tarjeta .ico { font-size: 22px; }
+  footer { border-top: 1px solid var(--linea); color: var(--texto2); font-size: 13px; padding: 24px 16px; text-align: center; }
+</style>
+</head>
+<body>
+<header class="portada">
+  <div class="ancho">
+    <img class="logo" src="assets/logo/logo-romus-app.svg" alt="Logo de Romus">
+    <div>
+      <h1>ROMUS</h1>
+      <p>Tutorial completo: instala Romus en Word, conéctalo a una IA gratis y aprende a usarlo, aunque nunca hayas hecho una investigación.</p>
+      <div class="cta">
+        <a class="boton prim" href="https://github.com/PassBri/romus/raw/main/descargas/Instalar-Romus.exe">⬇ Descargar instalador para Windows</a>
+        <a class="boton sec" href="https://github.com/PassBri/romus">Ver en GitHub</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="indice"><div class="ancho">
+  <a href="#instalar">1 · Instalar</a><a href="#abrir">2 · Abrir</a><a href="#ia">3 · Conectar IA</a><a href="#hablar">4 · Hablar</a><a href="#documentos">5 · Documentos</a><a href="#asesor">6 · Asesor</a><a href="#teoria">7 · Teoría</a><a href="#sustentar">8 · Sustentar</a><a href="#problemas">9 · Problemas</a>
+</div></nav>
+
+<main class="ancho">
+
+<section id="que-es">
+  <figure><img src="assets/gif/romus-esfera.gif" alt="La esfera de Romus escuchando y hablando" width="220"></figure>
+  <p><b>Romus</b> es un asistente de voz con inteligencia artificial que vive dentro de Microsoft Word. Dices <span class="di">«Ok Romus»</span> y tu orden, y él lee, corrige, redacta o da formato a tu documento. También es un <b>asesor de investigación</b>: te acompaña desde la idea hasta la sustentación de tu proyecto o tesis.</p>
+</section>
+
+<section id="instalar">
+  <h2><span class="num">1</span>Instalar Romus</h2>
+  <p class="bajada">Elige según el Word que uses. No necesitas permisos de administrador.</p>
+  <h3>Word de escritorio en Windows (recomendado: instalador)</h3>
+  <ol class="pasos">
+    <li><b>Cierra Word</b> por completo.</li>
+    <li>Descarga <a href="https://github.com/PassBri/romus/raw/main/descargas/Instalar-Romus.exe"><b>Instalar-Romus.exe</b></a> y ábrelo.</li>
+    <li>Si Windows muestra «Windows protegió su PC», pulsa <b>Más información → Ejecutar de todas formas</b>. Aparece porque el instalador es nuevo y no tiene firma comercial.</li>
+    <li>Sigue el asistente: <b>Siguiente → Instalar → Finalizar</b>. Deja marcada la opción de abrir Word.</li>
+  </ol>
+  <div class="caja"><strong>Qué hace el instalador</strong>Copia el manifiesto de Romus en tu equipo, lo registra en Word para tu usuario, limpia la caché de complementos para que cargue la versión más reciente y agrega esta guía y un desinstalador al menú Inicio. Romus se actualiza solo: no hay que volver a instalarlo.</div>
+  <h3>Word para la web (office.com) o Mac</h3>
+  <ol class="pasos">
+    <li>Abre <a href="https://passbri.github.io/romus/">passbri.github.io/romus</a> y pulsa <b>Descargar mi manifest.xml</b>.</li>
+    <li><b>Word para la web:</b> abre un documento → <b>Inicio → Complementos → Más complementos → Mis complementos → Cargar mi complemento</b> → elige el archivo → <b>Cargar</b>.</li>
+    <li><b>Mac:</b> copia el archivo en <code>~/Library/Containers/com.microsoft.Word/Data/Documents/wef</code> (créala si no existe) y reinicia Word.</li>
+  </ol>
+</section>
+
+<section id="abrir">
+  <h2><span class="num">2</span>Abrir Romus</h2>
+  <ol class="pasos">
+    <li>Abre Word y cualquier documento.</li>
+    <li>En la pestaña <b>Inicio</b>, a la derecha, pulsa el botón <b>Romus</b>.</li>
+    <li>Se abre el panel con la esfera. La primera vez, Word puede pedir permiso para el micrófono: acéptalo.</li>
+  </ol>
+  <figure><img src="assets/capturas/panel.png" alt="Panel de Romus en modo claro y oscuro"><figcaption>El panel de Romus en modo claro y oscuro (botón de luna o sol arriba).</figcaption></figure>
+</section>
+
+<section id="ia">
+  <h2><span class="num">3</span>Conectar una IA gratis (Google Gemini)</h2>
+  <p class="bajada">Leer en voz alta funciona sin IA. Para todo lo demás, Romus necesita una IA. Gemini tiene un plan gratuito y además permite que Romus te oiga en Word de escritorio.</p>
+  <ol class="pasos">
+    <li>Entra a <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a> con tu cuenta de Google y pulsa <b>Create API key</b>. Copia la clave (empieza por <code>AIza…</code>).</li>
+    <li>En Romus pulsa <b>Ajustes</b> (ícono de controles, arriba a la derecha) → <b>IA en uso → + Agregar → Google Gemini</b>.</li>
+    <li>Pega la clave. En <b>Modelo</b> deja <code>gemini-flash-latest</code>.</li>
+    <li>Pulsa <b>Probar conexión y corrección</b>. Debe decir «Conexión correcta».</li>
+  </ol>
+  <div class="caja oro"><strong>Para escribir mejor</strong>La calidad del lenguaje depende del modelo. Para tesis de maestría o doctorado conviene Claude (console.anthropic.com), GPT (platform.openai.com) o Gemini Pro. Puedes tener varias IA y cambiar con la voz: <span class="di">«usa Claude»</span>.</div>
+</section>
+
+<section id="hablar">
+  <h2><span class="num">4</span>Hablar con Romus</h2>
+  <ol class="pasos">
+    <li>Activa <b>Siempre atento</b> en el panel.</li>
+    <li>Di <span class="di">«Ok Romus»</span> + tu orden en la misma frase. Ejemplo: <span class="di">«Ok Romus, lee el documento»</span>.</li>
+    <li>Después de responder, Romus te sigue escuchando unos segundos: puedes continuar sin repetir su nombre.</li>
+    <li>Para terminar, di <span class="di">«Gracias, Romus»</span>.</li>
+  </ol>
+  <div class="caja"><strong>Consejo</strong>Usa audífonos: así el micrófono no oye a Romus por los parlantes. Si prefieres escribir, usa la caja de abajo; todo funciona igual.</div>
+  <figure><img src="assets/capturas/burbuja.png" alt="Burbuja flotante" width="420"><figcaption>La burbuja flotante: di «abre la burbuja» y muévela sobre tu documento.</figcaption></figure>
+</section>
+
+<section id="documentos">
+  <h2><span class="num">5</span>Trabajar tus documentos</h2>
+  <table>
+    <tr><th>Quieres…</th><th>Di…</th></tr>
+    <tr><td>Escuchar el documento</td><td>«lee el documento», «lee desde aquí», «más lento», «para»</td></tr>
+    <tr><td>Corregir ortografía</td><td>«corrige el documento» (los cambios quedan con control de cambios)</td></tr>
+    <tr><td>Resumir o explicar</td><td>«resume el documento», «explícame esto»</td></tr>
+    <tr><td>Reescribir</td><td>«hazlo más formal», «simplifica este párrafo»</td></tr>
+    <tr><td>Redactar</td><td>«escribe una conclusión al final»</td></tr>
+    <tr><td>Dar formato</td><td>«pon el título en negrita y centrado»</td></tr>
+    <tr><td>Dictar</td><td>«modo dictado» … «termina dictado»</td></tr>
+    <tr><td>Que hable a tu manera</td><td>«habla más formal», «a partir de ahora trátame de usted»</td></tr>
+  </table>
+</section>
+
+<section id="asesor">
+  <h2><span class="num">6</span>El asesor de investigación (aunque no sepas nada)</h2>
+  <p class="bajada">No necesitas saber metodología. Romus te pregunta dónde estás y te guía.</p>
+  <ol class="pasos">
+    <li>En el panel, baja a la sección <b>Investigación</b> y pulsa <b>Asesor de investigación</b>, o di <span class="di">«Ok Romus, asesor»</span> o <span class="di">«no sé por dónde empezar»</span>.</li>
+    <li>Elige tu <b>nivel</b> (pregrado, especialización, maestría, doctorado o posdoctorado). Si no sabes qué <b>enfoque</b> usar, pulsa «¿Cuál es el mío?».</li>
+    <li>Elige dónde estás y sigue las indicaciones:</li>
+  </ol>
+  <div class="rejilla" style="margin-top:12px">
+    <div class="tarjeta"><div class="ico">🌱</div><h4>No sé nada de investigación</h4><p>Tutorial paso a paso desde cero. Avanza con «siguiente paso».</p></div>
+    <div class="tarjeta"><div class="ico">💡</div><h4>Tengo una idea</h4><p>Romus la convierte en pregunta, problema y objetivos.</p></div>
+    <div class="tarjeta"><div class="ico">🧱</div><h4>Quiero empezar el documento</h4><p>Inserta la estructura de tu nivel con una guía en cada apartado.</p></div>
+    <div class="tarjeta"><div class="ico">🔎</div><h4>Tengo un borrador</h4><p>Coherencia, referencias y rúbrica, con comentarios en tu documento.</p></div>
+    <div class="tarjeta"><div class="ico">🎓</div><h4>Voy a sustentar</h4><p>Simulacro con jurado por voz.</p></div>
+    <div class="tarjeta"><div class="ico">❓</div><h4>Tengo una duda</h4><p>«¿Qué es la saturación?», «¿cómo calculo la muestra?»</p></div>
+  </div>
+  <figure><img src="assets/capturas/asesor.png" alt="Asesor de investigación"><figcaption>El asesor, una explicación «en palabras sencillas» y la sección Teoría.</figcaption></figure>
+  <figure><img src="assets/capturas/investigacion.png" alt="Coherencia, rúbrica y literatura"><figcaption>Matriz de coherencia, rúbrica y literatura con citas reales en APA 7.</figcaption></figure>
+  <div class="caja"><strong>¿Cómo sé si puedo confiar?</strong>Cada resultado trae una etiqueta: <b>Basado en tu documento</b> (Romus comprobó la evidencia), <b>Fuente verificable</b> (viene de OpenAlex), <b>Rúbrica Romus</b> (puntaje calculado con reglas fijas), <b>Guía Romus</b> o <b>Teoría · Suárez</b> (vienen de los libros base) e <b>Inferencia de la IA</b> (hay que revisarla).</div>
+</section>
+
+<section id="teoria">
+  <h2><span class="num">7</span>Teoría: construir conocimiento</h2>
+  <p class="bajada">Una investigación no solo recoge datos: también construye ideas. Esta sección se basa en el libro <i>Teoría: conocimiento científico</i> de Brian Suárez.</p>
+  <ol class="pasos">
+    <li>Pulsa el botón <b>Teoría</b> o di <span class="di">«Ok Romus, abre la teoría»</span>.</li>
+    <li>Abre un elemento, por ejemplo <b>Supuestos</b>, y lee primero el recuadro <b>«En palabras sencillas»</b>.</li>
+    <li>Si quieres uno para tu trabajo, pulsa <b>Construir uno para mi proyecto</b>, o di <span class="di">«ayúdame a construir un supuesto para mi tesis»</span>. Romus lee tu documento y sigue los pasos del libro.</li>
+    <li>Revisa la propuesta, ajústala con tus palabras y pulsa <b>Insertar en el documento</b>.</li>
+  </ol>
+  <div class="caja oro"><strong>¿Por cuál empiezo?</strong>En pregrado, con <b>Conceptos</b>, <b>Definiciones</b>, <b>El problema científico</b> y <b>Variables</b>. En maestría, suma <b>Supuestos</b>, <b>Constructos teóricos</b> y <b>Operacionalización</b>. En doctorado, <b>Axiomas</b>, <b>Postulados</b>, <b>Modelos</b>, <b>Teorías</b> y el <b>MICC</b>.</div>
+  <figure><img src="assets/capturas/teoria.png" alt="Sección Teoría"></figure>
+</section>
+
+<section id="sustentar">
+  <h2><span class="num">8</span>Prepararte para sustentar y entregar</h2>
+  <figure><img src="assets/gif/romus-demo.gif" alt="Verificador de referencias y simulacro de sustentación" width="340"><figcaption>Verificador de referencias y simulacro de sustentación.</figcaption></figure>
+  <h3>Verificador de citas y referencias</h3>
+  <p>Di <span class="di">«Ok Romus, verifica las referencias»</span>. Romus cruza cada cita del texto con la lista de referencias, revisa el formato APA 7 y comprueba en OpenAlex que cada fuente exista de verdad. Si una referencia la inventó una IA, la marca.</p>
+  <h3>Simulacro de sustentación</h3>
+  <ol class="pasos">
+    <li>Di <span class="di">«Ok Romus, simulacro de sustentación»</span>.</li>
+    <li>Romus hace de jurado: lee tu documento y te hace preguntas en voz alta.</li>
+    <li>Responde hablando, sin decir «Ok Romus». Cuando termines, di <span class="di">«terminé»</span>.</li>
+    <li>Recibes una calificación, lo que te faltó y una respuesta más sólida. Di <span class="di">«siguiente»</span> para continuar. Al final verás qué repasar.</li>
+  </ol>
+  <p>Antes de entregar, di <span class="di">«declaración de uso de IA»</span>: Romus agrega al final cómo y para qué se usó la IA.</p>
+</section>
+
+<section id="problemas">
+  <h2><span class="num">9</span>Problemas frecuentes</h2>
+  <table>
+    <tr><th>Problema</th><th>Solución</th></tr>
+    <tr><td>No aparece el botón Romus</td><td>Cierra Word y vuelve a ejecutar el instalador. En Word para la web, vuelve a cargar el manifiesto.</td></tr>
+    <tr><td>Romus no me oye o el micrófono se apaga</td><td>Conecta Gemini (paso 3), activa «Siempre atento» y permite el micrófono. En <b>Ajustes → Voz → Reconocimiento de voz</b> elige «Oído de Romus».</td></tr>
+    <tr><td>Repite o responde a su propia voz</td><td>Usa audífonos o baja el volumen.</td></tr>
+    <tr><td>«Límite de la IA por minuto»</td><td>El plan gratuito de Gemini tiene límites: espera un momento.</td></tr>
+    <tr><td>Veo una versión vieja</td><td>Cierra Word, vacía la carpeta <code>%LOCALAPPDATA%\Microsoft\Office\16.0\Wef\</code> (o reinstala) y abre Word.</td></tr>
+    <tr><td>Quiero desinstalar</td><td>Menú Inicio → <b>Romus → Desinstalar Romus</b>, o Configuración → Aplicaciones.</td></tr>
+  </table>
+</section>
+
+</main>
+<footer>Romus para Word · creado por Brian Gonzalo Suárez Acevedo · <a href="https://github.com/PassBri/romus">github.com/PassBri/romus</a></footer>
+</body>
+</html>

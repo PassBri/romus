@@ -181,7 +181,7 @@ window.Inv = (function () {
       rubrica: "Calculado con criterios fijos, no por la opinión de la IA.",
       modelo: "Propuesta generada por la IA. No está comprobada en tu documento ni en fuentes: revísala.",
       teoria: "Contenido del libro «Teoría: conocimiento científico» de Brian Gonzalo Suárez Acevedo (2025).",
-      guia: "Explicación de la guía metodológica de Romus, redactada a partir de Hernández Sampieri et al. (2014) y Martínez Miguélez (2004)."
+      guia: "Guía metodológica de Romus (método Kuetz), escrita para Romus. Al final de cada tema se indican lecturas para profundizar."
     }[o.cls] || "";
     return s;
   }
@@ -755,6 +755,20 @@ Reglas:
 
   /* ================= 7. Guía metodológica y modo tutorial ================= */
 
+  /** Temas de la guía conectados con la Teoría de Brian Suárez. */
+  const TEORIA_REL = {
+    investigacion: ["teo-ciclo-vital", "teo-micc"], idea: ["teo-micc", "teo-cebolla"], epistemologia: ["teo-paradigmas-segun-la-teoria", "teo-ciclo-vital"],
+    cientificidad: ["teo-razonamientos-logicos", "teo-argumentos-cientificos"], planteamiento: ["teo-el-problema-cientifico", "teo-fenomeno"],
+    "planteamiento-cualitativo": ["teo-el-problema-cientifico", "teo-fenomeno"], preguntas: ["teo-preguntas-cientificas", "teo-cebolla"],
+    objetivos: ["teo-la-tesis-afirmacion-principal"], "marco-teorico": ["teo-teorias-cientificas", "teo-constructos-teoricos", "teo-conceptos"],
+    "revision-literatura": ["teo-enunciados-teoricos"], hipotesis: ["teo-hipotesis-segun-la-teoria", "teo-supuestos"],
+    variables: ["teo-variables-segun-la-teoria", "teo-operacionalizacion-de-variables", "teo-indicadores"], instrumentos: ["teo-indicadores", "teo-observacion-empirica"],
+    "diseno-experimental": ["teo-simulaciones", "teo-inferencias"], "analisis-cuantitativo": ["teo-inferencias", "teo-razonamientos-logicos"],
+    "analisis-cualitativo": ["teo-conceptos", "teo-constructos-teoricos"], "recoleccion-cualitativa": ["teo-observacion-empirica"],
+    "disenos-cualitativos": ["teo-modelos-cientificos"], mixtos: ["teo-bosques"], "reporte-cuantitativo": ["teo-argumentos-cientificos"],
+    "uso-ia": ["teo-cognicion-sintetica", "teo-ecosistema"]
+  };
+
   let tutorialActivo = false;
 
   function botonAccion(t) {
@@ -776,7 +790,7 @@ Reglas:
   function mostrarTema(t, ruta, paso, hablarlo) {
     const c = el("div", "inv-cuerpo guia");
     const esTeoria = /^Teoría/.test(t.cat);
-    c.appendChild(etiqueta(esTeoria ? "teoria" : "guia", esTeoria ? t.fuente.replace(/^.*?, (?=§|Cap|Ecos)/, "") : t.fuente));
+    c.appendChild(etiqueta(esTeoria ? "teoria" : "guia", esTeoria ? t.fuente.replace(/^.*?, (?=§|Cap|Ecos)/, "") : "método Kuetz"));
     if (t.complejidad) c.appendChild(el("span", "guia-nivel", "Nivel de complejidad: " + t.complejidad));
     if (ruta) {
       const total = Guia.RUTAS[ruta].length;
@@ -785,6 +799,7 @@ Reglas:
       const barra = el("i", "barra"); const r = el("i"); r.style.width = Math.round((paso + 1) / total * 100) + "%"; barra.appendChild(r); prog.appendChild(barra);
       c.appendChild(prog);
     }
+    if (t.sencillo) { const sc = el("div", "guia-sencillo"); sc.appendChild(el("b", "", "En palabras sencillas")); sc.appendChild(el("span", "", t.sencillo)); c.appendChild(sc); }
     c.appendChild(el("p", "guia-resumen", t.resumen));
     if (t.puntos && t.puntos.length) { const ul = el("ul", "guia-puntos"); t.puntos.forEach(x => ul.appendChild(el("li", "", x))); c.appendChild(ul); }
     const desplegable = (titulo, xs, ordenada, abierto) => {
@@ -815,6 +830,14 @@ Reglas:
       acc.appendChild(bc);
     }
     c.appendChild(acc);
+    // Conexión con la Teoría de Brian Suárez y lecturas para profundizar
+    const enlaces = (TEORIA_REL[t.id] || []).map(id => Guia.tema(id)).filter(Boolean);
+    if (enlaces.length) {
+      const r = el("div", "guia-relacionados"); r.appendChild(el("span", "", "En la Teoría:"));
+      enlaces.forEach(x => { const a = el("button", "enlace-sutil", x.titulo); a.onclick = () => mostrarTema(x); r.appendChild(a); });
+      c.appendChild(r);
+    }
+    if (!esTeoria && t.fuente && t.fuente !== "Romus") c.appendChild(el("p", "inv-nota", "Para profundizar: " + t.fuente + "."));
     if (ruta) {
       const nav = el("div", "inv-acciones guia-nav");
       const ant = el("button", "boton secundario", "← Anterior"); ant.disabled = paso === 0; ant.onclick = () => pasoTutorial(-1);
@@ -830,15 +853,24 @@ Reglas:
       }
     }
     tarjeta(t.titulo, c);
-    if (hablarlo) ui.hablar(`${t.titulo}. ${t.resumen}`);
+    if (hablarlo) ui.hablar(`${t.titulo}. ${t.sencillo || t.resumen}`);
   }
 
   /** Índice de la guía con buscador. */
   function indiceGuia(soloTeoria) {
     const c = el("div", "inv-cuerpo guia");
+    if (soloTeoria) {
+      const ex = el("div", "guia-sencillo");
+      ex.appendChild(el("b", "", "¿Qué es esto y para quién es?"));
+      ex.appendChild(el("span", "", "Una investigación no solo recoge datos: también construye ideas. Esta sección, basada en el libro «Teoría: conocimiento científico» de Brian Suárez, explica las piezas con las que se arma el conocimiento (definiciones, supuestos, axiomas, postulados, constructos, modelos, teorías) y te ayuda a construir las tuyas. Si estás empezando, abre un tema y lee «En palabras sencillas». Si haces una maestría o un doctorado y quieres proponer un modelo o una teoría propia, usa «Construir uno para mi proyecto»."));
+      c.appendChild(ex);
+      const pasos = el("ol", "guia-puntos");
+      ["Elige un elemento (por ejemplo, «Supuestos» o «Constructos teóricos») y lee qué es.", "Pulsa «Construir uno para mi proyecto»: Romus lee tu documento y sigue los pasos del libro.", "Revisa la propuesta, ajústala con tus palabras e insértala en el documento."].forEach(x => pasos.appendChild(el("li", "", x)));
+      c.appendChild(pasos);
+    }
     c.appendChild(el("p", "inv-nota", soloTeoria
-      ? "«Teoría: conocimiento científico» de Brian Gonzalo Suárez Acevedo (2025): los elementos con los que se construye el conocimiento (axiomas, postulados, constructos, modelos, teorías…) y los modelos del autor. Pregunta («Ok Romus, ¿qué es un postulado?») o pide «ayúdame a construir un axioma para mi tesis»."
-      : "Guía metodológica de Romus, redactada a partir de Hernández Sampieri et al. (2014) y Martínez Miguélez (2004), más la Teoría de Brian Suárez. Pregunta con la voz («Ok Romus, ¿qué es la saturación?») o elige un tema."));
+      ? "También por voz: «Ok Romus, ¿qué es un postulado?» o «ayúdame a construir un supuesto para mi tesis»."
+      : "Guía metodológica de Romus (método Kuetz), conectada con la Teoría de Brian Suárez. Cada tema indica lecturas para profundizar. Pregunta con la voz («Ok Romus, ¿qué es la saturación?») o elige un tema."));
     const fila = el("div", "guia-buscar");
     const inp = el("input"); inp.placeholder = "¿Qué quieres saber? Ej.: tipos de muestreo";
     const b = el("button", "boton primario", "Buscar");
@@ -880,7 +912,7 @@ Reglas:
       `Duda del usuario: «${pregunta}»\n\nGUÍA DE ROMUS (fuente principal; respétala):\n${contexto}\n\nDOCUMENTO DEL USUARIO (contexto, puede estar vacío):\n${(doc.texto || "").slice(0, 15000)}\n\nSi la guía no cubre la duda, respóndela con tu conocimiento y marca cubierto_por_guia=false.`, signal);
     const c = el("div", "inv-cuerpo guia");
     const deTeoria = /^Teoría/.test(res[0].t.cat);
-    c.appendChild(etiqueta(d.cubierto_por_guia ? (deTeoria ? "teoria" : "guia") : "modelo", d.cubierto_por_guia ? res[0].t.fuente : ""));
+    c.appendChild(etiqueta(d.cubierto_por_guia ? (deTeoria ? "teoria" : "guia") : "modelo", d.cubierto_por_guia ? (deTeoria ? res[0].t.fuente : "método Kuetz") : ""));
     c.appendChild(el("p", "guia-resumen", d.respuesta));
     if (d.aplicacion) { const ap = el("div", "guia-caja ejemplo"); ap.appendChild(el("b", "", "En tu proyecto")); ap.appendChild(el("span", "", d.aplicacion)); c.appendChild(ap); }
     const r = el("div", "guia-relacionados"); r.appendChild(el("span", "", "Ver en la guía:"));
@@ -981,6 +1013,54 @@ Reglas:
     ui.hablar("Terminaste el tutorial. Pregúntame cuando tengas dudas.");
   }
 
+  /* ================= 8. Asesor: ¿por dónde empiezo? ================= */
+
+  function asesor() {
+    const c = el("div", "inv-cuerpo asesor");
+    c.appendChild(el("p", "guia-resumen", "Soy tu asesor de investigación. No necesitas saber de metodología: elige dónde estás y te guío paso a paso."));
+    const n = nivel(), e = enfoque();
+    const conf = el("div", "asesor-conf");
+    conf.appendChild(el("span", "", `Tu proyecto: ${n.nombre} · enfoque ${e.nombre.toLowerCase()}`));
+    const cambiar = el("button", "enlace-sutil", "Cambiar"); cambiar.onclick = () => { const s = $("selNivel"); if (s) { s.focus(); s.scrollIntoView({ block: "center" }); } };
+    const queEs = el("button", "enlace-sutil", "¿Cuál es el mío?"); queEs.onclick = () => mostrarTema(Guia.tema("enfoques"));
+    conf.append(cambiar, queEs);
+    c.appendChild(conf);
+    const opciones = [
+      ["🌱", "No sé nada de investigación", "Te enseño desde cero, paso a paso.", () => iniciarTutorial()],
+      ["💡", "Tengo una idea, pero no sé cómo plantearla", "La convierto en pregunta, problema y objetivos.", () => { if (ui.prefijar) ui.prefijar("Ayúdame a idear un proyecto sobre "); ui.hablar("Escribe o dime tu idea en una frase."); }],
+      ["🧱", "Quiero empezar el documento", `Inserto la estructura de ${n.producto.toLowerCase()} con una guía en cada apartado.`, () => ejecutar(insertarEstructura)],
+      ["🔎", "Ya tengo un borrador y quiero revisarlo", "Coherencia, referencias y rúbrica, con comentarios en tu documento.", () => revisarBorrador()],
+      ["🎓", "Voy a sustentar", "Hago de jurado: te pregunto en voz alta y evalúo tus respuestas.", () => { if (window.Jurado) ejecutar(() => Jurado.iniciar(5)); }],
+      ["🌳", "Quiero construir teoría (maestría o doctorado)", "Axiomas, supuestos, constructos y modelos con el libro de Brian Suárez.", () => indiceGuia(true)],
+      ["❓", "Tengo una duda concreta", "Pregúntame: «¿qué es la saturación?», «¿cómo calculo la muestra?»…", () => indiceGuia()]
+    ];
+    opciones.forEach(([ico, t, d, fn]) => {
+      const b = el("button", "asesor-op");
+      b.append(el("i", "", ico));
+      const tx = el("span", ""); tx.append(el("b", "", t), el("small", "", d)); b.appendChild(tx);
+      b.onclick = fn;
+      c.appendChild(b);
+    });
+    c.appendChild(el("p", "inv-nota", "Todo funciona también por voz. Di «Ok Romus, asesor» cuando quieras volver aquí."));
+    tarjeta("Asesor de investigación", c);
+    ui.hablar("Soy tu asesor de investigación. Dime dónde estás: no sé nada, tengo una idea, ya tengo un borrador, voy a sustentar o quiero construir teoría.");
+  }
+
+  function revisarBorrador() {
+    const c = el("div", "inv-cuerpo asesor");
+    c.appendChild(el("p", "guia-resumen", "Te recomiendo este orden. Cada revisión deja comentarios en tu documento."));
+    [["1", "Coherencia", "¿Problema, pregunta, objetivos y método encajan entre sí?", () => ejecutar(() => coherencia())],
+     ["2", "Referencias", "¿Cada cita tiene su referencia, en APA 7 y de una fuente que existe?", () => { if (window.Jurado) ejecutar(Jurado.verificar); }],
+     ["3", "Rúbrica", `¿Qué tan completo está para ${nivel().nombre}?`, () => ejecutar(() => evaluarRubrica())]
+    ].forEach(([n, t, d, fn]) => {
+      const b = el("button", "asesor-op"); b.append(el("i", "", n));
+      const tx = el("span", ""); tx.append(el("b", "", t), el("small", "", d)); b.appendChild(tx);
+      b.onclick = fn; c.appendChild(b);
+    });
+    const v = el("button", "boton secundario", "← Volver"); v.onclick = asesor; c.appendChild(v);
+    tarjeta("Revisar mi borrador", c);
+  }
+
   /* ================= Comandos de voz ================= */
 
   const NUM = { uno: 0, una: 0, primero: 0, primera: 0, "1": 0, dos: 1, segundo: 1, segunda: 1, "2": 1, tres: 2, tercero: 2, tercera: 2, "3": 2, cuatro: 3, cuarto: 3, cuarta: 3, "4": 3, cinco: 4, quinto: 4, quinta: 4, "5": 4, seis: 5, sexto: 5, sexta: 5, "6": 5 };
@@ -988,6 +1068,8 @@ Reglas:
 
   /** Devuelve una función si el comando es del modo investigación; si no, null. n = texto normalizado; original = texto con tildes. */
   function comando(n, original, signal) {
+    const extra = window.Jurado && Jurado.comando(n, original);
+    if (extra) return extra;
     const tarea = (fn) => async () => {
       ui.ocupar(true, "Investigación…");
       try { await fn(); } catch (e) { ui.mostrarError(e); } finally { ui.ocupar(false); }
@@ -1017,6 +1099,7 @@ Reglas:
     m = original.match(/^\s*(?:ay[uú]dame a\s+)?(?:idear|formular|plantear|convertir)\s*(?:un proyecto|una tesis|una investigaci[oó]n|una pregunta|la idea|mi idea)?\s*(?:sobre|de|acerca de|con|:)?\s*(.*)$/i);
     if (m && /^(ayudame a )?(idear|formular|plantear|convertir)/.test(n)) return tarea(() => idear(m[1], signal));
     if (/(declaracion|registro) (de )?(uso de )?(la )?(ia|inteligencia artificial)/.test(n)) return tarea(declaracion);
+    if (/^((abre|activa|inicia|quiero)( el)? )?asesor( de investigacion| metodologico)?$|^(ayudame|ayuda) con (mi|la) (investigacion|tesis|proyecto)$|^no se (por donde|como) (empezar|comenzar|iniciar)( mi (tesis|proyecto|investigacion))?$|^quiero (hacer|empezar) (una|mi) (tesis|investigacion|proyecto de investigacion)$/.test(n)) return () => asesor();
     // Guía y tutorial
     if (/^((inicia|empieza|abre|activa|comienza) (el )?)?(modo )?tutorial( de investigacion)?$|^ensename a investigar$/.test(n)) return () => iniciarTutorial();
     if (/^(siguiente|proximo) (paso|tema)$|^avanza$/.test(n) && (tutorialActivo || (Config.get().tutorial && /paso|tema/.test(n)))) return () => pasoTutorial(1);
@@ -1034,7 +1117,9 @@ Reglas:
   return {
     NIVELES, ENFOQUES, nivel, fijarNivel, enfoque, fijarEnfoque, secciones, conectar, comando, etiqueta, registrar, leerRegistro,
     insertarEstructura, idear, coherencia, literatura, citar, evaluarRubrica, declaracion,
-    preguntar, indiceGuia, mostrarTema, construir, iniciarTutorial, pasoTutorial, salirTutorial,
-    _apa: apa, _verificar: verificar, _partirNombre: partirNombre
+    preguntar, indiceGuia, mostrarTema, construir, asesor, iniciarTutorial, pasoTutorial, salirTutorial,
+    _apa: apa, _verificar: verificar, _partirNombre: partirNombre,
+    // Utilidades compartidas con otros módulos (jurado.js)
+    _h: { tarjeta, el, etiqueta, registrar, documentoNumerado, pedirHerramienta, verificar, norm, ejecutar, irA, get ui() { return ui; } }
   };
 })();
