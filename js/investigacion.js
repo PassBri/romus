@@ -260,6 +260,7 @@ Reglas:
   /* ================= Panel de resultados ================= */
 
   function tarjeta(titulo, contenido) {
+    if (window.RomusUI) RomusUI.irPestana("investigar", { sinScroll: true });
     const caja = $("invResultado");
     caja.innerHTML = "";
     const cab = document.createElement("div");

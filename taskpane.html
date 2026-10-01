@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Romus</title>
   <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
-  <link rel="stylesheet" href="css/taskpane.css?v=2.8">
+  <link rel="stylesheet" href="css/taskpane.css?v=2.9">
 </head>
 <body>
   <div id="app">
@@ -36,6 +36,30 @@
       </div>
     </header>
 
+    <!-- 01 · Núcleo: Romus vivo -->
+    <section class="nucleo" aria-label="Romus">
+      <div class="escena">
+        <canvas id="orbePanel" class="orbe-panel" title="Romus"></canvas>
+      </div>
+      <div id="micEtiqueta" class="nucleo-estado">Pulsa para hablar</div>
+      <div class="nucleo-info"><span id="roIA">—</span><span class="sep">·</span><span id="roVoz">—</span></div>
+      <div id="transcripcion" class="transcripcion">Prueba: «Ok Romus, corrige la ortografía»</div>
+      <div class="nucleo-controles">
+        <button id="btnMic" class="mic" aria-label="Hablar"><span class="onda"></span><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg><span class="mic-txt">Hablar</span></button>
+        <label class="interruptor pequeno">
+          <input type="checkbox" id="chkManosLibres">
+          <span class="riel"></span>
+          <span>Siempre atento</span>
+        </label>
+      </div>
+    </section>
+
+    <nav class="pestanas" role="tablist" aria-label="Secciones">
+      <button class="pestana" role="tab" data-ir="inicio" aria-selected="true"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg><span>Inicio</span></button>
+      <button class="pestana" role="tab" data-ir="investigar" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M3 8l9-4 9 4-9 4z"/><path d="M7 10v5c3 2 7 2 10 0v-5"/></svg><span>Investigar</span></button>
+      <button class="pestana" role="tab" data-ir="documento" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg><span>Documento</span></button>
+    </nav>
+
     <main id="principal">
       <div id="avisoFueraWord" class="aviso oculto">
         Este panel funciona dentro de Microsoft Word. Cárgalo como complemento con el archivo <b>manifest.xml</b>.
@@ -49,28 +73,11 @@
           <li><span>Pégala aquí:</span>
             <div class="bv-fila"><input id="inpClaveRapida" type="password" placeholder="AIza…" autocomplete="off" spellcheck="false"><button id="btnConectarRapido" class="boton primario">Conectar</button></div>
             <small id="bvNota"></small></li>
-          <li><span>Activa <b>Siempre atento</b> y di <b>«Ok Romus, lee el documento»</b>. ¿Vas a investigar? Toca <b>Asesor de investigación</b>.</span></li>
+          <li><span>Activa <b>Siempre atento</b> y di <b>«Ok Romus, lee el documento»</b>. ¿Vas a investigar? Abre la pestaña <b>Investigar</b>.</span></li>
         </ol>
         <div class="bv-pie"><button id="btnIrAjustes" class="enlace-sutil">Usar otra IA (Claude, ChatGPT…)</button><a class="enlace-sutil" href="https://passbri.github.io/romus/tutorial.html" target="_blank" rel="noopener">Ver tutorial</a></div>
       </div>
 
-      <!-- 01 · Núcleo: Romus vivo -->
-      <section class="nucleo" aria-label="Romus">
-        <div class="escena">
-          <canvas id="orbePanel" class="orbe-panel" title="Romus"></canvas>
-        </div>
-        <div id="micEtiqueta" class="nucleo-estado">Pulsa para hablar</div>
-        <div class="nucleo-info"><span id="roIA">—</span><span class="sep">·</span><span id="roVoz">—</span></div>
-        <div id="transcripcion" class="transcripcion">Prueba: «Ok Romus, corrige la ortografía»</div>
-        <div class="nucleo-controles">
-          <button id="btnMic" class="mic" aria-label="Hablar"><span class="onda"></span><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg><span class="mic-txt">Hablar</span></button>
-          <label class="interruptor pequeno">
-            <input type="checkbox" id="chkManosLibres">
-            <span class="riel"></span>
-            <span>Siempre atento</span>
-          </label>
-        </div>
-      </section>
 
       <!-- Lectura en curso -->
       <section id="lector" class="tarjeta lector oculto" aria-label="Lectura en voz alta">
@@ -95,47 +102,46 @@
         <div class="barra-progreso"><div id="progresoBarra"></div></div>
       </section>
 
-      <!-- 02 · Telemetría del documento -->
-      <section class="seccion telemetria" aria-label="Documento">
-        <div class="seccion-cab">Documento<button id="btnRefrescar" class="seccion-der enlace-sutil" title="Actualizar">Actualizar</button></div>
-        <div class="metricas">
-          <div class="metrica"><b id="mPalabras">—</b><span>palabras</span></div>
-          <div class="metrica"><b id="mEscucha">—</b><span>min escucha</span></div>
-          <div class="metrica"><b id="mParrafos">—</b><span>párrafos</span></div>
-          <div class="metrica"><b id="mCambios">—</b><span>cambios</span></div>
-        </div>
-        <div class="legibilidad">
-          <div class="leg-cab"><span>Legibilidad</span><b id="mLegTexto">—</b></div>
-          <div class="leg-barra"><i id="mLegRelleno"></i><em id="mLegMarca"></em></div>
-        </div>
-      </section>
 
-      <!-- 03 · Mapa del documento -->
-      <section class="seccion mapa" aria-label="Mapa del documento">
-        <div class="seccion-cab">Estructura<span class="seccion-der" id="mapaSeccion">—</span></div>
-        <div id="mapaDoc" class="mapa-doc"></div>
-        <div id="mapaTip" class="mapa-tip">Toca una barra para ir a ese párrafo</div>
-      </section>
 
-      <!-- 04 · Comandos -->
-      <section class="seccion comandos" aria-label="Acciones">
-        <div class="seccion-cab">Acciones</div>
+
+
+
+
+      <!-- ===== Pestaña Inicio ===== -->
+      <!-- Acciones -->
+      <section class="seccion comandos" aria-label="Acciones" data-pestana="inicio">
+        <div class="seccion-cab">Acciones rápidas<span class="seccion-der">o díselas a Romus</span></div>
         <div class="rapidas">
           <button class="chip" data-cmd="lee el documento" title="Di: «lee el documento»"><svg viewBox="0 0 24 24"><path d="M4 10v4h3l4 4V6L7 10H4zM15 9a4 4 0 0 1 0 6M17.5 6.5a7.5 7.5 0 0 1 0 11"/></svg><span>Leer</span></button>
-          <button class="chip" data-cmd="lee la selección" title="Di: «lee esto»"><svg viewBox="0 0 24 24"><path d="M4 10v4h3l4 4V6L7 10H4zM15 9a4 4 0 0 1 0 6"/><path d="M19 4v4M17 6h4"/></svg><span>Leer selección</span></button>
           <button class="chip" data-cmd="corrige la ortografía" title="Di: «corrige esto»"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg><span>Corregir</span></button>
           <button class="chip" data-cmd="revisa con comentarios" title="Di: «revisa con comentarios»"><svg viewBox="0 0 24 24"><path d="M5 5h14v10H9l-4 4z"/></svg><span>Revisar</span></button>
           <button class="chip" data-cmd="resume el documento en pocas frases" title="Di: «resume el documento»"><svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h10M5 17h6"/></svg><span>Resumir</span></button>
           <button class="chip" data-cmd="explícame lo que tengo seleccionado con palabras sencillas" title="Di: «explícame esto»"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span>Explicar</span></button>
-          <button class="chip" data-cmd="reescribe la selección con un lenguaje más sencillo" title="Di: «hazlo más sencillo»"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg><span>Simplificar</span></button>
-          <button class="chip" data-cmd="reescribe la selección con un tono más formal y académico" title="Di: «hazlo más formal»"><svg viewBox="0 0 24 24"><path d="M3 9l9-5 9 5-9 5zM7 11.5V16c3 2 7 2 10 0v-4.5"/></svg><span>Más formal</span></button>
           <button class="chip" data-cmd="modo dictado" title="Di: «modo dictado»"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 20h14"/></svg><span>Dictar</span></button>
-          <button class="chip" data-cmd="modo voz" title="Di: «modo voz»"><svg viewBox="0 0 24 24"><path d="M4 9V5h4M20 9V5h-4M4 15v4h4M20 15v4h-4"/><circle cx="12" cy="12" r="3.2"/></svg><span>Modo voz</span></button>
         </div>
+        <details class="inv-mas">
+          <summary>Más acciones</summary>
+          <div class="rapidas">
+            <button class="chip" data-cmd="lee la selección" title="Di: «lee esto»"><svg viewBox="0 0 24 24"><path d="M4 10v4h3l4 4V6L7 10H4zM15 9a4 4 0 0 1 0 6"/><path d="M19 4v4M17 6h4"/></svg><span>Leer selección</span></button>
+            <button class="chip" data-cmd="reescribe la selección con un lenguaje más sencillo" title="Di: «hazlo más sencillo»"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg><span>Simplificar</span></button>
+            <button class="chip" data-cmd="reescribe la selección con un tono más formal y académico" title="Di: «hazlo más formal»"><svg viewBox="0 0 24 24"><path d="M3 9l9-5 9 5-9 5zM7 11.5V16c3 2 7 2 10 0v-4.5"/></svg><span>Más formal</span></button>
+            <button class="chip" data-cmd="modo voz" title="Di: «modo voz»"><svg viewBox="0 0 24 24"><path d="M4 9V5h4M20 9V5h-4M4 15v4h4M20 15v4h-4"/><circle cx="12" cy="12" r="3.2"/></svg><span>Modo voz</span></button>
+          </div>
+        </details>
+      </section>
+      <!-- Conversación -->
+      <section class="seccion registro" aria-label="Conversación" data-pestana="inicio">
+        <div class="seccion-cab">Conversación<button id="btnLimpiarChat" class="seccion-der enlace-sutil" title="Borrar la conversación">Limpiar</button></div>
+        <section id="conversacion" class="conversacion" aria-live="polite">
+          <div class="mensaje sistema" data-meta="Romus">Di «Ok Romus» y lo que necesitas: «léeme el segundo párrafo», «corrige esto», «pon el título en negrita» o «¿de qué trata el documento?».</div>
+        </section>
       </section>
 
-      <section class="seccion investigacion" aria-label="Investigación">
-        <div class="seccion-cab">Investigación<span class="seccion-der">método Kuetz</span></div>
+      <!-- ===== Pestaña Investigar ===== -->
+      <section class="seccion investigacion" aria-label="Investigación" data-pestana="investigar">
+        <div id="invResultado" class="inv-resultado oculto" aria-live="polite"></div>
+        <div class="seccion-cab">Tu investigación<span class="seccion-der">método Kuetz</span></div>
         <button id="btnAsesor" class="asesor-boton" data-asesor="1">
           <svg viewBox="0 0 24 24"><path d="M12 3l2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 8.3l5-.7z"/></svg>
           <span><b>Asesor de investigación</b><small>¿No sabes por dónde empezar? Toca aquí o di «Ok Romus, asesor».</small></span>
@@ -182,11 +188,31 @@
             <button class="chip" data-cmd="declaración de uso de IA" title="Di: «declaración de uso de IA»"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Uso de IA</span></button>
           </div>
         </details>
-        <div id="invResultado" class="inv-resultado oculto" aria-live="polite"></div>
       </section>
 
-      <!-- 05 · Voz de lectura -->
-      <details id="tarjetaVoz" class="seccion tarjeta-voz">
+      <!-- ===== Pestaña Documento ===== -->
+      <!-- Documento -->
+      <section class="seccion telemetria" aria-label="Documento" data-pestana="documento">
+        <div class="seccion-cab">Documento<button id="btnRefrescar" class="seccion-der enlace-sutil" title="Actualizar">Actualizar</button></div>
+        <div class="metricas">
+          <div class="metrica"><b id="mPalabras">—</b><span>palabras</span></div>
+          <div class="metrica"><b id="mEscucha">—</b><span>min escucha</span></div>
+          <div class="metrica"><b id="mParrafos">—</b><span>párrafos</span></div>
+          <div class="metrica"><b id="mCambios">—</b><span>cambios</span></div>
+        </div>
+        <div class="legibilidad">
+          <div class="leg-cab"><span>Legibilidad</span><b id="mLegTexto">—</b></div>
+          <div class="leg-barra"><i id="mLegRelleno"></i><em id="mLegMarca"></em></div>
+        </div>
+      </section>
+      
+      <section class="seccion mapa" aria-label="Mapa del documento" data-pestana="documento">
+        <div class="seccion-cab">Estructura<span class="seccion-der" id="mapaSeccion">—</span></div>
+        <div id="mapaDoc" class="mapa-doc"></div>
+        <div id="mapaTip" class="mapa-tip">Toca una barra para ir a ese párrafo</div>
+      </section>
+      
+      <details id="tarjetaVoz" class="seccion tarjeta-voz" data-pestana="documento" open>
         <summary class="seccion-cab">Voz de lectura<span id="resumenVoz" class="seccion-der resumen-voz"></span></summary>
         <div class="voz-cuerpo">
           <div class="con-boton">
@@ -209,14 +235,6 @@
           <p class="nota" id="notaVoz">Los cambios se aplican al instante, incluso mientras lee.</p>
         </div>
       </details>
-
-      <!-- 06 · Registro -->
-      <section class="seccion registro" aria-label="Actividad">
-        <div class="seccion-cab">Actividad</div>
-        <section id="conversacion" class="conversacion" aria-live="polite">
-          <div class="mensaje sistema" data-meta="Romus">Di «Ok Romus» y lo que necesitas: «léeme el segundo párrafo», «corrige esto», «pon el título en negrita» o «¿de qué trata el documento?».</div>
-        </section>
-      </section>
     </main>
 
     <!-- Barra de comandos -->
@@ -379,7 +397,7 @@
         <div class="fila">
           <button id="btnBorrarHistorial" class="boton secundario">Borrar conversación</button>
         </div>
-        <p class="nota">Romus para Word v2.8 · Los textos se envían a la IA que elijas solo cuando das un comando que la usa.</p>
+        <p class="nota">Romus para Word v2.9 · Los textos se envían a la IA que elijas solo cuando das un comando que la usa.</p>
       </div>
     </div>
 
@@ -452,20 +470,20 @@
     </div>
   </div>
 
-  <script src="js/config.js?v=2.8"></script>
-  <script src="js/voz.js?v=2.8"></script>
-  <script src="js/escucha.js?v=2.8"></script>
-  <script src="js/orbe.js?v=2.8"></script>
-  <script src="js/romus.js?v=2.8"></script>
-  <script src="js/ia.js?v=2.8"></script>
-  <script src="js/documento.js?v=2.8"></script>
-  <script src="js/panel.js?v=2.8"></script>
-  <script src="js/guia.js?v=2.8"></script>
-  <script src="js/teoria.js?v=2.8"></script>
-  <script src="js/investigacion.js?v=2.8"></script>
-  <script src="js/jurado.js?v=2.8"></script>
-  <script src="js/asesor.js?v=2.8"></script>
-  <script src="js/datos.js?v=2.8"></script>
-  <script src="js/app.js?v=2.8"></script>
+  <script src="js/config.js?v=2.9"></script>
+  <script src="js/voz.js?v=2.9"></script>
+  <script src="js/escucha.js?v=2.9"></script>
+  <script src="js/orbe.js?v=2.9"></script>
+  <script src="js/romus.js?v=2.9"></script>
+  <script src="js/ia.js?v=2.9"></script>
+  <script src="js/documento.js?v=2.9"></script>
+  <script src="js/panel.js?v=2.9"></script>
+  <script src="js/guia.js?v=2.9"></script>
+  <script src="js/teoria.js?v=2.9"></script>
+  <script src="js/investigacion.js?v=2.9"></script>
+  <script src="js/jurado.js?v=2.9"></script>
+  <script src="js/asesor.js?v=2.9"></script>
+  <script src="js/datos.js?v=2.9"></script>
+  <script src="js/app.js?v=2.9"></script>
 </body>
 </html>

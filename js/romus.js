@@ -59,14 +59,15 @@ window.OrbeRomus = (function () {
 
     /* Esfera de Fibonacci: reparto uniforme y ordenado de los puntos (aspecto limpio) */
     _crearPuntos() {
-      const N = 640, oro = Math.PI * (3 - Math.sqrt(5));
+      // Compacta (panel, burbuja pequeña): menos puntos para que se lea limpia a poco tamaño
+      const N = this.compacto ? 300 : 640, oro = Math.PI * (3 - Math.sqrt(5));
       this.p = [];
       for (let i = 0; i < N; i++) {
         const y = 1 - (i / (N - 1)) * 2;
         const lat = Math.acos(y);
         const lon = (i * oro) % TAU;
         const u = Math.random();
-        const tipo = u < 0.3 ? "humano" : u < 0.36 ? "verde" : u < 0.5 ? "cian" : "ia";
+        const tipo = u < 0.28 ? "humano" : u < 0.3 ? "verde" : u < 0.4 ? "cian" : "ia"; // tú (magenta) y la IA (azul), con pocos acentos
         this.p.push({
           lat, lon, tipo,
           anillo: (Math.round((lat / Math.PI) * 10) + 0.5) / 11 * Math.PI,
@@ -86,6 +87,8 @@ window.OrbeRomus = (function () {
       this.dpr = dpr;
       this.c.width = Math.round((this.c.clientWidth || 200) * dpr);
       this.c.height = Math.round((this.c.clientHeight || 200) * dpr);
+      const comp = Math.min(this.c.clientWidth || 200, this.c.clientHeight || 200) < 170;
+      if (comp !== this.compacto) { this.compacto = comp; this._crearPuntos(); }
     }
 
     _cuadro(ahora) {
@@ -125,7 +128,7 @@ window.OrbeRomus = (function () {
       this.inclinY += (this.objY - this.inclinY) * Math.min(1, dt * 2.5);
 
       this.cx = W / 2; this.cy = H / 2;
-      this.R = Math.min(W, H) * 0.3 * this.escala;
+      this.R = Math.min(W, H) * (this.compacto ? 0.335 : 0.3) * this.escala;
       this.cY = Math.cos(this.rotY); this.sY = Math.sin(this.rotY);
       const ax = this.rotX + this.inclinX;
       this.cX = Math.cos(ax); this.sX = Math.sin(ax);
@@ -176,6 +179,7 @@ window.OrbeRomus = (function () {
       };
       const vel = e === "pensando" ? 1.6 : 1;
       arcos(R * 1.42, 3, 0.9, t * 0.35 * vel, 1.4, oscuro ? 0.55 : 0.45, acento);
+      if (this.compacto) return; // compacta: solo ecualizador y arco principal
       arcos(R * 1.5, 12, 0.22, -t * 0.12 * vel, 1, oscuro ? 0.22 : 0.18, P.linea);
 
       // Marcas finas tipo mira (cada 6°, más largas cada 30°)
@@ -242,7 +246,7 @@ window.OrbeRomus = (function () {
       }
       const oscuro = this.tema === "oscuro";
       const alfas = oscuro ? [0.22, 0.55, 0.95] : [0.18, 0.45, 0.9];
-      const tamanos = [0.8, 1.1, 1.5];
+      const tamanos = this.compacto ? [0.85, 1.2, 1.65] : [0.8, 1.1, 1.5];
       for (const clave in grupos) {
         const tipo = clave.replace(/\d.*$/, "");
         const capa = +clave.match(/\d/)[0];

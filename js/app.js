@@ -33,6 +33,27 @@
     e.className = "estado" + (tipo ? " " + tipo : "");
   }
 
+  /* ---------- Pestañas: Inicio · Investigar · Documento ---------- */
+  const PESTANAS = ["inicio", "investigar", "documento"];
+  function pestanaActual() { return document.body.dataset.pestana || "inicio"; }
+  function irPestana(nombre, opciones) {
+    if (!PESTANAS.includes(nombre)) return;
+    const antes = pestanaActual();
+    document.body.dataset.pestana = nombre;
+    document.querySelectorAll("[data-pestana]").forEach(el => el.classList.toggle("fuera-pestana", el.dataset.pestana !== nombre));
+    document.querySelectorAll(".pestana").forEach(b => {
+      const si = b.dataset.ir === nombre;
+      b.setAttribute("aria-selected", si ? "true" : "false");
+      if (si) b.classList.remove("novedad");
+    });
+    try { Config.set({ pestana: nombre }); } catch (e) { /* sin almacenamiento */ }
+    const main = $("principal");
+    if (main && antes !== nombre && !(opciones && opciones.sinScroll)) main.scrollTop = nombre === "inicio" ? main.scrollHeight : 0;
+    if (nombre === "documento" && window.Panel && Panel.actualizar) { try { Panel.actualizar(); } catch (e) { /* opcional */ } }
+  }
+  function marcarPestana(nombre) { const b = document.querySelector(`.pestana[data-ir="${nombre}"]`); if (b && pestanaActual() !== nombre) b.classList.add("novedad"); }
+  window.RomusUI = { irPestana, pestanaActual, marcarPestana };
+
   function agregarMensaje(tipo, texto, extra) {
     const div = document.createElement("div");
     div.className = "mensaje " + tipo;
@@ -44,8 +65,8 @@
     if (extra) div.appendChild(extra);
     $("conversacion").appendChild(div);
     if (estado.burbuja && (tipo === "usuario" || tipo === "ia" || tipo === "accion" || tipo === "error")) enviarBurbuja({ tipo: "texto", quien: tipo, texto });
-    const main = $("principal");
-    main.scrollTop = main.scrollHeight;
+    if (pestanaActual() === "inicio") { const main = $("principal"); main.scrollTop = main.scrollHeight; }
+    else if (tipo !== "usuario" && tipo !== "sistema") marcarPestana("inicio");
     return div;
   }
 
@@ -419,6 +440,8 @@
   /* ============ Comandos locales (lectura, cambios, ayuda) ============ */
 
   function comandoLocal(n) {
+    const mp = n.match(/^(ve|vamos|ir|llevame|abre|muestra|muestrame|cambia)( a| al)?( la)?( pestana| seccion)?( de)? (inicio|investigar|investigacion|documento|el documento|datos del documento)$/);
+    if (mp) return () => { const d = /^inic/.test(mp[6]) ? "inicio" : /^invest/.test(mp[6]) ? "investigar" : "documento"; irPestana(d); hablar(d === "inicio" ? "Listo." : d === "investigar" ? "Aquí tienes tu investigación." : "Estos son los datos de tu documento."); };
     // Estilo de las respuestas
     const me = n.match(/^(habla|hablame|responde|respondeme|contesta|se)( de forma| de manera| en tono| con tono| mas)? (mas )?(formal|profesional|natural|calido|cercano|breve|corto|conciso|detallado|didactico|extenso)$/);
     if (me) return () => {
@@ -1330,6 +1353,11 @@
   }
 
   function conectarEventos() {
+    document.querySelectorAll(".pestana").forEach(b => b.addEventListener("click", () => irPestana(b.dataset.ir)));
+    if ($("btnLimpiarChat")) $("btnLimpiarChat").addEventListener("click", () => {
+      estado.historial = [];
+      $("conversacion").querySelectorAll(".mensaje:not(:first-child)").forEach(m => m.remove());
+    });
     $("btnMic").addEventListener("click", alternarMic);
     $("btnModoVoz").addEventListener("click", abrirModoVoz);
     $("btnAbrirBurbuja").addEventListener("click", abrirBurbuja);
@@ -1576,6 +1604,7 @@
     llenarAjustes();
     actualizarAvisoClave();
     conectarEventos();
+    irPestana(Config.get().pestana || "inicio", { sinScroll: true });
     Voz.cargarVoces().then(llenarVoces);
     ajustarAltura();
     if (!Voz.soportaReconocimiento()) {

@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-2.8-185abd" alt="versión 2.8">
+  <img src="https://img.shields.io/badge/versión-2.9-185abd" alt="versión 2.9">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -58,7 +58,7 @@ Romus es un complemento (add-in) de Microsoft Word que convierte el procesador d
 
 Romus nace como proyecto personal de Brian Gonzalo Suárez Acevedo, docente. Lo creó para que leer, revisar y escribir documentos sea más accesible y rápido. Desde la versión 2.3 integra el **método Kuetz**: un asesor metodológico que acompaña proyectos de investigación y tesis dentro de Word.
 
-<p align="center"><img src="assets/capturas/panel.png" width="720" alt="Panel de Romus en modo claro y oscuro"></p>
+<p align="center"><img src="assets/capturas/panel.png" width="720" alt="Panel de Romus: pestañas Inicio, Investigar y Documento, en modo claro y oscuro"></p>
 
 ## Lo que puede hacer
 
@@ -90,7 +90,7 @@ Romus nace como proyecto personal de Brian Gonzalo Suárez Acevedo, docente. Lo 
 | **Formar pensamiento crítico** | Matriz de coherencia, rúbrica por nivel y preguntas socráticas sobre tu propio trabajo. |
 | **Dar autonomía** | **Modo Tutor**, activado por defecto: Romus te guía y te pregunta en lugar de redactar por ti. Si prefieres que proponga textos, en *Ajustes → Asesor de investigación* elige **Coautor**. |
 
-**Para empezar**, toca **Asesor de investigación** en la sección *Investigación* o di «Ok Romus, asesor» (también vale «no sé por dónde empezar»). Romus te pregunta dónde estás y te lleva al paso siguiente: no sé nada · tengo una idea · quiero empezar el documento · tengo un borrador · voy a sustentar · quiero construir teoría.
+**Para empezar**, abre la pestaña **Investigar** y toca **Asesor de investigación** o di «Ok Romus, asesor» (también vale «no sé por dónde empezar»). Romus te pregunta dónde estás y te lleva al paso siguiente: no sé nada · tengo una idea · quiero empezar el documento · tengo un borrador · voy a sustentar · quiero construir teoría.
 
 <p align="center"><img src="assets/capturas/asesor.png" width="900" alt="Asesor de investigación, explicación en palabras sencillas y sección Teoría"></p>
 
@@ -117,7 +117,7 @@ Donde más se atascan los tesistas es entre los datos y el capítulo de resultad
 | **Antes de analizar** | **Sintaxis de SPSS** (.sps) generada desde tu operacionalización e hipótesis: etiquetas de variables y valores, datos perdidos, nivel de medición, puntajes de escalas, alfa de Cronbach, normalidad y **una prueba por hipótesis** (t, ANOVA, correlación, chi cuadrado, regresión…) con su alternativa no paramétrica. También inserta el **plan de análisis** redactado y una **plantilla de datos** en Excel. | **Libro de códigos** desde tus categorías y objetivos, en **Excel con el formato de importación de ATLAS.ti** («Categoría: código», comentario y grupo) y en **QDC** (REFI-QDA), que también abren NVivo y MAXQDA. |
 | **Después de analizar** | Pega las tablas de la salida y Romus **redacta los resultados en APA 7**: *t*(58) = 2,41; *p* = ,019. **Comprueba que cada número exista en tu salida** y te marca los que no. | Pega el informe de códigos y citas, y Romus **redacta los hallazgos por categoría**, comprobando que **cada cita sea literal**. |
 
-Toca **SPSS** o **ATLAS.ti** en *Investigación → Más herramientas*, o di «Ok Romus, genera la sintaxis de SPSS», «redacta los resultados en APA» o «libro de códigos para ATLAS.ti». ¿No tienes SPSS? La sintaxis funciona igual en **PSPP**, que es gratuito. Puedes elegir decimales con coma o con punto. Romus no sube tus bases de datos: trabaja con tu documento y con lo que pegas.
+Toca **SPSS** o **ATLAS.ti** en *Investigar → Más herramientas*, o di «Ok Romus, genera la sintaxis de SPSS», «redacta los resultados en APA» o «libro de códigos para ATLAS.ti». ¿No tienes SPSS? La sintaxis funciona igual en **PSPP**, que es gratuito. Puedes elegir decimales con coma o con punto. Romus no sube tus bases de datos: trabaja con tu documento y con lo que pegas.
 
 <p align="center"><img src="assets/capturas/datos.png" width="760" alt="Resultados en APA desde SPSS con números verificados y hallazgos cualitativos desde ATLAS.ti con citas verificadas"></p>
 
@@ -287,6 +287,14 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 
 ## Novedades
 
+### v2.9 · Panel más fácil
+- **Tres pestañas**: **Inicio** (hablar, acciones rápidas y conversación), **Investigar** (asesor y herramientas) y **Documento** (estadísticas, estructura y voz de lectura).
+- **Romus siempre a la vista**: la esfera, el estado y el micrófono quedan fijos arriba en todas las pestañas.
+- Las respuestas aparecen donde miras: los resultados de investigación abren la pestaña Investigar y un punto avisa si Romus respondió en otra pestaña.
+- La tarjeta de lectura queda fija arriba mientras Romus lee.
+- Esfera más limpia en tamaño pequeño: menos puntos y menos adornos, con el mismo concepto (tú en magenta, la IA en azul, núcleo dorado). En el modo voz conserva todos sus detalles.
+- Por voz: «ve a investigar», «abre documento», «ve a inicio».
+
 ### v2.8 · Puente con SPSS y ATLAS.ti
 - **Sintaxis de SPSS** desde el proyecto, compatible con PSPP: diccionario, escalas, confiabilidad, normalidad y una prueba por hipótesis con su alternativa no paramétrica.
 - **Plan de análisis** y **libro de códigos** insertados en el documento, y **plantilla de datos** en Excel.
@@ -348,4 +356,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word · v2.8</sub></p>
+<p align="center"><sub>Romus para Word · v2.9</sub></p>
