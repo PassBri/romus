@@ -911,7 +911,7 @@
     }
     if (estado.burbuja) { agregarMensaje("sistema", "La burbuja ya está abierta."); return; }
     const url = location.href.replace(/taskpane\.html.*$/, "burbuja.html");
-    Office.context.ui.displayDialogAsync(url, { height: 44, width: 17, displayInIframe: false, promptBeforeOpen: false }, (res) => {
+    Office.context.ui.displayDialogAsync(url, { height: 50, width: 18, displayInIframe: false, promptBeforeOpen: false }, (res) => {
       if (res.status !== Office.AsyncResultStatus.Succeeded) {
         agregarMensaje("error", "No pude abrir la burbuja: " + (res.error && res.error.message));
         return;
@@ -1196,6 +1196,9 @@
     $("chkPalabraActivacion").checked = c.palabraActivacion;
     $("selMotorVoz").value = c.motorVoz || "auto";
     $("selTema").value = c.tema || "auto";
+    $("selModoAyuda").value = c.modoAyuda || "tutor";
+    $("inpCodigoPro").value = c.codigoPro || "";
+    if (window.Asesor && Asesor.esPro()) $("notaPro").textContent = "✓ Romus Pro activado: proyectos ilimitados.";
     $("selEstiloRespuesta").value = c.estiloRespuesta || "natural";
     $("txtInstrucciones").value = c.instrucciones || "";
     pintarNotaMotor();
@@ -1319,8 +1322,7 @@
   function actualizarAvisoClave() {
     const falta = Config.faltaClave();
     $("avisoClave").classList.toggle("oculto", !falta);
-    const b = $("avisoClave").querySelector("b");
-    if (b) b.textContent = falta ? `Falta la clave de ${Config.proveedorDe().nombre}.` : "";
+
   }
 
   function conectarEventos() {
@@ -1346,6 +1348,16 @@
       manejarComando(b.dataset.cmd, "boton");
     }));
     $("btnAsesor").addEventListener("click", () => Inv.asesor());
+    $("btnCrearProyecto").addEventListener("click", () => Asesor.nuevoProyecto());
+    $("btnMiProyecto").addEventListener("click", () => Inv._h.ejecutar(Asesor.miProyecto));
+    $("selModoAyuda").addEventListener("change", (e) => Config.set({ modoAyuda: e.target.value }));
+    $("inpCodigoPro").addEventListener("input", (e) => {
+      const v = e.target.value.trim().toUpperCase();
+      Config.set({ codigoPro: v });
+      const ok = Asesor.codigoValido(v);
+      $("notaPro").textContent = ok ? "✓ Romus Pro activado: proyectos ilimitados." : (v ? "Código no válido. Revísalo." : "Incluye 1 proyecto de prueba gratis. Con un código Pro puedes crear proyectos ilimitados.");
+      $("notaPro").className = ok ? "ok" : "";
+    });
     $("selNivel").addEventListener("change", (e) => Inv.fijarNivel(e.target.value));
     $("selEnfoque").addEventListener("change", (e) => Inv.fijarEnfoque(e.target.value));
 
@@ -1367,6 +1379,26 @@
 
     $("btnAjustes").addEventListener("click", () => abrirHoja("panelAjustes"));
     $("btnIrAjustes").addEventListener("click", () => { abrirHoja("panelAjustes"); $("inpClave").focus(); });
+    $("btnClaveGemini").addEventListener("click", () => {
+      const url = "https://aistudio.google.com/apikey";
+      try { if (window.Office && Office.context.ui.openBrowserWindow) { Office.context.ui.openBrowserWindow(url); return; } } catch (e) { /* sin API */ }
+      window.open(url, "_blank", "noopener");
+    });
+    const conectarRapido = () => {
+      const clave = $("inpClaveRapida").value.trim();
+      if (clave.length < 20) { $("bvNota").textContent = "Pega la clave completa (empieza por AIza…)."; $("inpClaveRapida").focus(); return; }
+      const c = Config.get();
+      let p = c.perfiles.find(x => x.proveedor === "gemini");
+      if (!p) { p = Config.nuevoPerfil("gemini"); c.perfiles.push(p); }
+      p.apiKey = clave; if (!p.modelo) p.modelo = "gemini-flash-latest";
+      Config.guardar(); activarPerfil(p.id);
+      if (typeof actualizarChipIA === "function") actualizarChipIA();
+      agregarMensaje("sistema", "Gemini conectado. Activa «Siempre atento» y di «Ok Romus, lee el documento».");
+      hablar("Listo, ya estoy conectado. Dime Ok Romus y lo que necesitas.");
+      if (!estado.escuchandoInicial && Config.get().manosLibres && !Voz.escuchando) empezarEscucha();
+    };
+    $("btnConectarRapido").addEventListener("click", conectarRapido);
+    $("inpClaveRapida").addEventListener("keydown", (e) => { if (e.key === "Enter") conectarRapido(); });
     $("btnCerrarAjustes").addEventListener("click", () => { cerrarHoja("panelAjustes"); actualizarAvisoClave(); });
     $("btnAyuda").addEventListener("click", () => abrirHoja("panelAyuda"));
     $("btnCerrarAyuda").addEventListener("click", () => cerrarHoja("panelAyuda"));

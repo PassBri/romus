@@ -23,14 +23,16 @@
     html, body { height: 100%; margin: 0; background: var(--bg); }
     body {
       font-family: "Segoe UI Variable Text", "Segoe UI", -apple-system, Roboto, sans-serif; font-size: 13px; color: var(--texto);
-      display: flex; flex-direction: column; align-items: center; padding: 8px 16px 14px; gap: 10px; overflow: hidden; user-select: none;
+      display: flex; flex-direction: column; align-items: center; padding: 10px 14px 12px; gap: 8px; overflow: hidden; user-select: none; position: relative;
       -webkit-font-smoothing: antialiased; transition: background .3s;
     }
-    .barra { width: 100%; display: flex; justify-content: flex-end; min-height: 28px; }
-    .escena { width: min(84vw, 46vh); aspect-ratio: 1; flex-shrink: 0; }
+    .barra { position: absolute; top: 6px; right: 8px; z-index: 2; }
+    /* La esfera ocupa el espacio que sobra: nunca empuja los controles fuera de la ventana. */
+    .escena { flex: 1 1 0; min-height: 70px; width: 100%; display: flex; justify-content: center; align-items: center; }
+    .escena canvas { height: 100%; width: auto; aspect-ratio: 1; max-width: 100%; }
     canvas { width: 100%; height: 100%; display: block; cursor: pointer; -webkit-tap-highlight-color: transparent; }
     #estado { font-size: 17px; font-weight: 600; letter-spacing: -.01em; text-align: center; min-height: 24px; }
-    #sub { flex-shrink: 0; max-height: 4.8em; overflow: hidden; font-size: 14px; line-height: 1.6; text-align: center; color: var(--tenue); width: 100%; padding: 0 4px; }
+    #sub { flex-shrink: 0; max-height: 3.2em; overflow: hidden; font-size: 14px; line-height: 1.6; text-align: center; color: var(--tenue); width: 100%; padding: 0 4px; }
     #sub span { border-radius: 3px; padding: 0 1px; transition: color .12s, background .12s; }
     #sub span.leida { color: var(--texto); }
     #sub span.actual { color: var(--sobre-acento); background: var(--acento); }
@@ -55,6 +57,10 @@
     .caja input:focus { border-color: var(--acento); }
     .caja input::placeholder { color: var(--tenue); }
     .pista { font-size: 11.5px; color: var(--tenue); text-align: center; line-height: 1.5; min-height: 14px; }
+    /* Ventanas pequeñas (pantallas de laptop): se compacta en vez de recortarse. */
+    @media (max-height: 470px) { .pista { display: none; } #estado { font-size: 15px; min-height: 20px; } .redondo { width: 40px; height: 40px; } body { gap: 6px; } }
+    @media (max-height: 400px) { .caja { display: none; } #sub { max-height: 1.6em; font-size: 13px; } }
+    @media (max-height: 320px) { #sub { display: none; } }
   </style>
 </head>
 <body>
@@ -80,11 +86,11 @@
     <div class="pista" id="pista"></div>
   </div>
 
-  <script src="js/config.js"></script>
-  <script src="js/voz.js"></script>
-  <script src="js/escucha.js"></script>
-  <script src="js/orbe.js"></script>
-  <script src="js/romus.js"></script>
+  <script src="js/config.js?v=2.7"></script>
+  <script src="js/voz.js?v=2.7"></script>
+  <script src="js/escucha.js?v=2.7"></script>
+  <script src="js/orbe.js?v=2.7"></script>
+  <script src="js/romus.js?v=2.7"></script>
   <script>
   (function () {
     const $ = (id) => document.getElementById(id);

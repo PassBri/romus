@@ -72,7 +72,7 @@
 </header>
 
 <nav class="indice"><div class="ancho">
-  <a href="#instalar">1 · Instalar</a><a href="#abrir">2 · Abrir</a><a href="#ia">3 · Conectar IA</a><a href="#hablar">4 · Hablar</a><a href="#documentos">5 · Documentos</a><a href="#asesor">6 · Asesor</a><a href="#teoria">7 · Teoría</a><a href="#sustentar">8 · Sustentar</a><a href="#problemas">9 · Problemas</a>
+  <a href="#instalar">1 · Instalar</a><a href="#abrir">2 · Abrir</a><a href="#ia">3 · Conectar IA</a><a href="#hablar">4 · Hablar</a><a href="#documentos">5 · Documentos</a><a href="#asesor">6 · Asesor</a><a href="#pro">★ Pro</a><a href="#teoria">7 · Teoría</a><a href="#sustentar">8 · Sustentar</a><a href="#problemas">9 · Problemas</a>
 </div></nav>
 
 <main class="ancho">
@@ -92,7 +92,7 @@
     <li>Si Windows muestra «Windows protegió su PC», pulsa <b>Más información → Ejecutar de todas formas</b>. Aparece porque el instalador es nuevo y no tiene firma comercial.</li>
     <li>Sigue el asistente: <b>Siguiente → Instalar → Finalizar</b>. Deja marcada la opción de abrir Word.</li>
   </ol>
-  <div class="caja"><strong>Qué hace el instalador</strong>Copia el manifiesto de Romus en tu equipo, lo registra en Word para tu usuario, limpia la caché de complementos para que cargue la versión más reciente y agrega esta guía y un desinstalador al menú Inicio. Romus se actualiza solo: no hay que volver a instalarlo.</div>
+  <div class="caja"><strong>Qué hace el instalador</strong>Copia el manifiesto de Romus en tu equipo, lo registra en Word para tu usuario y agrega esta guía y un desinstalador al menú Inicio. Si estás actualizando y ves una versión vieja, marca «Limpiar la caché de complementos» (borra tus ajustes: tendrás que pegar de nuevo la clave de la IA). Romus se actualiza solo: no hay que volver a instalarlo.</div>
   <h3>Word para la web (office.com) o Mac</h3>
   <ol class="pasos">
     <li>Abre <a href="https://passbri.github.io/romus/">passbri.github.io/romus</a> y pulsa <b>Descargar mi manifest.xml</b>.</li>
@@ -171,6 +171,16 @@
   <div class="caja"><strong>¿Cómo sé si puedo confiar?</strong>Cada resultado trae una etiqueta: <b>Basado en tu documento</b> (Romus comprobó la evidencia), <b>Fuente verificable</b> (viene de OpenAlex), <b>Rúbrica Romus</b> (puntaje calculado con reglas fijas), <b>Guía Romus</b> o <b>Teoría · Suárez</b> (vienen de los libros base) e <b>Inferencia de la IA</b> (hay que revisarla).</div>
 </section>
 
+<section id="pro">
+  <h2><span class="num">★</span>Mi proyecto, sesiones de asesoría y Romus Pro</h2>
+  <ol class="pasos">
+    <li><b>Mi proyecto:</b> toca el botón o di <span class="di">«Ok Romus, mi proyecto»</span>. Verás tu avance por etapas y lo que sigue. Escribe tu fecha de entrega y pulsa <b>Crear cronograma</b>.</li>
+    <li><b>Sesión de asesoría:</b> di <span class="di">«sesión de asesoría»</span> cada semana. Romus te dice qué hiciste bien, tus 3 prioridades, preguntas para pensar y tareas con plazo. En la siguiente sesión revisa si las cumpliste.</li>
+    <li><b>Crear mi proyecto ★ Pro:</b> responde 4 preguntas (tema, con quiénes y dónde, problema y recursos). Romus propone título, pregunta y objetivos; tú los apruebas o pides cambios. Luego busca fuentes reales y escribe el proyecto completo en tu documento. Tienes 1 proyecto de prueba gratis.</li>
+  </ol>
+  <div class="caja oro"><strong>Modo Tutor</strong>Por defecto Romus te guía sin redactar por ti, como un buen asesor. En <b>Ajustes → Asesor de investigación</b> puedes elegir <b>Coautor</b> si quieres que también proponga textos.</div>
+</section>
+
 <section id="teoria">
   <h2><span class="num">7</span>Teoría: construir conocimiento</h2>
   <p class="bajada">Una investigación no solo recoge datos: también construye ideas. Esta sección se basa en el libro <i>Teoría: conocimiento científico</i> de Brian Suárez.</p>
@@ -207,7 +217,7 @@
     <tr><td>Romus no me oye o el micrófono se apaga</td><td>Conecta Gemini (paso 3), activa «Siempre atento» y permite el micrófono. En <b>Ajustes → Voz → Reconocimiento de voz</b> elige «Oído de Romus».</td></tr>
     <tr><td>Repite o responde a su propia voz</td><td>Usa audífonos o baja el volumen.</td></tr>
     <tr><td>«Límite de la IA por minuto»</td><td>El plan gratuito de Gemini tiene límites: espera un momento.</td></tr>
-    <tr><td>Veo una versión vieja</td><td>Cierra Word, vacía la carpeta <code>%LOCALAPPDATA%\Microsoft\Office\16.0\Wef\</code> (o reinstala) y abre Word.</td></tr>
+    <tr><td>Veo una versión vieja</td><td>Cierra Word por completo, espera 10 minutos y ábrelo de nuevo. Como último recurso, vacía <code>%LOCALAPPDATA%\Microsoft\Office\16.0\Wef\</code>: ojo, eso borra tus ajustes y tendrás que volver a pegar la clave de la IA.</td></tr>
     <tr><td>Quiero desinstalar</td><td>Menú Inicio → <b>Romus → Desinstalar Romus</b>, o Configuración → Aplicaciones.</td></tr>
   </table>
 </section>

@@ -27,7 +27,7 @@ window.Inv = (function () {
     "Preguntas e hipótesis": "Pregunta central y, si el enfoque es cuantitativo, hipótesis contrastables. En cualitativo, supuestos o preguntas orientadoras.",
     "Supuestos y preguntas orientadoras": "En la ruta cualitativa no se prueban hipótesis al inicio: se plantean supuestos y preguntas que orientan y pueden emerger o cambiar en el campo.",
     "Hipótesis o supuestos": "Hipótesis verificables (cuantitativo) o supuestos de trabajo (cualitativo). Deben responder a la pregunta.",
-    "Justificación": "Argumenta con criterios: conveniencia, relevancia social, implicaciones prácticas, valor teórico y utilidad metodológica (Hernández Sampieri et al., 2014). Incluye viabilidad y qué deficiencias del conocimiento atiende.",
+    "Justificación": "Argumenta con criterios: conveniencia, relevancia social, implicaciones prácticas, valor teórico y utilidad metodológica. Incluye viabilidad y qué deficiencias del conocimiento atiende.",
     "Objetivos": "Un objetivo general que responde a la pregunta y 3 o 4 específicos que, sumados, lo logran. Verbos en infinitivo y medibles.",
     "Objetivo general": "Uno solo. Responde directamente a la pregunta de investigación. Verbo en infinitivo (analizar, determinar, diseñar…).",
     "Objetivos específicos": "3 o 4 pasos que juntos logran el general. Evita verbos vagos como «conocer» o «entender».",
@@ -62,13 +62,13 @@ window.Inv = (function () {
     "Plan de financiación": "Convocatoria o fuente de financiación, montos y contrapartidas.",
     "Cronograma": "Tabla de actividades por mes o semana, alineada con los objetivos específicos.",
     "Presupuesto": "Rubros (personal, equipos, materiales, salidas de campo, publicación) con fuente de financiación.",
-    "Alcance de la investigación": "Exploratorio, descriptivo, correlacional o explicativo. El alcance depende de cuánto se sabe del tema y define el tipo de hipótesis y de diseño (Hernández Sampieri et al., 2014).",
+    "Alcance de la investigación": "Exploratorio, descriptivo, correlacional o explicativo. El alcance depende de cuánto se sabe del tema y define el tipo de hipótesis y de diseño.",
     "Hipótesis y variables": "Hipótesis de investigación, nula y alternativa según el alcance (descriptivas, correlacionales, de diferencia de grupos o causales). Cada variable con definición conceptual y definición operacional.",
     "Diseño de investigación": "Experimental (preexperimento, experimento puro o cuasiexperimento) o no experimental (transeccional o longitudinal). Justifica por qué ese diseño responde la pregunta.",
     "Muestra": "Delimita la población, el marco muestral y el tipo de muestra (probabilística o no probabilística). Si es probabilística, calcula el tamaño con nivel de confianza y error.",
     "Instrumentos: confiabilidad y validez": "Cada instrumento debe reportar confiabilidad (p. ej., alfa de Cronbach), validez de contenido, de criterio y de constructo, y objetividad.",
     "Análisis estadístico": "Estadística descriptiva por variable y pruebas inferenciales según el nivel de medición y las hipótesis. Indica el software.",
-    "Paradigma y posicionamiento epistemológico": "Declara desde dónde conoces: interpretativo, crítico, sistémico o complejo. Para Martínez Miguélez, todo método está inserto en un paradigma y la observación depende del punto de vista del investigador.",
+    "Paradigma y posicionamiento epistemológico": "Declara desde dónde conoces: interpretativo, crítico, sistémico o complejo. Todo método está inserto en un paradigma, y lo que se observa depende del punto de vista de quien investiga.",
     "Diseño cualitativo": "Teoría fundamentada, etnográfico, narrativo, fenomenológico o investigación-acción. El diseño es flexible y emergente: explica cómo se ajustará en el campo.",
     "Participantes y muestreo cualitativo": "Muestra intencional (de casos tipo, expertos, bola de nieve, por conveniencia…). El tamaño se decide por saturación de categorías, no por cálculo estadístico.",
     "Técnicas de recolección": "Entrevista en profundidad, observación participante, grupos focales, documentos o historias de vida. Describe la inmersión inicial en el campo.",
@@ -130,7 +130,7 @@ window.Inv = (function () {
     }
   };
 
-  /* Subapartados de la metodología según la ruta (Hernández Sampieri et al., 2014; Martínez Miguélez). */
+  /* Subapartados de la metodología según la ruta (método Kuetz). */
   const ENFOQUES = {
     cuantitativo: { nombre: "Cuantitativo", metodo: ["Alcance de la investigación", "Hipótesis y variables", "Diseño de investigación", "Muestra", "Instrumentos: confiabilidad y validez", "Análisis estadístico", "Consideraciones éticas"] },
     cualitativo: { nombre: "Cualitativo", metodo: ["Paradigma y posicionamiento epistemológico", "Diseño cualitativo", "Participantes y muestreo cualitativo", "Técnicas de recolección", "Categorización y análisis", "Rigor cualitativo", "Consideraciones éticas"] },
@@ -234,10 +234,8 @@ window.Inv = (function () {
   function sistemaAsesor() {
     const n = nivel(), e = enfoque();
     return `Eres Romus en modo asesor metodológico (método Kuetz). Acompañas un proyecto de nivel ${n.nombre} (${n.producto}) con enfoque ${e.nombre.toLowerCase()}.
-Base metodológica (aplícala con tus propias palabras; no inventes citas textuales):
-- Hernández Sampieri, Fernández y Baptista (2014), Metodología de la investigación, 6.ª ed.: rutas cuantitativa, cualitativa y mixta; el planteamiento incluye objetivos, preguntas, justificación (conveniencia, relevancia social, implicaciones prácticas, valor teórico, utilidad metodológica), viabilidad y deficiencias en el conocimiento; alcances exploratorio, descriptivo, correlacional y explicativo; hipótesis y variables con definición conceptual y operacional; diseños experimentales y no experimentales; muestreo probabilístico y no probabilístico; confiabilidad, validez y objetividad de los instrumentos. En lo cualitativo: planteamiento abierto y emergente, inmersión en el campo, muestras intencionales y saturación, diseños (teoría fundamentada, etnográfico, narrativo, fenomenológico, investigación-acción) y rigor (dependencia, credibilidad, transferencia, confirmabilidad). En lo mixto: diseños secuenciales, convergentes y anidados, e integración.
-- Martínez Miguélez, Epistemología y metodología cualitativa en las ciencias sociales: todo método está inserto en un paradigma; la observación depende de la teoría y del punto de vista del investigador; paradigma sistémico y dialéctico que integra lo empírico, lo interpretativo y lo crítico; la cientificidad exige rigor, sistematicidad y criticidad, junto con apertura y creatividad.
-Cuando un consejo se apoye en estos autores, puedes mencionarlos (por ejemplo: «según Hernández Sampieri et al.»).
+Marco de trabajo (método Kuetz; aplícalo con tus propias palabras): rutas cuantitativa, cualitativa y mixta; el planteamiento incluye objetivos, preguntas, justificación (conveniencia, relevancia social, implicaciones prácticas, valor teórico, utilidad metodológica), viabilidad y deficiencias en el conocimiento; alcances exploratorio, descriptivo, correlacional y explicativo; hipótesis y variables con definición conceptual y operacional; diseños experimentales y no experimentales; muestreo probabilístico y no probabilístico; confiabilidad, validez y objetividad. En lo cualitativo: planteamiento abierto y emergente, inmersión en el campo, muestras intencionales y saturación, diseños (teoría fundamentada, etnográfico, narrativo, fenomenológico, investigación-acción) y rigor (dependencia, credibilidad, transferencia, confirmabilidad). En lo mixto: diseños secuenciales, convergentes y anidados, e integración. Epistemología: todo método está inserto en un paradigma; la cientificidad exige rigor, sistematicidad y criticidad. Usa también la Teoría de Brian Suárez (axiomas, postulados, supuestos, constructos, modelos, MICC).
+No menciones autores de manuales de metodología salvo que el usuario pida bibliografía; en ese caso, ofrece buscar literatura real.
 Reglas:
 - Eres riguroso y honesto: señalas vacíos y debilidades con precisión, y propones cómo resolverlos.
 - La exigencia se ajusta al nivel: en pregrado, claridad y viabilidad; en especialización, aplicabilidad; en maestría, rigor metodológico y estado del arte; en doctorado, aporte original y posicionamiento epistemológico; en posdoctorado, impacto, transferencia y financiación.
@@ -696,7 +694,6 @@ Reglas:
     const pun = el("div", "inv-puntaje");
     pun.append(el("b", "", puntaje), el("span", "", `/100 · rúbrica ${n.nombre} · ${enfoque().nombre.toLowerCase()}`));
     c.append(pun, etiqueta("rubrica"));
-    c.appendChild(el("p", "inv-nota", "Criterios basados en Hernández Sampieri et al. (2014) y Martínez Miguélez."));
     const lista = el("div", "inv-rubrica");
     criterios.forEach(cr => {
       const f = el("details", "inv-criterio");
@@ -809,10 +806,20 @@ Reglas:
       const l = el(ordenada ? "ol" : "ul", "guia-puntos"); xs.forEach(x => l.appendChild(el("li", "", x))); d.appendChild(l);
       c.appendChild(d);
     };
+    const prosa = (titulo, txt) => {
+      if (!txt) return;
+      const d = el("details", "guia-mas"); d.appendChild(el("summary", "", titulo)); d.appendChild(el("p", "guia-resumen chico", txt)); c.appendChild(d);
+    };
+    prosa("Para qué sirve en una investigación", t.importancia);
     desplegable("Tipos", t.tipos);
     desplegable("Cómo se construye", t.pasos, true, esTeoria);
     desplegable("Partes", t.partes, true);
     desplegable("Ejemplos por nivel académico", t.niveles);
+    desplegable("Cómo saber si está bien hecho", t.evaluar);
+    desplegable("Ventajas y limitaciones", t.ventajas);
+    desplegable("Aplicaciones en distintos campos", t.aplicaciones);
+    prosa("Impacto en la metodología", t.impacto);
+    prosa("Reflexión final", t.conclusion);
     if (t.ejemplo) { const ej = el("div", "guia-caja ejemplo"); ej.appendChild(el("b", "", "Ejemplo")); ej.appendChild(el("span", "", t.ejemplo)); c.appendChild(ej); }
     if (t.error) { const er = el("div", "guia-caja error"); er.appendChild(el("b", "", "Error frecuente")); er.appendChild(el("span", "", t.error)); c.appendChild(er); }
     const acc = el("div", "inv-acciones");
@@ -1026,6 +1033,9 @@ Reglas:
     conf.append(cambiar, queEs);
     c.appendChild(conf);
     const opciones = [
+      ["🚀", "Crear mi proyecto completo desde cero ★ Pro", "Te entrevisto y construimos juntos el proyecto con el método Kuetz, con fuentes reales.", () => { if (window.Asesor) Asesor.nuevoProyecto(); }],
+      ["🗓️", "Mi proyecto: avance y cronograma", "En qué etapa vas, qué sigue y fechas de entrega.", () => { if (window.Asesor) Asesor.miProyecto(); }],
+      ["🧑‍🏫", "Sesión de asesoría", "Reviso tu avance como lo haría tu asesor: prioridades, preguntas y tareas.", () => { if (window.Asesor) ejecutar(() => Asesor.sesion()); }],
       ["🌱", "No sé nada de investigación", "Te enseño desde cero, paso a paso.", () => iniciarTutorial()],
       ["💡", "Tengo una idea, pero no sé cómo plantearla", "La convierto en pregunta, problema y objetivos.", () => { if (ui.prefijar) ui.prefijar("Ayúdame a idear un proyecto sobre "); ui.hablar("Escribe o dime tu idea en una frase."); }],
       ["🧱", "Quiero empezar el documento", `Inserto la estructura de ${n.producto.toLowerCase()} con una guía en cada apartado.`, () => ejecutar(insertarEstructura)],
@@ -1068,7 +1078,7 @@ Reglas:
 
   /** Devuelve una función si el comando es del modo investigación; si no, null. n = texto normalizado; original = texto con tildes. */
   function comando(n, original, signal) {
-    const extra = window.Jurado && Jurado.comando(n, original);
+    const extra = (window.Jurado && Jurado.comando(n, original)) || (window.Asesor && Asesor.comando(n, original));
     if (extra) return extra;
     const tarea = (fn) => async () => {
       ui.ocupar(true, "Investigación…");
@@ -1120,6 +1130,6 @@ Reglas:
     preguntar, indiceGuia, mostrarTema, construir, asesor, iniciarTutorial, pasoTutorial, salirTutorial,
     _apa: apa, _verificar: verificar, _partirNombre: partirNombre,
     // Utilidades compartidas con otros módulos (jurado.js)
-    _h: { tarjeta, el, etiqueta, registrar, documentoNumerado, pedirHerramienta, verificar, norm, ejecutar, irA, get ui() { return ui; } }
+    _h: { tarjeta, el, etiqueta, registrar, documentoNumerado, pedirHerramienta, verificar, norm, ejecutar, irA, buscarOpenAlex, apa, claveDoc, get ui() { return ui; } }
   };
 })();

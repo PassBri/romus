@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-2.6-185abd" alt="versión 2.6">
+  <img src="https://img.shields.io/badge/versión-2.7-185abd" alt="versión 2.7">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -23,6 +23,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
   <a href="#instalación-en-2-minutos">Instalación</a> ·
   <a href="https://passbri.github.io/romus/tutorial.html">Tutorial</a> ·
   <a href="#el-asesor-de-investigación">Asesor de investigación</a> ·
+  <a href="#-romus-pro--crear-un-proyecto-desde-cero">Romus Pro</a> ·
   <a href="#lo-que-hace-a-romus-insustituible">Lo insustituible</a> ·
   <a href="#comandos-de-voz">Comandos</a> ·
   <a href="#novedades">Novedades</a>
@@ -79,20 +80,33 @@ Romus nace como proyecto personal de Brian Gonzalo Suárez Acevedo, docente. Lo 
 
 ## El asesor de investigación
 
-**No necesitas saber metodología.** En el panel, sección **Investigación**, toca **Asesor de investigación** o di «Ok Romus, asesor» (también «no sé por dónde empezar»). Romus te pregunta dónde estás y te lleva al siguiente paso:
+**No necesitas saber metodología.** Romus trabaja como un asesor de tesis real y cumple sus cinco funciones:
 
-| Si estás aquí… | Romus te ofrece… |
+| Función de un asesor | Cómo la cumple Romus |
 |---|---|
-| 🌱 No sé nada de investigación | Un tutorial desde cero, paso a paso («siguiente paso»). |
-| 💡 Tengo una idea | Convertirla en pregunta, problema y objetivos. |
-| 🧱 Quiero empezar el documento | La estructura de tu nivel, con una guía en cada apartado. |
-| 🔎 Ya tengo un borrador | Coherencia, referencias y rúbrica, con comentarios en Word. |
-| 🎓 Voy a sustentar | Un simulacro con jurado por voz. |
-| 🌳 Quiero construir teoría | Axiomas, supuestos, constructos y modelos con la Teoría de Brian Suárez. |
+| **Gestionar el proyecto** | **Mi proyecto**: etapas, porcentaje de avance calculado con tus títulos, lo que sigue y un **cronograma** hacia tu fecha de entrega, que puedes insertar en Word. |
+| **Revisar y retroalimentar** | **Sesión de asesoría**: lee tu avance, reconoce lo que hiciste bien y da un diagnóstico, 3 prioridades con el cómo, preguntas para pensar y tareas con plazo. Queda en la **bitácora** y en la siguiente sesión revisa si las cumpliste. |
+| **Enseñar el oficio** | Guía metodológica, tutorial paso a paso y la Teoría de Brian Suárez, con explicaciones «en palabras sencillas». |
+| **Formar pensamiento crítico** | Matriz de coherencia, rúbrica por nivel y preguntas socráticas sobre tu propio trabajo. |
+| **Dar autonomía** | **Modo Tutor**, activado por defecto: Romus te guía y te pregunta en lugar de redactar por ti. Si prefieres que proponga textos, en *Ajustes → Asesor de investigación* elige **Coautor**. |
 
-Cada tema trae un recuadro **«En palabras sencillas»** para quien empieza.
+**Para empezar**, toca **Asesor de investigación** en la sección *Investigación* o di «Ok Romus, asesor» (también vale «no sé por dónde empezar»). Romus te pregunta dónde estás y te lleva al paso siguiente: no sé nada · tengo una idea · quiero empezar el documento · tengo un borrador · voy a sustentar · quiero construir teoría.
 
 <p align="center"><img src="assets/capturas/asesor.png" width="900" alt="Asesor de investigación, explicación en palabras sencillas y sección Teoría"></p>
+
+## ★ Romus Pro · crear un proyecto desde cero
+
+Con **Crear mi proyecto**, Romus construye contigo un proyecto completo siguiendo el **método Kuetz, en 7 fases**:
+
+1. **Descubrir.** Una entrevista corta: tu idea, con quiénes y dónde, el problema que observaste y tus recursos.
+2. **Delimitar.** Título, problema, pregunta, objetivos, justificación e hipótesis. **Tú apruebas** o pides ajustes («hazlo cualitativo»).
+3. **Fundamentar.** Busca **fuentes reales** en OpenAlex y redacta antecedentes y marco teórico citando solo esas fuentes, en APA 7.
+4. **Diseñar.** La metodología completa según tu nivel y enfoque.
+5. **Planear.** Cronograma, presupuesto en pesos colombianos y resultados esperados.
+6. **Verificar.** Revisa la coherencia y deja comentarios donde haya que ajustar.
+7. **Declarar.** Agrega la declaración de uso de IA.
+
+Romus **no inventa datos ni resultados**: donde falta información real escribe *[dato por confirmar]*. El resultado es un anteproyecto que tú lees, completas y haces tuyo. Cada instalación trae **1 proyecto de prueba gratis**; con un código **Romus Pro** (*Ajustes → Romus Pro*) los proyectos son ilimitados.
 
 ## Lo que hace a Romus insustituible
 
@@ -122,7 +136,7 @@ Romus acompaña proyectos de investigación y tesis de **pregrado, especializaci
 
 ### Guía metodológica y modo tutorial
 
-Cuando tengas una duda de metodología, pregúntale a Romus. Responde con su **guía metodológica (método Kuetz)**: 32 temas escritos para Romus, cada uno con explicación, puntos clave, un ejemplo, el error más frecuente, la conexión con la Teoría de Brian Suárez y lecturas para profundizar.
+Cuando tengas una duda de metodología, pregúntale a Romus. Responde con su **guía metodológica (método Kuetz)**: 32 temas escritos para Romus, cada uno con explicación, puntos clave, un ejemplo, el error más frecuente, y la conexión con la Teoría de Brian Suárez.
 
 | Quieres… | Di… |
 |---|---|
@@ -149,21 +163,11 @@ El botón **Teoría** abre el libro *Teoría: conocimiento científico* (Suárez
 - *Basado en tu documento*: Romus comprobó que la evidencia aparece literalmente.
 - *Fuente verificable*: viene de OpenAlex.
 - *Rúbrica Romus*: puntaje calculado por reglas fijas, no por la opinión de la IA.
-- *Guía Romus*: viene de la guía metodológica, con el capítulo de referencia.
+- *Guía Romus · método Kuetz*: viene de la guía metodológica de Romus.
 - *Teoría · Suárez (2025)*: viene del libro de Brian Suárez, con la sección.
 - *Inferencia de la IA*: hay que verificarla.
 
 Si la IA dice que algo se cumple pero la evidencia no aparece en el documento, el ítem cuenta solo como parcial.
-
-### Base metodológica
-
-Los criterios, las estructuras y las rúbricas se construyeron a partir de:
-
-- Hernández Sampieri, R., Fernández Collado, C. y Baptista Lucio, M. P. (2014). *Metodología de la investigación* (6.ª ed.). McGraw-Hill.
-- Martínez Miguélez, M. (2004). *Epistemología y metodología cualitativa en las ciencias sociales*. Trillas.
-- Suárez Acevedo, B. G. (2025). *Teoría: conocimiento científico* (2.ª ed.). RouteToTop. Se incluye en Romus con autorización del autor.
-
-Romus aplica sus conceptos con palabras propias: rutas, alcances, hipótesis y variables, diseños, muestreo, confiabilidad y validez, rigor cualitativo y posicionamiento epistemológico. La guía está escrita con palabras propias en `js/guia.js` y remite al capítulo correspondiente. Las obras no se incluyen en el repositorio porque tienen derechos de autor. Para profundizar, consulta los libros.
 
 ## Instalación rápida
 
@@ -190,7 +194,8 @@ Con **Siempre atento** activado, empieza cada orden con «Ok Romus». Después d
 | Escribir | «modo dictado» (y luego «termina dictado») |
 | Cambiar de IA | «usa Gemini», «usa Claude», «usa la IA local» |
 | Teoría (Brian Suárez) | «abre la teoría», «¿qué es un postulado?», «¿qué es el MICC?», «ayúdame a construir un axioma para mi tesis» |
-| Asesor | «Ok Romus, asesor», «no sé por dónde empezar», «ayúdame con mi tesis» |
+| Asesor | «Ok Romus, asesor», «no sé por dónde empezar», «mi proyecto», «sesión de asesoría», «bitácora» |
+| Pro | «crea mi proyecto sobre…» |
 | Sustentación | «simulacro de sustentación» (responde hablando y di «terminé»), «siguiente», «repite la pregunta», «salir del simulacro» |
 | Referencias | «verifica las referencias» |
 | Resolver dudas | «¿qué es…?», «¿cómo hago…?», «abre la guía», «modo tutorial», «siguiente paso» |
@@ -247,6 +252,7 @@ romus/
 │   ├── panel.js          estadísticas y estructura del documento
 │   ├── investigacion.js  modo investigación: niveles, coherencia, literatura, rúbrica, Trust Label, tutorial
 │   ├── jurado.js         simulacro de sustentación y verificador de citas y referencias
+│   ├── asesor.js         asesor: mi proyecto, cronograma, sesiones, bitácora y Romus Pro (método Kuetz)
 │   ├── guia.js           guía metodológica: 32 temas, buscador y rutas del tutorial
 │   ├── teoria.js         biblioteca «Teoría: conocimiento científico» (Suárez, 2025): 39 temas
 │   ├── romus.js          la esfera holográfica de Romus
@@ -257,13 +263,23 @@ romus/
 └── LEEME.md              notas técnicas ampliadas
 ```
 
-Todo es HTML, CSS y JavaScript puro: no hace falta compilar nada. Para publicar una versión nueva basta con subir los archivos a GitHub. Después cierra Word y vacía la caché de complementos (`%LOCALAPPDATA%\Microsoft\Office\16.0\Wef\`).
+Todo es HTML, CSS y JavaScript puro: no hace falta compilar nada. Para publicar una versión nueva basta con subir los archivos a GitHub: los scripts llevan número de versión (`?v=…`), así que Word carga lo nuevo al cerrar y abrir. No hace falta vaciar la caché de Office, que además borra los ajustes guardados (como la clave de la IA).
 
 ## Tecnologías
 
 Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canvas 2D · APIs de Anthropic, OpenAI y Gemini, más cualquier API compatible con OpenAI · GitHub Pages.
 
 ## Novedades
+
+### v2.7 · Asesor real y Romus Pro
+- **Mi proyecto**: etapas, avance, lo que sigue y cronograma hacia tu fecha de entrega.
+- **Sesión de asesoría** con diagnóstico, 3 prioridades, preguntas socráticas, tareas con plazo y bitácora.
+- **Modo Tutor** (guía sin redactar por ti) y modo **Coautor**.
+- **★ Romus Pro**: crear un proyecto desde cero con el método Kuetz en 7 fases, con fuentes reales.
+- **Bienvenida en 3 pasos**: conectar Gemini gratis directamente desde el panel.
+- Panel más simple: acciones principales arriba y el resto en «Más herramientas».
+- Teoría más completa: para qué sirve, cómo saber si está bien hecho, ventajas y limitaciones, aplicaciones y reflexión final.
+- La burbuja se adapta a pantallas pequeñas sin recortarse.
 
 ### v2.6 · Asesor, sustentación y verificador
 - **Asesor de investigación**: guía según dónde estés, pensado para quien no sabe nada de investigación.
@@ -278,7 +294,7 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 - Las dudas por voz buscan a la vez en la guía metodológica y en la Teoría.
 
 ### v2.4 · Guía metodológica y modo tutorial
-- **Guía** con 32 temas en 7 categorías, redactada a partir de Hernández Sampieri et al. (2014) y Martínez Miguélez (2004), con capítulo de referencia.
+- **Guía metodológica (método Kuetz)** con 32 temas en 7 categorías.
 - Dudas por voz («¿qué es…?», «¿cómo hago…?»): respuesta inmediata sin IA; con IA, respuesta apoyada en la guía y en tu documento.
 - **Modo tutorial** paso a paso según el enfoque, con progreso guardado.
 - «Revisar mi documento con esto» aplica cualquier tema a tu proyecto.
@@ -287,7 +303,6 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 - Nueva sección **Investigación** con nivel (pregrado → posdoctorado) y enfoque (cuantitativo, cualitativo, mixto).
 - **Idear**, **estructura por nivel** con guías en comentarios, **matriz de coherencia**, **literatura real** de OpenAlex con citas y referencias en APA 7, **rúbrica** con puntaje por reglas y **declaración de uso de IA**.
 - **Trust Label** en cada resultado y verificación de evidencias contra el documento.
-- Base metodológica: Hernández Sampieri et al. (2014) y Martínez Miguélez (2004).
 - La IA general ya no inventa referencias: cuando le piden fuentes, usa la búsqueda real.
 
 ### v2.2 · Voz en Word de escritorio
@@ -310,4 +325,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word · v2.6</sub></p>
+<p align="center"><sub>Romus para Word · v2.7</sub></p>

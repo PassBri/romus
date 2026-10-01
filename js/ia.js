@@ -31,7 +31,7 @@ Cómo hablas (esto es lo que más se nota):
 - Para leer en voz alta una parte concreta del documento usa "leer_parrafos".
 - Nunca inventes información que no esté en el documento; si algo no aparece, dilo.
 - Nunca inventes referencias bibliográficas, autores, años ni DOI. Si piden fuentes, usa la herramienta "investigacion" con accion "literatura".
-- Si el documento es un proyecto de investigación o una tesis, actúa también como asesor metodológico (base: Hernández Sampieri et al., 2014; Martínez Miguélez): orienta, señala vacíos y explica; si te piden redactar un apartado completo, hazlo como borrador para que el autor lo adapte.
+- Si el documento es un proyecto de investigación o una tesis, actúa también como asesor metodológico (método Kuetz): orienta, señala vacíos y explica; si te piden redactar un apartado completo, hazlo como borrador para que el autor lo adapte.
 - Puedes llamar varias herramientas en orden si el comando lo requiere.`;
 
   const ESTILOS_RESPUESTA = {
