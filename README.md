@@ -4,13 +4,15 @@
 
 <h1 align="center">ROMUS</h1>
 <p align="center"><b>Asistente de voz con inteligencia artificial para Microsoft Word</b><br>
-Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, resumir, redactar y dar formato.</p>
+Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar formato<br>y formular proyectos de investigación de pregrado a posdoctorado.</p>
 
 <p align="center">
   <a href="https://passbri.github.io/romus/">Página de instalación</a> ·
   <a href="GUIA-INSTALACION.md">Guía paso a paso</a> ·
+  <a href="#modo-investigación--método-kuetz">Modo investigación</a> ·
   <a href="#comandos-de-voz">Comandos</a> ·
-  <a href="#conectar-una-ia">Conectar una IA</a>
+  <a href="#conectar-una-ia">Conectar una IA</a> ·
+  <a href="#novedades">Novedades</a>
 </p>
 
 <p align="center">
@@ -28,7 +30,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, resumir, redact
 
 Romus es un complemento (add-in) de Microsoft Word que convierte el procesador de texto en un espacio de trabajo por voz. Su identidad visual es una **esfera holográfica de partículas con un núcleo dorado**: respira en reposo, escucha con los puntos magenta, habla con los azules y se ordena en anillos cuando trabaja.
 
-Romus nace como proyecto personal de Brian Gonzalo Suárez Acevedo, docente e investigador en educación. Lo creó para que leer, revisar y escribir documentos sea más accesible y rápido.
+Romus nace como proyecto personal de Brian Gonzalo Suárez Acevedo, docente. Lo creó para que leer, revisar y escribir documentos sea más accesible y rápido. Desde la versión 2.3 integra el **método Kuetz**: un asesor metodológico que acompaña proyectos de investigación y tesis dentro de Word.
 
 ## Lo que puede hacer
 
@@ -43,13 +45,16 @@ Romus nace como proyecto personal de Brian Gonzalo Suárez Acevedo, docente e in
 | 🔁 | **Buscar y reemplazar** en todo el documento. | «Ok Romus, cambia alumnos por estudiantes» |
 | 🎙️ | **Dictado** con puntuación hablada («coma», «punto y aparte»). | «Ok Romus, modo dictado» |
 | 🫧 | **Burbuja flotante** que puedes mover sobre el documento. | «Ok Romus, abre la burbuja» |
-| 🌗 | **Modo claro y oscuro**. | «Ok Romus, modo oscuro» |
+| 🌗 | **Modo claro y oscuro**, en el panel y en la burbuja. | «Ok Romus, modo oscuro» |
+| 🔬 | **Modo investigación**: idear, estructurar, revisar la coherencia, buscar literatura real y evaluar con rúbrica. | «Ok Romus, revisa la coherencia» |
 
 <p align="center"><img src="assets/capturas/burbuja.png" width="560" alt="Burbuja flotante de Romus en modo claro y oscuro"></p>
 
 ## Modo investigación · método Kuetz
 
-Romus acompaña proyectos de investigación y tesis de **pregrado, especialización, maestría, doctorado y posdoctorado**, con enfoque **cuantitativo, cualitativo o mixto**. Todo ocurre dentro de Word y también se puede pedir por voz.
+Romus acompaña proyectos de investigación y tesis de **pregrado, especialización, maestría, doctorado y posdoctorado**, con enfoque **cuantitativo, cualitativo o mixto**. Todo ocurre dentro de Word y también se puede pedir por voz. En el panel está en la sección **Investigación**: dos selectores (nivel y enfoque) y seis botones.
+
+<p align="center"><img src="assets/capturas/investigacion.png" width="900" alt="Matriz de coherencia, rúbrica y literatura con citas reales"></p>
 
 | | Función | Di… |
 |---|---|---|
@@ -102,6 +107,7 @@ Con **Siempre atento** activado, empieza cada orden con «Ok Romus». Después d
 | Editar | «resume la introducción», «simplifica este párrafo», «tradúcelo al inglés» |
 | Escribir | «modo dictado» (y luego «termina dictado») |
 | Cambiar de IA | «usa Gemini», «usa Claude», «usa la IA local» |
+| Investigar | «nivel maestría», «enfoque cualitativo», «ayúdame a idear un proyecto sobre…», «inserta la estructura», «revisa la coherencia», «busca literatura sobre…», «cita el uno», «evalúa con la rúbrica», «declaración de uso de IA» |
 | Ajustar cómo habla | «habla más formal», «sé breve», «a partir de ahora trátame de usted» |
 | Apariencia | «modo oscuro», «modo claro», «modo voz», «abre la burbuja» |
 | Terminar | «gracias, Romus» |
@@ -165,9 +171,31 @@ Todo es HTML, CSS y JavaScript puro: no hace falta compilar nada. Para publicar 
 
 Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canvas 2D · APIs de Anthropic, OpenAI y Gemini, más cualquier API compatible con OpenAI · GitHub Pages.
 
+## Novedades
+
+### v2.3 · Modo investigación (método Kuetz)
+- Nueva sección **Investigación** con nivel (pregrado → posdoctorado) y enfoque (cuantitativo, cualitativo, mixto).
+- **Idear**, **estructura por nivel** con guías en comentarios, **matriz de coherencia**, **literatura real** de OpenAlex con citas y referencias en APA 7, **rúbrica** con puntaje por reglas y **declaración de uso de IA**.
+- **Trust Label** en cada resultado y verificación de evidencias contra el documento.
+- Base metodológica: Hernández Sampieri et al. (2014) y Martínez Miguélez (2004).
+- La IA general ya no inventa referencias: cuando le piden fuentes, usa la búsqueda real.
+
+### v2.2 · Voz en Word de escritorio
+- **Oído propio**: en Word para Windows, Romus graba cada frase y la transcribe con Gemini, OpenAI o Groq (el navegador interno no trae reconocimiento de voz).
+- **Filtro de eco**: Romus ya no se oye a sí mismo por los parlantes ni repite órdenes.
+- Respuestas más rápidas con Gemini (sin «pensar» al transcribir ni en órdenes cortas).
+- **Modo claro y oscuro** con botón de luna o sol, en Ajustes o por voz.
+- **Cómo habla Romus**: estilo (natural, profesional, breve, detallado) e instrucciones personales; personalidad reescrita para un español más natural.
+- **Burbuja** rediseñada con el mismo estilo del modo voz y su propio botón de tema.
+- Se retiró la apariencia «cielo»: Romus tiene una sola identidad, la esfera.
+
+### v2.1 · Romus
+- Nombre e identidad Romus, activación con «Ok Romus», logo «Planeta», diseño limpio acorde a Word.
+- Conexión con cualquier IA por API, perfiles múltiples y modo básico para modelos sin herramientas.
+
 ## Autor
 
-**Brian Gonzalo Suárez Acevedo**: docente, y creador del proyecto Romus.
+**Brian Gonzalo Suárez Acevedo**: docente y creador del proyecto Romus.
 GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
