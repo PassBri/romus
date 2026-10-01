@@ -165,7 +165,8 @@ window.Inv = (function () {
     fuente: { txt: "Fuente verificable · OpenAlex", cls: "fuente" },
     rubrica: { txt: "Rúbrica Romus · puntaje por reglas", cls: "rubrica" },
     modelo: { txt: "Inferencia de la IA · verifícala", cls: "modelo" },
-    plantilla: { txt: "Plantilla del nivel", cls: "rubrica" }
+    plantilla: { txt: "Plantilla del nivel", cls: "rubrica" },
+    guia: { txt: "Guía Romus", cls: "guia" }
   };
   function etiqueta(origen, extra) {
     const o = ORIGENES[origen] || ORIGENES.modelo;
@@ -176,7 +177,8 @@ window.Inv = (function () {
       doc: "Romus comprobó que la evidencia citada aparece literalmente en tu documento.",
       fuente: "Dato tomado de una base académica abierta (OpenAlex). Revisa el formato de los nombres.",
       rubrica: "Calculado con criterios fijos, no por la opinión de la IA.",
-      modelo: "Propuesta generada por la IA. No está comprobada en tu documento ni en fuentes: revísala."
+      modelo: "Propuesta generada por la IA. No está comprobada en tu documento ni en fuentes: revísala.",
+      guia: "Explicación de la guía metodológica de Romus, redactada a partir de Hernández Sampieri et al. (2014) y Martínez Miguélez (2004)."
     }[o.cls] || "";
     return s;
   }
@@ -748,6 +750,168 @@ Reglas:
     ui.confirmar(`Agregué la declaración de uso de IA al final, con ${reg.length} ${reg.length === 1 ? "registro" : "registros"}.`);
   }
 
+  /* ================= 7. Guía metodológica y modo tutorial ================= */
+
+  let tutorialActivo = false;
+
+  function botonAccion(t) {
+    const mapa = {
+      coherencia: ["Revisar la coherencia de mi documento", () => ejecutar(() => coherencia())],
+      literatura: ["Buscar literatura", () => { if (ui.prefijar) ui.prefijar("Busca literatura sobre "); }],
+      idear: ["Idear mi proyecto", () => { if (ui.prefijar) ui.prefijar("Ayúdame a idear un proyecto sobre "); }],
+      declaracion: ["Agregar la declaración de uso de IA", () => ejecutar(declaracion)],
+      enfoque: ["Elegir enfoque", () => { const s = $("selEnfoque"); if (s) { s.focus(); s.scrollIntoView({ block: "center" }); } }]
+    };
+    const a = mapa[t.accion];
+    if (!a) return null;
+    const b = el("button", "boton secundario", a[0]); b.onclick = a[1];
+    return b;
+  }
+  async function ejecutar(fn) { ui.ocupar(true, "Investigación…"); try { await fn(); } catch (e) { ui.mostrarError(e); } finally { ui.ocupar(false); } }
+
+  /** Tarjeta de un tema de la guía. ruta/paso: si viene del tutorial. */
+  function mostrarTema(t, ruta, paso, hablarlo) {
+    const c = el("div", "inv-cuerpo guia");
+    c.appendChild(etiqueta("guia", t.fuente));
+    if (ruta) {
+      const total = Guia.RUTAS[ruta].length;
+      const prog = el("div", "guia-progreso");
+      prog.appendChild(el("span", "", `Tutorial ${ENFOQUES[ruta].nombre.toLowerCase()} · paso ${paso + 1} de ${total}`));
+      const barra = el("i", "barra"); const r = el("i"); r.style.width = Math.round((paso + 1) / total * 100) + "%"; barra.appendChild(r); prog.appendChild(barra);
+      c.appendChild(prog);
+    }
+    c.appendChild(el("p", "guia-resumen", t.resumen));
+    const ul = el("ul", "guia-puntos"); t.puntos.forEach(x => ul.appendChild(el("li", "", x))); c.appendChild(ul);
+    const ej = el("div", "guia-caja ejemplo"); ej.appendChild(el("b", "", "Ejemplo")); ej.appendChild(el("span", "", t.ejemplo)); c.appendChild(ej);
+    const er = el("div", "guia-caja error"); er.appendChild(el("b", "", "Error frecuente")); er.appendChild(el("span", "", t.error)); c.appendChild(er);
+    const acc = el("div", "inv-acciones");
+    const bEsc = el("button", "boton secundario", "Escuchar"); bEsc.onclick = () => ui.hablar(`${t.titulo}. ${t.resumen} ${t.puntos.join(" ")}`);
+    acc.appendChild(bEsc);
+    if (!Config.faltaClave()) {
+      const bAp = el("button", "boton secundario", "Revisar mi documento con esto");
+      bAp.onclick = () => ejecutar(() => aplicarTema(t));
+      acc.appendChild(bAp);
+    }
+    const bx = botonAccion(t); if (bx) acc.appendChild(bx);
+    c.appendChild(acc);
+    if (ruta) {
+      const nav = el("div", "inv-acciones guia-nav");
+      const ant = el("button", "boton secundario", "← Anterior"); ant.disabled = paso === 0; ant.onclick = () => pasoTutorial(-1);
+      const sig = el("button", "boton primario", paso + 1 < Guia.RUTAS[ruta].length ? "Siguiente →" : "Terminar"); sig.onclick = () => paso + 1 < Guia.RUTAS[ruta].length ? pasoTutorial(1) : salirTutorial();
+      nav.append(ant, sig);
+      c.appendChild(nav);
+    } else {
+      const rel = Guia.buscar(t.titulo + " " + t.claves.slice(0, 3).join(" "), 4).filter(x => x.t.id !== t.id).slice(0, 3);
+      if (rel.length) {
+        const r = el("div", "guia-relacionados"); r.appendChild(el("span", "", "Relacionados:"));
+        rel.forEach(x => { const a = el("button", "enlace-sutil", x.t.titulo); a.onclick = () => mostrarTema(x.t); r.appendChild(a); });
+        c.appendChild(r);
+      }
+    }
+    tarjeta(t.titulo, c);
+    if (hablarlo) ui.hablar(`${t.titulo}. ${t.resumen}`);
+  }
+
+  /** Índice de la guía con buscador. */
+  function indiceGuia() {
+    const c = el("div", "inv-cuerpo guia");
+    c.appendChild(el("p", "inv-nota", "Guía metodológica de Romus, redactada a partir de Hernández Sampieri et al. (2014) y Martínez Miguélez (2004). Pregunta con la voz («Ok Romus, ¿qué es la saturación?») o elige un tema."));
+    const fila = el("div", "guia-buscar");
+    const inp = el("input"); inp.placeholder = "¿Qué quieres saber? Ej.: tipos de muestreo";
+    const b = el("button", "boton primario", "Buscar");
+    const ir = () => { const v = inp.value.trim(); if (v) ejecutar(() => preguntar(v)); };
+    b.onclick = ir; inp.onkeydown = (e) => { if (e.key === "Enter") ir(); };
+    fila.append(inp, b); c.appendChild(fila);
+    const tut = el("button", "boton secundario", `▶ Tutorial paso a paso (${enfoque().nombre.toLowerCase()})`); tut.onclick = () => iniciarTutorial(); c.appendChild(tut);
+    Guia.categorias().forEach(cat => {
+      const d = el("details", "guia-cat");
+      d.appendChild(el("summary", "", cat));
+      Guia.TEMAS.filter(t => t.cat === cat).forEach(t => { const a = el("button", "guia-tema", t.titulo); a.onclick = () => mostrarTema(t); d.appendChild(a); });
+      c.appendChild(d);
+    });
+    tarjeta("Guía metodológica", c);
+    setTimeout(() => inp.focus(), 50);
+  }
+
+  /** Responde una duda: con la guía local (rápido, sin internet) o con la IA apoyada en la guía. */
+  async function preguntar(pregunta, signal) {
+    const res = Guia.buscar(pregunta, 3);
+    const definicion = /\b(que es|que son|que significa|cuales son|tipos de|que tipos|diferencia|define|definicion)\b/.test(Guia.norm(pregunta));
+    const fuerte = res.length && res[0].puntos >= 5;
+    registrar("Consulta a la guía", pregunta, "guia");
+    if ((fuerte && definicion) || Config.faltaClave() || !res.length) {
+      if (!res.length) { ui.agregarMensaje("ia", "No encontré ese tema en la guía. Prueba con otras palabras o abre la guía completa."); indiceGuia(); return; }
+      mostrarTema(res[0].t, null, null, true);
+      return;
+    }
+    // IA apoyada en la guía (RAG sobre contenido propio).
+    const contexto = res.map(r => Guia.textoPlano(r.t)).join("\n\n---\n\n");
+    const doc = await documentoNumerado().catch(() => ({ texto: "" }));
+    const d = await pedirHerramienta("respuesta_guia", "Responde la duda metodológica del usuario apoyándote en la guía de Romus.",
+      { type: "object", properties: {
+        respuesta: { type: "string", description: "Respuesta clara, en 3 a 7 frases, en español, sin markdown" },
+        cubierto_por_guia: { type: "boolean", description: "true si la respuesta se apoya principalmente en la guía" },
+        aplicacion: { type: "string", description: "Si el documento del usuario tiene algo relacionado, una sugerencia concreta para su proyecto; si no, vacío" }
+      }, required: ["respuesta", "cubierto_por_guia"] },
+      `Duda del usuario: «${pregunta}»\n\nGUÍA DE ROMUS (fuente principal; respétala):\n${contexto}\n\nDOCUMENTO DEL USUARIO (contexto, puede estar vacío):\n${(doc.texto || "").slice(0, 15000)}\n\nSi la guía no cubre la duda, respóndela con tu conocimiento y marca cubierto_por_guia=false.`, signal);
+    const c = el("div", "inv-cuerpo guia");
+    c.appendChild(etiqueta(d.cubierto_por_guia ? "guia" : "modelo", d.cubierto_por_guia ? res[0].t.fuente : ""));
+    c.appendChild(el("p", "guia-resumen", d.respuesta));
+    if (d.aplicacion) { const ap = el("div", "guia-caja ejemplo"); ap.appendChild(el("b", "", "En tu proyecto")); ap.appendChild(el("span", "", d.aplicacion)); c.appendChild(ap); }
+    const r = el("div", "guia-relacionados"); r.appendChild(el("span", "", "Ver en la guía:"));
+    res.forEach(x => { const a = el("button", "enlace-sutil", x.t.titulo); a.onclick = () => mostrarTema(x.t); r.appendChild(a); });
+    c.appendChild(r);
+    tarjeta(pregunta.length > 60 ? pregunta.slice(0, 57) + "…" : pregunta, c);
+    ui.hablar(d.respuesta);
+  }
+
+  async function aplicarTema(t, signal) {
+    const doc = await documentoNumerado();
+    if (doc.parrafos.filter(p => p.texto.trim()).length < 2) throw new Error("Tu documento está casi vacío. Escribe ese apartado y vuelve a pedirlo.");
+    const d = await pedirHerramienta("revision_guia", "Revisa el documento del usuario a la luz de un tema de la guía.",
+      { type: "object", properties: {
+        diagnostico: { type: "string", description: "2 a 4 frases sobre cómo está ese aspecto en el documento" },
+        evidencia: { type: "string", description: "Fragmento literal del documento relacionado (máx. 25 palabras); vacío si no existe" },
+        mejoras: { type: "array", items: { type: "string" }, description: "2 a 4 mejoras concretas" }
+      }, required: ["diagnostico", "mejoras"] },
+      `Tema de la guía:\n${Guia.textoPlano(t)}\n\nRevisa este aspecto en el DOCUMENTO:\n${doc.texto}`, signal);
+    const i = d.evidencia ? verificar(d.evidencia, doc.parrafos) : -1;
+    const c = el("div", "inv-cuerpo guia");
+    c.appendChild(etiqueta(i >= 0 ? "documento" : "modelo"));
+    c.appendChild(el("p", "guia-resumen", d.diagnostico));
+    if (i >= 0) { const b = el("button", "enlace-sutil", "Ir al texto relacionado"); b.onclick = () => irA(i); c.appendChild(b); }
+    const ul = el("ul", "guia-puntos"); (d.mejoras || []).forEach(x => ul.appendChild(el("li", "", x))); c.appendChild(ul);
+    const v = el("button", "boton secundario", "← Volver al tema"); v.onclick = () => mostrarTema(t); c.appendChild(v);
+    tarjeta("Tu documento · " + t.titulo, c);
+    registrar("Revisión con la guía", t.titulo, i >= 0 ? "documento" : "modelo");
+    ui.hablar(d.diagnostico);
+  }
+
+  function iniciarTutorial() {
+    tutorialActivo = true;
+    const ruta = enfoque().id;
+    const t = Config.get().tutorial || {};
+    const paso = t.ruta === ruta ? Math.min(t.paso || 0, Guia.RUTAS[ruta].length - 1) : 0;
+    Config.set({ tutorial: { ruta, paso } });
+    mostrarTema(Guia.tema(Guia.RUTAS[ruta][paso]), ruta, paso, true);
+    if (paso === 0) ui.agregarMensaje("ia", `Empezamos el tutorial de la ruta ${enfoque().nombre.toLowerCase()}. Di «siguiente paso» para avanzar o «paso anterior» para volver.`);
+  }
+  function pasoTutorial(delta) {
+    const t = Config.get().tutorial;
+    if (!t || !Guia.RUTAS[t.ruta]) return iniciarTutorial();
+    tutorialActivo = true;
+    const paso = Math.max(0, Math.min(Guia.RUTAS[t.ruta].length - 1, (t.paso || 0) + delta));
+    Config.set({ tutorial: { ruta: t.ruta, paso } });
+    mostrarTema(Guia.tema(Guia.RUTAS[t.ruta][paso]), t.ruta, paso, true);
+  }
+  function salirTutorial() {
+    tutorialActivo = false;
+    Config.set({ tutorial: null });
+    $("invResultado").classList.add("oculto");
+    ui.agregarMensaje("ia", "Terminaste el tutorial. Cuando quieras repasar un tema, pregúntame o abre la guía.");
+    ui.hablar("Terminaste el tutorial. Pregúntame cuando tengas dudas.");
+  }
+
   /* ================= Comandos de voz ================= */
 
   const NUM = { uno: 0, una: 0, primero: 0, primera: 0, "1": 0, dos: 1, segundo: 1, segunda: 1, "2": 1, tres: 2, tercero: 2, tercera: 2, "3": 2, cuatro: 3, cuarto: 3, cuarta: 3, "4": 3, cinco: 4, quinto: 4, quinta: 4, "5": 4, seis: 5, sexto: 5, sexta: 5, "6": 5 };
@@ -777,6 +941,15 @@ Reglas:
     m = original.match(/^\s*(?:ay[uú]dame a\s+)?(?:idear|formular|plantear|convertir)\s*(?:un proyecto|una tesis|una investigaci[oó]n|una pregunta|la idea|mi idea)?\s*(?:sobre|de|acerca de|con|:)?\s*(.*)$/i);
     if (m && /^(ayudame a )?(idear|formular|plantear|convertir)/.test(n)) return tarea(() => idear(m[1], signal));
     if (/(declaracion|registro) (de )?(uso de )?(la )?(ia|inteligencia artificial)/.test(n)) return tarea(declaracion);
+    // Guía y tutorial
+    if (/^((inicia|empieza|abre|activa|comienza) (el )?)?(modo )?tutorial( de investigacion)?$|^ensename a investigar$/.test(n)) return () => iniciarTutorial();
+    if (/^(siguiente|proximo) (paso|tema)$|^avanza$/.test(n) && (tutorialActivo || (Config.get().tutorial && /paso|tema/.test(n)))) return () => pasoTutorial(1);
+    if (/^(paso|tema) anterior$|^(regresa|vuelve) (al )?paso anterior$/.test(n)) return () => pasoTutorial(-1);
+    if (/^(sal|salir|termina|terminar|cierra) (del |el )?tutorial$/.test(n)) return () => salirTutorial();
+    if (/^((abre|muestra|ver) (la )?)?guia( metodologica| de investigacion)?$|^ayuda (de|en) investigacion$/.test(n)) return () => indiceGuia();
+    if (/^(que es|que son|que significa|que significan|cuales son|cual es|como (se )?(hace|hago|redacta|redacto|formula|formulo|plantea|planteo|calcula|calculo|elige|elijo|escoge|escojo|define|defino|construye|construyo|elabora|elaboro|valida|valido|analiza|analizo|escribe|escribo|cita|cito|selecciona|selecciono)|para que sirve|diferencia(s)? entre|explicame (que|como|el|la|los|las|en que)|que tipos de|tipos de|guia (de|sobre)|ayuda (con|sobre)|tengo una duda (sobre|con))\b/.test(n)) {
+      if (Guia.buscar(original, 1).length) return tarea(() => preguntar(original.replace(/^\s*(ok|oye|hola)?\s*romus[\s,]*/i, "").trim(), signal));
+    }
     return null;
   }
 
@@ -785,6 +958,7 @@ Reglas:
   return {
     NIVELES, ENFOQUES, nivel, fijarNivel, enfoque, fijarEnfoque, secciones, conectar, comando, etiqueta, registrar, leerRegistro,
     insertarEstructura, idear, coherencia, literatura, citar, evaluarRubrica, declaracion,
+    preguntar, indiceGuia, mostrarTema, iniciarTutorial, pasoTutorial, salirTutorial,
     _apa: apa, _verificar: verificar, _partirNombre: partirNombre
   };
 })();

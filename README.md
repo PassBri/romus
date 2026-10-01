@@ -16,7 +16,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-2.3-185abd" alt="versión 2.3">
+  <img src="https://img.shields.io/badge/versión-2.4-185abd" alt="versión 2.4">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -65,11 +65,27 @@ Romus acompaña proyectos de investigación y tesis de **pregrado, especializaci
 | 📊 | **Autoevaluación con rúbrica** por nivel y enfoque. | «Ok Romus, evalúa con la rúbrica» |
 | 🛡️ | **Declaración de uso de IA** con el registro de todo lo que hizo Romus en el documento. | «Ok Romus, declaración de uso de IA» |
 
+### Guía metodológica y modo tutorial
+
+Cuando tengas una duda de metodología, pregúntale a Romus. Responde con su **guía metodológica**: 32 temas redactados a partir de los dos libros base, cada uno con explicación, puntos clave, un ejemplo, el error más frecuente y el capítulo donde ampliarlo.
+
+| Quieres… | Di… |
+|---|---|
+| Resolver una duda | «Ok Romus, ¿qué es la saturación?», «¿cómo calculo la muestra?», «diferencia entre cuantitativo y cualitativo», «¿qué es el alfa de Cronbach?» |
+| Ver todos los temas | «Ok Romus, abre la guía» (o el botón **Guía**) |
+| Aprender paso a paso | «Ok Romus, modo tutorial», luego «siguiente paso», «paso anterior» o «salir del tutorial» |
+
+- **Sin IA y sin internet**, las definiciones salen al instante de la guía local.
+- **Con IA conectada**, las preguntas abiertas («¿cómo elijo a los participantes de mi estudio?») se responden apoyándose en la guía y en tu documento.
+- **«Revisar mi documento con esto»** aplica el tema que estás leyendo a tu proyecto.
+- **El tutorial** recorre el proceso completo según tu enfoque: 22 pasos en el cuantitativo, 20 en el cualitativo y 21 en el mixto. Cada paso trae un botón para actuar sobre tu documento.
+
 **Trust Label.** Cada resultado indica su origen:
 
 - *Basado en tu documento*: Romus comprobó que la evidencia aparece literalmente.
 - *Fuente verificable*: viene de OpenAlex.
 - *Rúbrica Romus*: puntaje calculado por reglas fijas, no por la opinión de la IA.
+- *Guía Romus*: viene de la guía metodológica, con el capítulo de referencia.
 - *Inferencia de la IA*: hay que verificarla.
 
 Si la IA dice que algo se cumple pero la evidencia no aparece en el documento, el ítem cuenta solo como parcial.
@@ -81,7 +97,7 @@ Los criterios, las estructuras y las rúbricas se construyeron a partir de:
 - Hernández Sampieri, R., Fernández Collado, C. y Baptista Lucio, M. P. (2014). *Metodología de la investigación* (6.ª ed.). McGraw-Hill.
 - Martínez Miguélez, M. (2004). *Epistemología y metodología cualitativa en las ciencias sociales*. Trillas.
 
-Romus aplica sus conceptos con palabras propias: rutas, alcances, hipótesis y variables, diseños, muestreo, confiabilidad y validez, rigor cualitativo y posicionamiento epistemológico. Las obras no se incluyen en el repositorio.
+Romus aplica sus conceptos con palabras propias: rutas, alcances, hipótesis y variables, diseños, muestreo, confiabilidad y validez, rigor cualitativo y posicionamiento epistemológico. La guía está escrita con palabras propias en `js/guia.js` y remite al capítulo correspondiente. Las obras no se incluyen en el repositorio porque tienen derechos de autor. Para profundizar, consulta los libros.
 
 ## Instalación rápida
 
@@ -107,6 +123,7 @@ Con **Siempre atento** activado, empieza cada orden con «Ok Romus». Después d
 | Editar | «resume la introducción», «simplifica este párrafo», «tradúcelo al inglés» |
 | Escribir | «modo dictado» (y luego «termina dictado») |
 | Cambiar de IA | «usa Gemini», «usa Claude», «usa la IA local» |
+| Resolver dudas | «¿qué es…?», «¿cómo hago…?», «abre la guía», «modo tutorial», «siguiente paso» |
 | Investigar | «nivel maestría», «enfoque cualitativo», «ayúdame a idear un proyecto sobre…», «inserta la estructura», «revisa la coherencia», «busca literatura sobre…», «cita el uno», «evalúa con la rúbrica», «declaración de uso de IA» |
 | Ajustar cómo habla | «habla más formal», «sé breve», «a partir de ahora trátame de usted» |
 | Apariencia | «modo oscuro», «modo claro», «modo voz», «abre la burbuja» |
@@ -156,7 +173,8 @@ romus/
 │   ├── ia.js             conexión con cualquier IA y personalidad de Romus
 │   ├── documento.js      lectura y edición del documento (Word API)
 │   ├── panel.js          estadísticas y estructura del documento
-│   ├── investigacion.js  modo investigación: niveles, coherencia, literatura, rúbrica, Trust Label
+│   ├── investigacion.js  modo investigación: niveles, coherencia, literatura, rúbrica, Trust Label, tutorial
+│   ├── guia.js           guía metodológica: 32 temas, buscador y rutas del tutorial
 │   ├── romus.js          la esfera holográfica de Romus
 │   ├── orbe.js           medidor del micrófono
 │   └── config.js         ajustes guardados en tu equipo
@@ -172,6 +190,12 @@ Todo es HTML, CSS y JavaScript puro: no hace falta compilar nada. Para publicar 
 Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canvas 2D · APIs de Anthropic, OpenAI y Gemini, más cualquier API compatible con OpenAI · GitHub Pages.
 
 ## Novedades
+
+### v2.4 · Guía metodológica y modo tutorial
+- **Guía** con 32 temas en 7 categorías, redactada a partir de Hernández Sampieri et al. (2014) y Martínez Miguélez (2004), con capítulo de referencia.
+- Dudas por voz («¿qué es…?», «¿cómo hago…?»): respuesta inmediata sin IA; con IA, respuesta apoyada en la guía y en tu documento.
+- **Modo tutorial** paso a paso según el enfoque, con progreso guardado.
+- «Revisar mi documento con esto» aplica cualquier tema a tu proyecto.
 
 ### v2.3 · Modo investigación (método Kuetz)
 - Nueva sección **Investigación** con nivel (pregrado → posdoctorado) y enfoque (cuantitativo, cualitativo, mixto).
@@ -200,4 +224,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word · v2.3</sub></p>
+<p align="center"><sub>Romus para Word · v2.4</sub></p>

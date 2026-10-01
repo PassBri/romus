@@ -202,11 +202,11 @@ Reglas:
     },
     {
       name: "investigacion",
-      description: "Funciones del modo investigación de Romus. Úsalo cuando pidan: buscar literatura, autores o antecedentes reales (accion=literatura, tema=palabras clave); revisar la coherencia del proyecto (accion=coherencia); evaluar el proyecto con la rúbrica (accion=rubrica); insertar la estructura de la tesis o proyecto (accion=estructura); idear o formular un proyecto a partir de una idea (accion=idear, tema=la idea); o agregar la declaración de uso de IA (accion=declaracion). NUNCA inventes referencias: para fuentes usa accion=literatura.",
+      description: "Funciones del modo investigación de Romus. Úsalo cuando pidan: buscar literatura, autores o antecedentes reales (accion=literatura, tema=palabras clave); revisar la coherencia del proyecto (accion=coherencia); evaluar el proyecto con la rúbrica (accion=rubrica); insertar la estructura de la tesis o proyecto (accion=estructura); idear o formular un proyecto a partir de una idea (accion=idear, tema=la idea); agregar la declaración de uso de IA (accion=declaracion); o explicar un concepto o resolver una duda de metodología de la investigación —qué es, cómo se hace, tipos, diferencias— con la guía metodológica de Romus (accion=guia, tema=la duda tal como la dijo el usuario). NUNCA inventes referencias: para fuentes usa accion=literatura.",
       input_schema: {
         type: "object",
         properties: {
-          accion: { type: "string", enum: ["literatura", "coherencia", "rubrica", "estructura", "idear", "declaracion"] },
+          accion: { type: "string", enum: ["literatura", "coherencia", "rubrica", "estructura", "idear", "declaracion", "guia"] },
           tema: { type: "string" }
         },
         required: ["accion"]

@@ -132,6 +132,8 @@
   }
 
   let textoOriginalActual = "";
+  function comandoActual() { return textoOriginalActual; }
+  function prefijar(t) { const c = $("txtComando"); c.value = t; c.focus(); c.setSelectionRange(t.length, t.length); ajustarAltura(); }
   function responderLocal(texto) { agregarMensaje("ia", texto); hablar(texto); }
 
   async function hablar(texto) {
@@ -623,6 +625,7 @@
         else if (a === "estructura") await Inv.insertarEstructura();
         else if (a === "idear") await Inv.idear(d.tema || "", estado.abort && estado.abort.signal);
         else if (a === "declaracion") await Inv.declaracion();
+        else if (a === "guia") await Inv.preguntar(d.tema || comandoActual(), estado.abort && estado.abort.signal);
         return { resumen: "Modo investigación: " + a + (d.tema ? " (" + d.tema + ")" : "") };
       }
       case "responder": {
@@ -1522,7 +1525,7 @@
     }, 150);
     if (window.Panel) Panel.iniciar(estado.enWord);
     if (window.Inv) {
-      Inv.conectar({ agregarMensaje, hablar, confirmar, ocupar, mostrarError });
+      Inv.conectar({ agregarMensaje, hablar, confirmar, ocupar, mostrarError, prefijar });
       $("selNivel").value = Inv.nivel().id;
       $("selEnfoque").value = Inv.enfoque().id;
     }

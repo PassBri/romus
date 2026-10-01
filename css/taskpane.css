@@ -359,3 +359,24 @@ textarea::placeholder { color: var(--tenue); }
 .trust.rubrica { color: var(--oro); border-color: color-mix(in srgb, var(--oro) 45%, transparent); }
 .trust.modelo { color: var(--texto-2); border-color: var(--linea-2); }
 .mensaje .trust { display: flex; width: fit-content; }
+/* ===== Guía metodológica y tutorial ===== */
+.trust.guia { color: var(--magenta); border-color: color-mix(in srgb, var(--magenta) 40%, transparent); }
+.guia .guia-resumen { font-size: 13px; line-height: 1.55; color: var(--texto); }
+.guia-puntos { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.guia-caja { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: 8px; font-size: 12px; background: var(--superficie-2); border-left: 3px solid var(--acento); }
+.guia-caja b { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--texto-2); }
+.guia-caja.error { border-left-color: var(--oro); }
+.guia-relacionados { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; font-size: 11.5px; color: var(--texto-2); }
+.guia-progreso { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: var(--texto-2); }
+.guia-progreso .barra { display: block; height: 4px; border-radius: 2px; background: var(--superficie-2); overflow: hidden; }
+.guia-progreso .barra i { display: block; height: 4px; background: var(--acento); }
+.guia-nav { justify-content: space-between; margin-top: 4px; }
+.guia-nav .boton:disabled { opacity: .4; }
+.guia-buscar { display: flex; gap: 6px; }
+.guia-buscar input { flex: 1; min-width: 0; font: inherit; font-size: 12.5px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--linea-2); background: var(--superficie); color: var(--texto); }
+.guia-cat summary { cursor: pointer; font-weight: 600; font-size: 12px; padding: 6px 2px; list-style: none; }
+.guia-cat summary::-webkit-details-marker { display: none; }
+.guia-cat summary::before { content: "›"; display: inline-block; width: 12px; color: var(--tenue); transition: transform .15s; }
+.guia-cat[open] summary::before { transform: rotate(90deg); }
+.guia-tema { display: block; width: 100%; text-align: left; border: none; background: none; padding: 5px 4px 5px 14px; font: inherit; font-size: 12.5px; color: var(--acento); border-radius: 6px; cursor: pointer; }
+.guia-tema:hover { background: var(--hover); }
