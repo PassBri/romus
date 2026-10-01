@@ -633,6 +633,10 @@
         else if (a === "idear") await Inv.idear(d.tema || "", estado.abort && estado.abort.signal);
         else if (a === "declaracion") await Inv.declaracion();
         else if (a === "guia") await Inv.preguntar(d.tema || comandoActual(), estado.abort && estado.abort.signal);
+        else if (a === "spss" && window.Datos) await Datos.sintaxis(estado.abort && estado.abort.signal);
+        else if (a === "resultados_apa" && window.Datos) Datos.resultadosAPA();
+        else if (a === "atlas" && window.Datos) await Datos.libroCodigos(estado.abort && estado.abort.signal);
+        else if (a === "resultados_cualitativos" && window.Datos) Datos.resultadosCualitativos();
         return { resumen: "Modo investigación: " + a + (d.tema ? " (" + d.tema + ")" : "") };
       }
       case "responder": {

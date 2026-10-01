@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Romus</title>
   <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
-  <link rel="stylesheet" href="css/taskpane.css?v=2.7">
+  <link rel="stylesheet" href="css/taskpane.css?v=2.8">
 </head>
 <body>
   <div id="app">
@@ -174,6 +174,8 @@
             <button class="chip" data-cmd="inserta la estructura" title="Di: «inserta la estructura de la tesis»"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h10M8 15h12M8 20h8"/></svg><span>Estructura</span></button>
             <button class="chip" data-prefijo="Busca literatura sobre " title="Di: «busca literatura sobre…»"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M9 7h6M9 11h4"/></svg><span>Literatura</span></button>
             <button class="chip" data-cmd="evalúa con la rúbrica" title="Di: «evalúa mi proyecto»"><svg viewBox="0 0 24 24"><path d="M5 20V10M10 20V4M15 20v-7M20 20V8"/></svg><span>Rúbrica</span></button>
+            <button class="chip" data-cmd="spss" title="SPSS o PSPP: sintaxis desde tu proyecto y resultados redactados en APA. Di: «genera la sintaxis de SPSS» o «redacta los resultados en APA»"><svg viewBox="0 0 24 24"><path d="M4 4v16h16"/><path d="M8 16v-4M12 16V8M16 16v-6"/></svg><span>SPSS</span></button>
+            <button class="chip" data-cmd="atlas ti" title="ATLAS.ti: libro de códigos (Excel o QDC) y resultados cualitativos con citas verificadas. Di: «libro de códigos» o «redacta los resultados cualitativos»"><svg viewBox="0 0 24 24"><path d="M4 7l4-3h12v12l-3 4H4z"/><path d="M8 4v12h12M8 16l-4 4"/></svg><span>ATLAS.ti</span></button>
             <button class="chip" data-cmd="abre la guía" title="Di: «¿qué es la saturación?» o «abre la guía»"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.2-2.5 3.9M12 17.2v.3"/></svg><span>Guía</span></button>
             <button class="chip" data-cmd="abre la teoría" title="Libro «Teoría: conocimiento científico» de Brian Suárez. Di: «¿qué es un postulado?» o «ayúdame a construir un axioma»"><svg viewBox="0 0 24 24"><path d="M12 22V12M12 12C9 12 6 10 6 6c3 0 6 2 6 6zM12 12c3 0 6-2 6-6-3 0-6 2-6 6zM12 15c-2.5 0-4.5-1.5-5-4M12 15c2.5 0 4.5-1.5 5-4"/></svg><span>Teoría</span></button>
             <button class="chip" data-cmd="modo tutorial" title="Di: «modo tutorial»"><svg viewBox="0 0 24 24"><path d="M3 8l9-4 9 4-9 4z"/><path d="M7 10v5c3 2 7 2 10 0v-5M21 8v6"/></svg><span>Tutorial</span></button>
@@ -377,7 +379,7 @@
         <div class="fila">
           <button id="btnBorrarHistorial" class="boton secundario">Borrar conversación</button>
         </div>
-        <p class="nota">Romus para Word v2.7 · Los textos se envían a la IA que elijas solo cuando das un comando que la usa.</p>
+        <p class="nota">Romus para Word v2.8 · Los textos se envían a la IA que elijas solo cuando das un comando que la usa.</p>
       </div>
     </div>
 
@@ -450,19 +452,20 @@
     </div>
   </div>
 
-  <script src="js/config.js?v=2.7"></script>
-  <script src="js/voz.js?v=2.7"></script>
-  <script src="js/escucha.js?v=2.7"></script>
-  <script src="js/orbe.js?v=2.7"></script>
-  <script src="js/romus.js?v=2.7"></script>
-  <script src="js/ia.js?v=2.7"></script>
-  <script src="js/documento.js?v=2.7"></script>
-  <script src="js/panel.js?v=2.7"></script>
-  <script src="js/guia.js?v=2.7"></script>
-  <script src="js/teoria.js?v=2.7"></script>
-  <script src="js/investigacion.js?v=2.7"></script>
-  <script src="js/jurado.js?v=2.7"></script>
-  <script src="js/asesor.js?v=2.7"></script>
-  <script src="js/app.js?v=2.7"></script>
+  <script src="js/config.js?v=2.8"></script>
+  <script src="js/voz.js?v=2.8"></script>
+  <script src="js/escucha.js?v=2.8"></script>
+  <script src="js/orbe.js?v=2.8"></script>
+  <script src="js/romus.js?v=2.8"></script>
+  <script src="js/ia.js?v=2.8"></script>
+  <script src="js/documento.js?v=2.8"></script>
+  <script src="js/panel.js?v=2.8"></script>
+  <script src="js/guia.js?v=2.8"></script>
+  <script src="js/teoria.js?v=2.8"></script>
+  <script src="js/investigacion.js?v=2.8"></script>
+  <script src="js/jurado.js?v=2.8"></script>
+  <script src="js/asesor.js?v=2.8"></script>
+  <script src="js/datos.js?v=2.8"></script>
+  <script src="js/app.js?v=2.8"></script>
 </body>
 </html>

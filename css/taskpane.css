@@ -483,3 +483,18 @@ input.fecha { font: inherit; font-size: 12.5px; padding: 4px 6px; border-radius:
 .bv-fila input { flex: 1; min-width: 0; font: inherit; font-size: 12.5px; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--linea-2); background: var(--superficie); color: var(--texto); }
 #bvNota { color: var(--error); }
 .bv-pie { display: flex; justify-content: space-between; margin-top: 8px; }
+
+/* ---------- v2.8 · Puente con SPSS y ATLAS.ti ---------- */
+.datos-vars { display: flex; flex-direction: column; gap: 3px; }
+.datos-var { display: grid; grid-template-columns: auto 1fr auto; gap: 2px 8px; align-items: baseline; padding: 4px 6px; border-radius: 6px; background: var(--superficie-2); font-size: 12px; }
+.datos-var code { font-family: Consolas, "Cascadia Mono", monospace; font-size: 11.5px; color: var(--acento); }
+.datos-var small { font-size: 10.5px; color: var(--texto-2); text-transform: uppercase; letter-spacing: .03em; }
+.datos-var small.nivel-escala { color: var(--ok); }
+.datos-var small.nivel-ordinal { color: var(--oro); }
+.datos-var .enlace-sutil { grid-column: 2 / 4; justify-self: start; font-size: 11px; color: var(--ok); }
+.datos-codigo summary { cursor: pointer; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+.datos-codigo pre { margin: 0; max-height: 260px; overflow: auto; padding: 8px 10px; border-radius: 8px; background: var(--superficie-2); border: 1px solid var(--linea); font: 11px/1.45 Consolas, "Cascadia Mono", monospace; white-space: pre; color: var(--texto); }
+.datos-apa { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--linea); background: var(--superficie); }
+.datos-apa p { font-family: "Times New Roman", Georgia, serif; font-size: 13px; line-height: 1.6; text-indent: 1.2em; }
+.datos-apa b { font-size: 12px; margin-top: 4px; }
+.datos select.ajuste { font: inherit; font-size: 12px; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--linea-2); background: var(--superficie); color: var(--texto); }

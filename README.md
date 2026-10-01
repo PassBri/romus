@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-2.7-185abd" alt="versión 2.7">
+  <img src="https://img.shields.io/badge/versión-2.8-185abd" alt="versión 2.8">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -108,6 +108,19 @@ Con **Crear mi proyecto**, Romus construye contigo un proyecto completo siguiend
 
 Romus **no inventa datos ni resultados**: donde falta información real escribe *[dato por confirmar]*. El resultado es un anteproyecto que tú lees, completas y haces tuyo. Cada instalación trae **1 proyecto de prueba gratis**; con un código **Romus Pro** (*Ajustes → Romus Pro*) los proyectos son ilimitados.
 
+## Analizar tus datos · SPSS y ATLAS.ti
+
+Donde más se atascan los tesistas es entre los datos y el capítulo de resultados. Romus hace de puente en los dos sentidos:
+
+| | Cuantitativo · SPSS o PSPP | Cualitativo · ATLAS.ti |
+|---|---|---|
+| **Antes de analizar** | **Sintaxis de SPSS** (.sps) generada desde tu operacionalización e hipótesis: etiquetas de variables y valores, datos perdidos, nivel de medición, puntajes de escalas, alfa de Cronbach, normalidad y **una prueba por hipótesis** (t, ANOVA, correlación, chi cuadrado, regresión…) con su alternativa no paramétrica. También inserta el **plan de análisis** redactado y una **plantilla de datos** en Excel. | **Libro de códigos** desde tus categorías y objetivos, en **Excel con el formato de importación de ATLAS.ti** («Categoría: código», comentario y grupo) y en **QDC** (REFI-QDA), que también abren NVivo y MAXQDA. |
+| **Después de analizar** | Pega las tablas de la salida y Romus **redacta los resultados en APA 7**: *t*(58) = 2,41; *p* = ,019. **Comprueba que cada número exista en tu salida** y te marca los que no. | Pega el informe de códigos y citas, y Romus **redacta los hallazgos por categoría**, comprobando que **cada cita sea literal**. |
+
+Toca **SPSS** o **ATLAS.ti** en *Investigación → Más herramientas*, o di «Ok Romus, genera la sintaxis de SPSS», «redacta los resultados en APA» o «libro de códigos para ATLAS.ti». ¿No tienes SPSS? La sintaxis funciona igual en **PSPP**, que es gratuito. Puedes elegir decimales con coma o con punto. Romus no sube tus bases de datos: trabaja con tu documento y con lo que pegas.
+
+<p align="center"><img src="assets/capturas/datos.png" width="760" alt="Resultados en APA desde SPSS con números verificados y hallazgos cualitativos desde ATLAS.ti con citas verificadas"></p>
+
 ## Lo que hace a Romus insustituible
 
 Otras herramientas escriben. Romus **verifica, acompaña y prepara**, dentro de Word y por voz:
@@ -115,7 +128,8 @@ Otras herramientas escriben. Romus **verifica, acompaña y prepara**, dentro de 
 1. **Simulacro de sustentación por voz.** Romus lee tu documento y hace de jurado. Te pregunta en voz alta sobre tu metodología, tu aporte y tus limitaciones. Tú respondes hablando y él evalúa cada respuesta con criterios, te dice qué faltó, te muestra una respuesta más sólida y al final te indica qué repasar. Es un ensayo de sustentación disponible a cualquier hora.
 2. **Verificador de citas y referencias.** Cruza cada cita del texto con la lista de referencias, revisa el formato APA 7 y el orden alfabético, y comprueba en OpenAlex que cada fuente exista. Detecta las referencias que inventa una IA antes de que las vea el jurado.
 3. **Trust Label.** Cada resultado dice de dónde sale: de tu documento, de una fuente real, de reglas fijas, de la guía, de la Teoría o de la IA. Así sabes qué verificar.
-4. **Declaración de uso de IA.** Romus registra lo que hizo y redacta la declaración que piden las universidades.
+4. **Resultados que no inventan datos.** Del SPSS o el ATLAS.ti al capítulo de resultados en APA, con cada número y cada cita comprobados contra tu salida.
+5. **Declaración de uso de IA.** Romus registra lo que hizo y redacta la declaración que piden las universidades.
 
 <p align="center"><img src="assets/capturas/sustentacion-referencias.png" width="900" alt="Verificador de referencias y simulacro de sustentación"></p>
 
@@ -188,6 +202,7 @@ Con **Siempre atento** activado, empieza cada orden con «Ok Romus». Después d
 | Quieres… | Di… |
 |---|---|
 | Que lea | «lee el documento», «lee desde aquí», «léeme la conclusión» |
+| Analizar datos | «genera la sintaxis de SPSS», «redacta los resultados en APA», «libro de códigos para ATLAS.ti», «redacta los resultados cualitativos» |
 | Controlar la lectura | «pausa», «sigue», «más rápido», «más lento», «para» |
 | Corregir | «corrige el documento», «corrige esto», «corrige la ortografía» |
 | Editar | «resume la introducción», «simplifica este párrafo», «tradúcelo al inglés» |
@@ -253,6 +268,7 @@ romus/
 │   ├── investigacion.js  modo investigación: niveles, coherencia, literatura, rúbrica, Trust Label, tutorial
 │   ├── jurado.js         simulacro de sustentación y verificador de citas y referencias
 │   ├── asesor.js         asesor: mi proyecto, cronograma, sesiones, bitácora y Romus Pro (método Kuetz)
+│   ├── datos.js          puente con SPSS/PSPP y ATLAS.ti: sintaxis, libro de códigos y resultados en APA verificados
 │   ├── guia.js           guía metodológica: 32 temas, buscador y rutas del tutorial
 │   ├── teoria.js         biblioteca «Teoría: conocimiento científico» (Suárez, 2025): 39 temas
 │   ├── romus.js          la esfera holográfica de Romus
@@ -270,6 +286,13 @@ Todo es HTML, CSS y JavaScript puro: no hace falta compilar nada. Para publicar 
 Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canvas 2D · APIs de Anthropic, OpenAI y Gemini, más cualquier API compatible con OpenAI · GitHub Pages.
 
 ## Novedades
+
+### v2.8 · Puente con SPSS y ATLAS.ti
+- **Sintaxis de SPSS** desde el proyecto, compatible con PSPP: diccionario, escalas, confiabilidad, normalidad y una prueba por hipótesis con su alternativa no paramétrica.
+- **Plan de análisis** y **libro de códigos** insertados en el documento, y **plantilla de datos** en Excel.
+- **Resultados en APA 7** desde la salida de SPSS, con verificación de cada número, coma o punto decimal y *p* < ,001 automático.
+- **Libro de códigos para ATLAS.ti** en Excel y QDC (también NVivo y MAXQDA).
+- **Hallazgos cualitativos** desde un informe de ATLAS.ti, con verificación de citas literales.
 
 ### v2.7 · Asesor real y Romus Pro
 - **Mi proyecto**: etapas, avance, lo que sigue y cronograma hacia tu fecha de entrega.
@@ -325,4 +348,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word · v2.7</sub></p>
+<p align="center"><sub>Romus para Word · v2.8</sub></p>

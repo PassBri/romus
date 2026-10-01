@@ -1040,6 +1040,7 @@ Reglas:
       ["💡", "Tengo una idea, pero no sé cómo plantearla", "La convierto en pregunta, problema y objetivos.", () => { if (ui.prefijar) ui.prefijar("Ayúdame a idear un proyecto sobre "); ui.hablar("Escribe o dime tu idea en una frase."); }],
       ["🧱", "Quiero empezar el documento", `Inserto la estructura de ${n.producto.toLowerCase()} con una guía en cada apartado.`, () => ejecutar(insertarEstructura)],
       ["🔎", "Ya tengo un borrador y quiero revisarlo", "Coherencia, referencias y rúbrica, con comentarios en tu documento.", () => revisarBorrador()],
+      ["📊", "Tengo datos: SPSS o ATLAS.ti", "Sintaxis de SPSS, libro de códigos para ATLAS.ti y resultados redactados en APA, con cada dato verificado.", () => { if (window.Datos) Datos.inicio(); }],
       ["🎓", "Voy a sustentar", "Hago de jurado: te pregunto en voz alta y evalúo tus respuestas.", () => { if (window.Jurado) ejecutar(() => Jurado.iniciar(5)); }],
       ["🌳", "Quiero construir teoría (maestría o doctorado)", "Axiomas, supuestos, constructos y modelos con el libro de Brian Suárez.", () => indiceGuia(true)],
       ["❓", "Tengo una duda concreta", "Pregúntame: «¿qué es la saturación?», «¿cómo calculo la muestra?»…", () => indiceGuia()]
@@ -1078,7 +1079,7 @@ Reglas:
 
   /** Devuelve una función si el comando es del modo investigación; si no, null. n = texto normalizado; original = texto con tildes. */
   function comando(n, original, signal) {
-    const extra = (window.Jurado && Jurado.comando(n, original)) || (window.Asesor && Asesor.comando(n, original));
+    const extra = (window.Jurado && Jurado.comando(n, original)) || (window.Asesor && Asesor.comando(n, original)) || (window.Datos && Datos.comando(n, original));
     if (extra) return extra;
     const tarea = (fn) => async () => {
       ui.ocupar(true, "Investigación…");

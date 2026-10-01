@@ -202,11 +202,11 @@ Reglas:
     },
     {
       name: "investigacion",
-      description: "Funciones del modo investigación de Romus. Úsalo cuando pidan: buscar literatura, autores o antecedentes reales (accion=literatura, tema=palabras clave); revisar la coherencia del proyecto (accion=coherencia); evaluar el proyecto con la rúbrica (accion=rubrica); insertar la estructura de la tesis o proyecto (accion=estructura); idear o formular un proyecto a partir de una idea (accion=idear, tema=la idea); agregar la declaración de uso de IA (accion=declaracion); o explicar un concepto o resolver una duda de metodología de la investigación —qué es, cómo se hace, tipos, diferencias— con la guía metodológica de Romus (accion=guia, tema=la duda tal como la dijo el usuario). NUNCA inventes referencias: para fuentes usa accion=literatura.",
+      description: "Funciones del modo investigación de Romus. Úsalo cuando pidan: buscar literatura, autores o antecedentes reales (accion=literatura, tema=palabras clave); revisar la coherencia del proyecto (accion=coherencia); evaluar el proyecto con la rúbrica (accion=rubrica); insertar la estructura de la tesis o proyecto (accion=estructura); idear o formular un proyecto a partir de una idea (accion=idear, tema=la idea); agregar la declaración de uso de IA (accion=declaracion); generar la sintaxis de SPSS o PSPP desde el proyecto (accion=spss); redactar en APA los resultados de una salida de SPSS (accion=resultados_apa); crear el libro de códigos para ATLAS.ti (accion=atlas); redactar resultados cualitativos desde un informe de ATLAS.ti (accion=resultados_cualitativos); o explicar un concepto o resolver una duda de metodología de la investigación —qué es, cómo se hace, tipos, diferencias— con la guía metodológica de Romus (accion=guia, tema=la duda tal como la dijo el usuario). NUNCA inventes referencias: para fuentes usa accion=literatura.",
       input_schema: {
         type: "object",
         properties: {
-          accion: { type: "string", enum: ["literatura", "coherencia", "rubrica", "estructura", "idear", "declaracion", "guia"] },
+          accion: { type: "string", enum: ["literatura", "coherencia", "rubrica", "estructura", "idear", "declaracion", "guia", "spss", "resultados_apa", "atlas", "resultados_cualitativos"] },
           tema: { type: "string" }
         },
         required: ["accion"]
