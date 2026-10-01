@@ -135,7 +135,7 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 
 ## Autor
 
-**Brian Gonzalo Suárez Acevedo**: docente, doctor en educación y creador del proyecto Romus.
+**Brian Gonzalo Suárez Acevedo**: docente, y creador del proyecto Romus.
 GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
