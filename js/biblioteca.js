@@ -320,7 +320,7 @@ ${doc.texto}`, signal);
     const pares = [];
     const vistos = new Set();
     for (const ci of citas) {
-      if (pares.length >= 8) break;
+      if (pares.length >= 24) break;
       const r = refs.find(x => norm(x.autor).includes(prim(ci.autor)) && String(x.anio).slice(0, 4) === String(ci.anio).slice(0, 4));
       if (!r || vistos.has(r.i + "|" + ci.parrafo)) continue; vistos.add(r.i + "|" + ci.parrafo);
       const p = ps.find(x => x.i === ci.parrafo);
@@ -329,29 +329,36 @@ ${doc.texto}`, signal);
     }
     // Resúmenes desde OpenAlex
     const biblio = todas();
-    for (const x of pares) {
+    await Promise.all(pares.map(async (x) => {
       const b = biblio.find(y => norm(y.titulo).slice(0, 50) === norm(x.r.titulo).slice(0, 50));
-      if (b && (b.ficha || b.resumen)) { x.resumen = b.ficha ? `${b.ficha.objetivo}. ${b.ficha.hallazgos}. ${b.ficha.conclusiones || ""}` : b.resumen; continue; }
+      if (b && (b.ficha || b.resumen)) { x.resumen = b.ficha ? `${b.ficha.objetivo}. ${b.ficha.hallazgos}. ${b.ficha.conclusiones || ""}` : b.resumen; return; }
       try {
         const q = x.r.doi ? "https://api.openalex.org/works/https://doi.org/" + encodeURIComponent(x.r.doi) + "?select=display_name,abstract_inverted_index" : "https://api.openalex.org/works?per-page=1&select=display_name,abstract_inverted_index&search=" + encodeURIComponent(x.r.titulo.slice(0, 200));
         const j = await (await fetch(q)).json();
         const w = j.results ? j.results[0] : j;
         if (w && w.abstract_inverted_index) x.resumen = Inv._resumenDe(w.abstract_inverted_index);
       } catch (e) { /* sin resumen */ }
-    }
+    }));
     const conRes = pares.filter(x => x.resumen);
     if (!conRes.length) throw new Error("No encontré los resúmenes de tus fuentes en OpenAlex. Haz sus fichas de lectura en «Mi biblioteca» y vuelve a intentarlo.");
-    const d = await pedirHerramienta("cita_fuente", "¿La fuente respalda lo que el texto le atribuye?",
+    // De a 8 citas por consulta, para que la IA compare con calma cada una.
+    const d = { veredictos: [] };
+    for (let ini = 0; ini < conRes.length; ini += 8) {
+      const lote = conRes.slice(ini, ini + 8);
+      const r = await pedirHerramienta("cita_fuente", "¿La fuente respalda lo que el texto le atribuye?",
       { type: "object", properties: { veredictos: { type: "array", items: { type: "object", properties: {
         n: { type: "integer" }, veredicto: { type: "string", enum: ["respaldada", "parcial", "exagerada", "no_se_puede_saber", "contradice"] }, explicacion: { type: "string" }
       }, required: ["n", "veredicto", "explicacion"] } } }, required: ["veredictos"] },
       `Para cada par, decide si el resumen de la fuente respalda la afirmación del texto. Sé prudente: con solo el resumen, si no hay información suficiente, responde «no_se_puede_saber».
 
-${conRes.map((x, k) => `${k + 1}. AFIRMACIÓN: ${x.frase}\n   FUENTE: ${x.r.texto}\n   RESUMEN DE LA FUENTE: ${x.resumen.slice(0, 1500)}`).join("\n\n")}`, signal);
+${lote.map((x, k) => `${k + 1}. AFIRMACIÓN: ${x.frase}\n   FUENTE: ${x.r.texto}\n   RESUMEN DE LA FUENTE: ${x.resumen.slice(0, 1500)}`).join("\n\n")}`, signal);
+      (r.veredictos || []).forEach(v => d.veredictos.push(Object.assign({}, v, { n: v.n + ini })));
+    }
     registrar("Cita–fuente", `${conRes.length} citas`, "modelo");
     const c = el("div", "inv-cuerpo");
     c.appendChild(etiqueta("modelo", "comparado con el resumen de cada fuente"));
-    c.appendChild(el("p", "guia-resumen", `Comparé ${conRes.length} citas con el resumen de su fuente. Es una alerta, no un veredicto: confírmalo leyendo la fuente.`));
+    const sinRes = pares.length - conRes.length;
+    c.appendChild(el("p", "guia-resumen", `Comparé ${conRes.length} citas con el resumen de su fuente. Es una alerta, no un veredicto: confírmalo leyendo la fuente.${sinRes ? ` ${sinRes} no se pudieron comparar porque su fuente no tiene resumen: haz su ficha de lectura en «Mi biblioteca» (pegando el texto) y vuelve a intentarlo.` : ""}`));
     const ico = { respaldada: "✓ Respaldada", parcial: "≈ Parcial", exagerada: "⚠ Exagerada", no_se_puede_saber: "? No se puede saber con el resumen", contradice: "✗ Contradice" };
     (d.veredictos || []).forEach(v => {
       const x = conRes[v.n - 1]; if (!x) return;
@@ -362,8 +369,84 @@ ${conRes.map((x, k) => `${k + 1}. AFIRMACIÓN: ${x.frase}\n   FUENTE: ${x.r.text
       const bI = el("button", "enlace-sutil", "Ir"); bI.onclick = () => irA(x.ci.parrafo); b.appendChild(bI);
       c.appendChild(b);
     });
+    const malas = (d.veredictos || []).filter(v => ["parcial", "exagerada", "contradice"].includes(v.veredicto) && conRes[v.n - 1]);
+    if (malas.length) {
+      const bC = el("button", "boton secundario", "Poner comentarios en el documento");
+      bC.onclick = () => H().ejecutar(async () => { await Doc.comentar(malas.map(v => { const x = conRes[v.n - 1]; return { parrafo: x.ci.parrafo, fragmento: x.frase.length <= 255 ? x.frase : "", comentario: `Romus · Fidelidad de la cita (${ico[v.veredicto]}): ${v.explicacion}` }; })); H().ui.confirmar(`Dejé ${malas.length} comentarios en el documento.`); });
+      c.appendChild(bC);
+    }
     tarjeta("¿Tus citas dicen lo que les atribuyes?", c);
     return d;
+  }
+
+  /* ================= Datos por confirmar ================= */
+  // Romus deja marcas como «[dato por confirmar: cifras de uso de IA en Colombia]» donde falta evidencia.
+  // Aquí se buscan fuentes para cada una y se reemplaza la marca por el dato que el investigador lee en la fuente.
+  const RE_PENDIENTE = /\[[^\[\]]{0,240}?(por confirmar|por completar|completar con|pendiente|por definir)[^\[\]]{0,240}?\]/gi;
+  async function porConfirmar() {
+    const { el, tarjeta, etiqueta, irA, buscarOpenAlex, apa, registrar } = H();
+    const ui = H().ui;
+    const ps = await Doc.leerParrafos();
+    const marcas = [];
+    ps.forEach(p => { (p.texto.match(RE_PENDIENTE) || []).forEach(m => marcas.push({ parrafo: p.i, marca: m, frase: (oraciones(p.texto).find(o => o.includes(m.slice(0, 30))) || p.texto).trim() })); });
+    const c = el("div", "inv-cuerpo");
+    c.appendChild(etiqueta("reglas", "marcas [por confirmar] de tu documento"));
+    if (!marcas.length) {
+      c.appendChild(el("p", "guia-resumen", "No hay datos por confirmar en tu documento. ¡Bien!"));
+      tarjeta("Datos por confirmar", c); ui.hablar("No encontré datos por confirmar en tu documento."); return marcas;
+    }
+    c.appendChild(el("p", "guia-resumen", `Hay ${marcas.length} ${marcas.length === 1 ? "dato" : "datos"} por confirmar. Para cada uno busco fuentes reales; tú lees la fuente, escribes el dato y yo lo pongo en el texto con su cita y su referencia en APA 7.`));
+    c.appendChild(el("p", "inv-nota", "Romus no inventa el dato: debe salir de la fuente que tú leíste o de tu institución."));
+    marcas.slice(0, 15).forEach((m, k) => {
+      const caja = el("div", "apa-hall pendiente");
+      caja.appendChild(el("b", "", `Dato ${k + 1}`));
+      caja.appendChild(el("code", "", m.frase.length > 160 ? m.frase.slice(0, 157) + "…" : m.frase));
+      const dato = el("textarea", "ajuste"); dato.rows = 2; dato.placeholder = "Escribe aquí el dato tal como lo dice la fuente (ej.: el 62 % de los estudiantes usa IA cada semana)";
+      caja.appendChild(dato);
+      const lista = el("div", "pendiente-fuentes"); caja.appendChild(lista);
+      let elegida = null;
+      const acc = el("div", "inv-acciones");
+      const bB = el("button", "enlace-sutil", "Buscar fuentes");
+      bB.onclick = () => H().ejecutar(async () => {
+        const tema = (m.marca.split(":").slice(1).join(":") || m.frase).replace(/[\[\]]/g, "").replace(/\b(dato|datos|cifras?) por confirmar\b/gi, "").trim();
+        let obras = [];
+        try { obras = await buscarOpenAlex(tema, true, true); } catch (e) { /* sigue */ }
+        if (obras.length < 3) { try { (await buscarOpenAlex(tema, true)).forEach(w => { if (!obras.some(o => o.id === w.id)) obras.push(w); }); } catch (e) { /* sigue */ } }
+        lista.innerHTML = "";
+        if (!obras.length) { lista.appendChild(el("p", "inv-nota", "No encontré fuentes académicas. Prueba con datos de tu institución, el DANE, el Ministerio o un informe oficial, y cítalo con «Generar referencia».")); return; }
+        obras.slice(0, 4).forEach(w => {
+          const r = Object.assign(apa(w), { resumen: Inv._resumenDe(w.abstract_inverted_index) });
+          const op = el("button", "verif-fila medio");
+          op.append(el("b", "", `${r.cita} · ${r.titulo.slice(0, 90)}`), el("span", "", (r.resumen || "Sin resumen en OpenAlex").slice(0, 220) + (r.resumen && r.resumen.length > 220 ? "…" : "")));
+          op.onclick = () => { elegida = r; lista.querySelectorAll(".verif-fila").forEach(x => x.classList.remove("ok")); op.classList.add("ok"); };
+          lista.appendChild(op);
+        });
+        lista.appendChild(el("p", "inv-nota", "Toca una fuente para usarla y ábrela por su DOI para leer el dato exacto."));
+      });
+      const bR = el("button", "boton secundario", "Poner en el texto");
+      bR.onclick = () => H().ejecutar(async () => {
+        const t = dato.value.trim();
+        if (!t) { dato.focus(); ui.hablar("Primero escribe el dato que leíste en la fuente."); return; }
+        const nuevo = t.replace(/[.\s]+$/, "") + (elegida && !t.includes(elegida.cita) ? " " + elegida.cita : "");
+        const ok = await Word.run(async (ctx) => {
+          const r = ctx.document.body.search(m.marca.slice(0, 250), { matchCase: true }); r.load("items"); await ctx.sync();
+          if (!r.items.length) return false;
+          r.items[0].insertText(nuevo, "Replace"); await ctx.sync(); return true;
+        });
+        if (!ok) throw new Error("No encontré esa marca en el documento: quizá ya la cambiaste.");
+        if (elegida) await Inv.citarObra(elegida, false);
+        registrar("Dato por confirmar completado", t.slice(0, 60), elegida ? "fuente" : "documento");
+        caja.classList.add("hecho"); bR.textContent = "Listo ✓"; bR.disabled = true;
+        ui.confirmar(elegida ? `Puse el dato con la cita ${elegida.cita} y su referencia.` : "Puse el dato en el texto. Recuerda citar de dónde salió.");
+      });
+      const bI = el("button", "enlace-sutil", "Ir"); bI.onclick = () => irA(m.parrafo);
+      acc.append(bR, bB, bI); caja.appendChild(acc);
+      c.appendChild(caja);
+    });
+    if (marcas.length > 15) c.appendChild(el("p", "inv-nota", `Te muestro los primeros 15 de ${marcas.length}.`));
+    tarjeta("Datos por confirmar", c);
+    ui.hablar(`Tienes ${marcas.length} ${marcas.length === 1 ? "dato" : "datos"} por confirmar. Busco fuentes para cada uno; tú escribes el dato que leas.`);
+    return marcas;
   }
 
   function comando(n) {
@@ -373,9 +456,10 @@ ${conRes.map((x, k) => `${k + 1}. AFIRMACIÓN: ${x.frase}\n   FUENTE: ${x.r.text
     if (/matriz de antecedentes/.test(n)) return () => matriz();
     if (/(organiza|estado del arte)/.test(n) && /estado del arte|antecedentes/.test(n)) return tarea(estadoArte);
     if (/(afirmaciones|frases) sin (respaldo|cita|fuente)|que necesitan cita|segun quien/.test(n)) return tarea(sinRespaldo);
+    if (/(datos?|cifras?) (por confirmar|pendientes?)|completa(r)? (los )?datos/.test(n)) return tarea(porConfirmar);
     if (/(mis citas dicen|cita fuente|citas (respaldan|coinciden)|verifica (que )?las citas digan)/.test(n)) return tarea(citaFuente);
     return null;
   }
 
-  return { abrir, todas, guardarObra, guardarRef, importar, parsearRIS, parsearBibTeX, ficha, matriz, estadoArte, sinRespaldo, citaFuente, comando, _filasMatriz: filasMatriz };
+  return { abrir, todas, guardarObra, guardarRef, importar, parsearRIS, parsearBibTeX, ficha, matriz, estadoArte, sinRespaldo, citaFuente, porConfirmar, comando, _filasMatriz: filasMatriz };
 })();

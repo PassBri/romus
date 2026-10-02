@@ -499,7 +499,28 @@ Reglas:
      Solo se pasan a minúscula palabras comunes conocidas: los nombres propios desconocidos (Turing, Colombia…) se respetan. */
   const COMUNES = new Set(("a an the of in on at to for from by with without and or but nor as is are be was were been being can could may might should would will do does did not no its it this that these those their our your his her they we you what which who whom whose why how when where whether if than then so yet into onto over under between among through toward towards about against across after before during within beyond via vs versus upon per " +
     "new old large small big high low long short good bad better best more most less least many much few other others same different further toward early late recent current future past present general special social public private human natural artificial machine machines model models language languages learning deep neural network networks system systems agent agents synthetic intelligence intelligent mind minds brain brains thought thinking knowledge belief beliefs justified justification true truth false meaning understanding reasoning reason argument arguments theory theories theoretical philosophy philosophical science scientific sciences epistemology epistemic ethics ethical moral account accounts approach approaches analysis analyses review study studies research case cases evidence effect effects impact role nature scope limits limit consequences consequence dangers danger risk risks debate debates problem problems question questions answer answers challenge challenges perspective perspectives framework frameworks method methods methodology methodological design data information computation computational computer computing simulation simulations novelty program programs programs talking talk words word testimony trust trustworthy trustworthiness reliability reliable process processes concept concepts conceptual introduction overview guide handbook education educational teaching teachers teacher students student school schools university higher learning children child adolescents youth young adults adult people health medical clinical care practice practices policy policies development developing developmental assessment evaluation measurement scale validation validity reliability quality performance use uses using based towards beyond within across factors factor relationship relationships association associations between among effectiveness efficacy intervention interventions program training skills skill competence competences competencies teaching physical activity sport sports games game play cooperative violence conflict coexistence school environment environmental change climate economic economy business management organizational organization organizations work workers family families community communities culture cultural society societies political politics power state states government law legal rights right history historical world global local national international regional urban rural women men gender identity self mental emotional emotions emotion social media digital technology technologies technological tools tool online virtual reality augmented robots robot robotic automation automated ai-generated generated generative text texts large-scale scale scaling understanding semantic semantics syntax grammar communication dialogue conversation conversational chat chatbots chatbot assistant assistants explanation explanations explainable interpretability transparency bias fairness accountability responsibility autonomy autonomous agency moral mechanism mechanisms representation representations consciousness experience experiences perception cognition cognitive extended embodied situated distributed collective individual subject object objects body bodies life living being beings what's toward ontology ontological metaphysics metaphysical logic logical formal informal can too part i ii iii one two three four five first second third stochastic parrot parrots computing machinery engine engines mechanical automata automaton test tests testing imitation game believe know knowing knower knowers known believing claim claims assertion assertions sense senses reference referential grounding grounded symbol symbols symbolic connectionism connectionist representation functionalism functionalist argument chinese room roots foundations foundation essay essays notes note remarks source sources reply replies response responses critique critical toward virtue virtues internalism externalism reliabilism social epistemology science sciences crisis open closed hard easy problem age era revolution turn turning point view views position positions defense defence against case for why how matter matters really still beyond el la los las un una unos unas de del al y e o u en con sin por para sobre entre desde hacia hasta como que su sus lo se es son estudio estudios análisis analisis revisión revision sistemática sistematica investigación investigacion educación educacion física fisica escolar escuela escuelas estudiantes docentes profesores niños niñas jóvenes jovenes adolescentes universidad universitarios aprendizaje enseñanza enseñanza calidad desarrollo evaluación evaluacion propuesta modelo modelos teoría teoria teorías conocimiento conocimientos inteligencia artificial agentes agente sintéticos sinteticos filosofía filosofia epistemología epistemologia ética etica lenguaje lenguajes perspectiva perspectivas enfoque juegos juego cooperativos cooperativo convivencia violencia conflicto conflictos salud mental social sociales cultura cultural política politica políticas derechos tecnología tecnologia tecnologías digital digitales uso usos efecto efectos impacto relación relacion factores estrategias estrategia práctica prácticas practica formación formacion competencias habilidades nuevo nueva nuevos nuevas caso casos experiencia experiencias aportes aporte hacia problema problemas pregunta preguntas").split(/\s+/));
-  function aOracion(t) {
+  // Gentilicios e idiomas en inglés: siempre con mayúscula («Chinese room», «English»).
+  const GENTILICIO = /^(american|african|asian|european|latin|chinese|english|spanish|french|german|italian|portuguese|colombian|mexican|brazilian|argentine|chilean|peruvian|japanese|korean|indian|arabic|russian|british|canadian|australian|greek|roman|christian|islamic|jewish|cartesian|bayesian|darwinian|kantian|aristotelian|platonic|marxist|freudian|newtonian|euclidean|gaussian|markov|turing|wittgensteinian)$/;
+  /** Evidencia del resumen de OpenAlex: palabras que el autor escribe con mayúscula a mitad de oración (nombres propios)
+      o en minúscula (palabras comunes). */
+  function evidenciaResumen(ii) {
+    const ev = {};
+    if (!ii) return ev;
+    const pos = [];
+    Object.keys(ii).forEach(w => ii[w].forEach(i => { pos[i] = w; }));
+    pos.forEach((w, i) => {
+      if (!w) return;
+      const limpio = w.replace(/^[^A-Za-zÀ-ÿ]+|[^A-Za-zÀ-ÿ'’]+$/g, "").replace(/['’]s$/, "");
+      if (!limpio) return;
+      const k = limpio.toLowerCase(), e = ev[k] || (ev[k] = { min: false, mayMedio: false });
+      const inicio = i === 0 || /[.?!:]$/.test(pos[i - 1] || ".");
+      if (/^[a-zà-ÿ]/.test(limpio)) e.min = true;
+      else if (!inicio && /^[A-ZÁÉÍÓÚÑ][a-zà-ÿ]/.test(limpio)) e.mayMedio = true;
+    });
+    return ev;
+  }
+  function aOracion(t, ii) {
+    const ev = evidenciaResumen(ii);
     const pals = String(t || "").split(/\s+/).filter(Boolean);
     const largas = pals.slice(1).filter(w => w.replace(/[^A-Za-zÀ-ÿ]/g, "").length >= 4);
     const cap = largas.filter(w => /^[^A-Za-zÀ-ÿ]*[A-ZÁÉÍÓÚÑ][a-záéíóúñ]/.test(w)).length;
@@ -509,8 +530,13 @@ Reglas:
       const out = tras ? w : w.split("-").map(p => {
         const m = p.match(/^([^A-Za-zÀ-ÿ]*)([A-ZÁÉÍÓÚÑ][a-záéíóúñü']*)([^A-Za-zÀ-ÿ]*)$/);
         if (!m) return p; // siglas (GPT-3, AI), mayúsculas internas (McMillan) o números
-        const base = m[2].toLowerCase(), raiz = base.replace(/'s$/, "");
-        return COMUNES.has(raiz) || COMUNES.has(raiz.replace(/s$/, "")) ? m[1] + base + m[3] : p;
+        const base = m[2].toLowerCase(), raiz = base.replace(/['’]s$/, "");
+        if (GENTILICIO.test(raiz)) return p;
+        const e = ev[raiz] || ev[raiz.replace(/s$/, "")];
+        if (e) { if (e.mayMedio && !e.min) return p; if (e.min) return m[1] + base + m[3]; } // el resumen decide
+        // Sufijos de palabras comunes en inglés (revisited, learning, cognition, reliability, realism…).
+        const comun = COMUNES.has(raiz) || COMUNES.has(raiz.replace(/s$/, "")) || (raiz.length > 5 && /(ed|ing|tions?|sions?|ity|ities|isms?|ness|ments?|ologys?|ologies|ics|ives?|ous|ances?|ences?|ships?|izations?|ists?)$/.test(raiz));
+        return comun ? m[1] + base + m[3] : p;
       }).join("-");
       tras = /[:?!.]$/.test(w);
       return out;
@@ -526,7 +552,7 @@ Reglas:
     else if (autores.length <= 20) lista = autores.slice(0, -1).map(fmt).join(", ") + " y " + fmt(autores[autores.length - 1]); // APA 7 en español: sin coma antes de «y»
     else lista = autores.slice(0, 19).map(fmt).join(", ") + ", … " + fmt(autores[autores.length - 1]);
     const anio = w.publication_year || "s. f.";
-    const titulo = aOracion((w.display_name || w.title || "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().replace(/\.$/, ""));
+    const titulo = aOracion((w.display_name || w.title || "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().replace(/\.$/, ""), w.abstract_inverted_index);
     const src = (w.primary_location && w.primary_location.source) || {};
     const fuente = src.display_name || "";
     const editorial = src.host_organization_name || (/press|editorial|ediciones|springer|routledge|wiley|elsevier|sage|publisher|universidad|university/i.test(fuente) ? fuente : "");
@@ -626,11 +652,14 @@ Reglas:
   async function citar(k) {
     const w = ultimos[k];
     if (!w) throw new Error("Primero busca literatura: «busca literatura sobre…».");
+    return citarObra(w, true);
+  }
+  /** Agrega la referencia APA de una obra (de apa()) a la lista, en orden alfabético; con enCursor, también la cita. */
+  async function citarObra(w, enCursor) {
     await Word.run(async (ctx) => {
       const body = ctx.document.body;
       // 1) Cita en el cursor
-      const sel = ctx.document.getSelection();
-      sel.insertText(" " + w.cita, "End");
+      if (enCursor) ctx.document.getSelection().insertText(" " + w.cita, "End");
       // 2) Referencia en la lista
       const ps = body.paragraphs;
       ps.load("items/text,items/style");
@@ -1199,7 +1228,7 @@ Reglas:
     NIVELES, ENFOQUES, nivel, fijarNivel, enfoque, fijarEnfoque, sinHipotesis, secciones, conectar, comando, etiqueta, registrar, leerRegistro,
     insertarEstructura, idear, coherencia, literatura, citar, evaluarRubrica, declaracion,
     preguntar, indiceGuia, mostrarTema, construir, asesor, iniciarTutorial, pasoTutorial, salirTutorial,
-    _apa: apa, _verificar: verificar, _partirNombre: partirNombre, _aOracion: aOracion,
+    _apa: apa, _verificar: verificar, citarObra, _partirNombre: partirNombre, _aOracion: aOracion,
     // Utilidades compartidas con otros módulos (jurado.js)
     _resumenDe: resumenDe,
     _h: { tarjeta, el, etiqueta, registrar, documentoNumerado, pedirHerramienta, verificar, norm, ejecutar, irA, buscarOpenAlex, apa, claveDoc, get ui() { return ui; } }

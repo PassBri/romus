@@ -34,7 +34,7 @@ const GRUPOS = [
   { id: "Voz", nombre: "Romus", ico: "logo", controles: ["ABRIR", "Hablar", "ModoVoz", "Burbuja"] },
   { id: "Doc", nombre: "Documento", ico: "leer", controles: ["Leer", "Corregir", "Revisar", "Resumir", { menu: "Mas", nombre: "Más", ico: "mas", items: ["Explicar", "LeerSel", "Simplificar", "Formal", "Dictar"] }] },
   { id: "Inv", nombre: "Investigación", ico: "asesor", controles: ["Asesor", "MiProyecto", "Crear",
-    { menu: "Planear", nombre: "Planear y fundamentar", ico: "bombillo", items: ["idear", "estructura", "coherencia", "rubrica", "literatura", "biblioteca", "matriz", "sincita"] },
+    { menu: "Planear", nombre: "Planear y fundamentar", ico: "bombillo", items: ["idear", "estructura", "coherencia", "rubrica", "literatura", "biblioteca", "matriz", "sincita", "fidelidad", "pendientes"] },
     { menu: "Disenar", nombre: "Diseñar y analizar", ico: "instrumento", items: ["muestra", "instrumento", "validacion", "etica", "spss", "atlas"] },
     { menu: "Entregar", nombre: "Escribir y entregar", ico: "sustentacion", items: ["discusion", "conclusiones", "resumen", "existen", "observaciones", "acta", "sustentacion", "diapositivas", "articulo", "usoia"] }] },
   { id: "Apa", nombre: "APA 7", ico: "apa", controles: ["apaasesor", "aparevisor", "apaformato", "apareferencia"] },

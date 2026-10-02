@@ -59,6 +59,8 @@ window.Herramientas = (function () {
     formal: '<path d="M3 9l9-5 9 5-9 5zM7 11.5V16c3 2 7 2 10 0v-4.5"/>',
     dictar: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 20h14"/>',
     mas: '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
+    pendiente: '<path d="M7 4H5v16h2M17 4h2v16h-2"/><path d="M10 9h4M10 13h4M10 17h2"/><circle cx="16.5" cy="17" r=".6"/>',
+    fidelidad: '<path d="M4 6h7v12H4zM13 6h7v12h-7"/><path d="M6 10h3M6 13h3M15 10h3M15 13h3"/><path d="M10.5 3.5l1.5 1.5 1.5-1.5"/>',
     cronometro: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5M18.5 6.5l1.5-1.5"/>',
     ayuda: '<circle cx="12" cy="12" r="9.5"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.2-2.5 3.9"/><circle cx="12" cy="17.2" r=".6"/>'
   };
@@ -73,6 +75,8 @@ window.Herramientas = (function () {
     ["fundamentar", "literatura", "Buscar literatura", "Fuentes reales, también en español", "libro", pref("Busca literatura sobre ", "Dime el tema y busco fuentes reales.")],
     ["fundamentar", "biblioteca", "Mi biblioteca", "Fuentes guardadas, fichas e importación de Zotero", "biblioteca", () => Biblio.abrir()],
     ["fundamentar", "matriz", "Matriz de antecedentes", "Con tus fichas de lectura", "matriz", () => Biblio.todas().some(x => x.ficha) ? Biblio.matriz() : Biblio.abrir()],
+    ["fundamentar", "fidelidad", "¿Dicen lo que cito?", "Compara tus citas con el resumen de cada fuente", "fidelidad", run(() => Biblio.citaFuente())],
+    ["fundamentar", "pendientes", "Datos por confirmar", "Completa los [datos por confirmar] con su fuente", "pendiente", () => Biblio.porConfirmar()],
     ["fundamentar", "sincita", "Frases sin cita", "Lo que el jurado preguntaría «¿según quién?»", "sincita", run(() => Biblio.sinRespaldo())],
     ["disenar", "muestra", "Tamaño de muestra", "Cálculo exacto y párrafo para tu método", "muestra", () => Instrumentos.muestra()],
     ["disenar", "instrumento", "Instrumento", "Cuestionario, guion de entrevista o ficha documental", "instrumento", run(() => Instrumentos.instrumento())],
@@ -128,8 +132,8 @@ window.Herramientas = (function () {
   /** Herramientas recomendadas para cada etapa del método Kuetz. */
   const POR_ETAPA = {
     tema: ["idear", "literatura", "estructura"],
-    planteamiento: ["coherencia", "literatura", "sincita", "rubrica"],
-    fundamentacion: ["biblioteca", "matriz", "sincita", "apareferencia"],
+    planteamiento: ["coherencia", "pendientes", "sincita", "rubrica"],
+    fundamentacion: ["biblioteca", "matriz", "fidelidad", "sincita"],
     metodologia: ["muestra", "instrumento", "etica", "coherencia"],
     campo: ["validacion", "etica", "spss", "atlas"],
     resultados: ["spss", "atlas", "aparevisor"],

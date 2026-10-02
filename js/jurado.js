@@ -371,6 +371,13 @@ ${doc.texto}`);
     if (ini < 0) c.appendChild(el("p", "inv-nota", "No encontré una sección titulada «Referencias». Agrégala con estilo de título para revisarla."));
     if (comentarios.length) c.appendChild(el("p", "inv-nota", `Dejé ${comentarios.length} ${comentarios.length === 1 ? "comentario" : "comentarios"} en el documento.`));
     c.appendChild(el("p", "inv-nota", "OpenAlex cubre más de 250 millones de trabajos académicos; algunos libros, normas y documentos locales pueden no estar."));
+    // Existir no basta: el siguiente paso compara lo que el texto atribuye con lo que la fuente dice.
+    if (window.Biblio && Biblio.citaFuente && verif && citas.length) {
+      const caja = el("div", "guia-caja");
+      caja.append(el("b", "", "Que existan no basta"), el("span", "", "Comprueba también que cada cita diga lo que tú le atribuyes: Romus compara tus frases con el resumen de cada fuente."));
+      const bF = el("button", "boton secundario", "¿Mis citas dicen lo que les atribuyo?"); bF.onclick = () => H().ejecutar(Biblio.citaFuente);
+      caja.appendChild(bF); c.appendChild(caja);
+    }
     tarjeta("Verificador de citas y referencias", c);
     const noExisten = refs.filter(r => ["no-encontrada", "doi-inexistente", "doi-distinto"].includes(r.estado)).length;
     ui.hablar(`Revisé ${refs.length} referencias y ${citas.length} citas. ${verif} existen. ${noExisten ? noExisten + " no las pude encontrar. " : ""}${huerfanas.length ? huerfanas.length + " citas no tienen referencia. " : ""}${sinCitar.length ? sinCitar.length + " referencias no se citan." : ""}`);

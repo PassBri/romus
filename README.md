@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-3.2-185abd" alt="versión 3.2">
+  <img src="https://img.shields.io/badge/versión-3.2.1-185abd" alt="versión 3.2.1">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -373,6 +373,11 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 
 ## Novedades
 
+### v3.2.1 · Citas fieles y datos completos
+- **¿Tus citas dicen lo que les atribuyes?** El proyecto Pro compara cada cita con el resumen real de su fuente y deja un comentario donde la frase podría exagerar o cambiar lo que dice el autor. La herramienta manual ahora revisa hasta 24 citas, permite dejar comentarios y se ofrece desde el verificador de referencias.
+- **Datos por confirmar**: nueva herramienta que encuentra las marcas [dato por confirmar], busca fuentes reales para cada una y pone en el texto el dato que tú escribes, con su cita y su referencia APA 7. Romus no inventa el dato.
+- **Nombres propios en los títulos**: al pasar los títulos a tipo oración, Romus usa el resumen de la obra para reconocer nombres propios y respeta gentilicios e idiomas («Chinese room», «Bayesian»).
+
 ### v3.2 · Investigación teórica y más rigor
 - **Nuevo enfoque teórico-documental** para tesis de filosofía, epistemología o teoría: metodología con corpus y criterios de selección, ficha de análisis documental (en lugar de cuestionario), tesis a defender (en lugar de hipótesis), rúbrica propia y ruta en la guía.
 - **Referencias APA 7 más exactas** desde OpenAlex: títulos en tipo oración, libros y capítulos con su formato, cursivas en revista y volumen (o en el título del libro), sin punto tras «?» y apellidos correctos en nombres con iniciales («John R. Searle» → Searle, J. R.).
@@ -469,4 +474,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word y PowerPoint · v3.2</sub></p>
+<p align="center"><sub>Romus para Word y PowerPoint · v3.2.1</sub></p>

@@ -368,6 +368,9 @@ Redacta con calidad académica en español. No inventes cifras, autores ni citas
         marco_conceptual: { type: "array", items: { type: "object", properties: { concepto: { type: "string" }, definicion: { type: "string" } }, required: ["concepto", "definicion"] } }
       }, required: ["antecedentes", "marco_teorico"] },
       `Proyecto: ${d.titulo}\nPregunta: ${d.pregunta}\nObjetivo: ${d.objetivo_general}\n\nFUENTES REALES DISPONIBLES (no uses otras, no inventes autores ni años; si una fuente no es pertinente, no la cites):\n${listaF || "(ninguna: escribe sin citas y señala [completar con fuentes])"}`);
+    // Fidelidad: ¿cada cita dice lo que la fuente dice? Se compara cada oración con el resumen real de la obra.
+    pinta(2, "Comparando cada cita con el resumen de su fuente…");
+    const fidelidad = await revisarFidelidad([m.antecedentes, m.marco_teorico], obras.slice(0, 12), d.titulo).catch(() => null);
     // Fase 4 · Diseñar
     pinta(3, "Diseñando la metodología…");
     const secMet = (Inv.secciones().find(([t]) => /^(Metodolog|Dise[ñn]o metodol)/.test(t)) || ["Metodología", []])[1] || [];
@@ -436,20 +439,71 @@ Redacta con calidad académica en español. No inventes cifras, autores ni citas
     pinta(5, "Verificando coherencia y referencias…");
     try { await Inv.coherencia(); } catch (x) { /* el documento ya está escrito */ }
     try { await Inv.declaracion(); } catch (x) { /* opcional */ }
+    let marcadas = 0;
+    if (fidelidad && fidelidad.alertas.length) { try { marcadas = await comentarFidelidad(fidelidad.alertas, citar); } catch (x) { /* opcional */ } }
     const q = proyecto(); q.hechos = Object.assign({}, q.hechos, { tema: true }); guardar(q);
     const { el: E } = H();
     const c = E("div", "inv-cuerpo asesor pro"); progresoFases(c, 7);
     c.appendChild(E("p", "guia-resumen", `Tu proyecto «${d.titulo}» está en el documento: planteamiento, objetivos, ${refs.length} fuentes reales citadas en APA 7, metodología, cronograma y presupuesto. También revisé la coherencia y agregué la declaración de uso de IA.`));
+    if (fidelidad) {
+      const sinRes = fidelidad.sinResumen ? `${fidelidad.sinResumen === 1 ? "1 cita no se pudo comparar" : fidelidad.sinResumen + " citas no se pudieron comparar"} porque su fuente no tiene resumen en OpenAlex: léelas tú.` : "";
+      const caja = E("div", "guia-caja" + (fidelidad.alertas.length ? " error" : ""));
+      caja.append(E("b", "", "Fidelidad de las citas"), E("span", "", fidelidad.alertas.length
+        ? `Comparé ${fidelidad.revisadas} citas con el resumen de su fuente: ${fidelidad.alertas.length === 1 ? "1 podría atribuirle" : fidelidad.alertas.length + " podrían atribuirle"} a la fuente algo que no dice${marcadas ? (marcadas === 1 ? " (dejé un comentario en el documento)" : " (dejé un comentario en cada una)") : ""}. ${sinRes}`
+        : `Comparé ${fidelidad.revisadas} citas con el resumen de su fuente y ninguna parece exagerada. ${sinRes}`));
+      c.appendChild(caja);
+    }
     const pasos = E("ol", "guia-puntos");
     ["Lee todo y reescribe con tu voz lo que no te represente.", "Completa los [datos por confirmar] con información real de tu contexto.", "Lee las fuentes citadas antes de entregar.", "Pide una «sesión de asesoría» para el siguiente paso."].forEach(x => pasos.appendChild(E("li", "", x)));
     c.appendChild(pasos);
     const acc = E("div", "inv-acciones");
     const b1 = E("button", "boton primario", "Sesión de asesoría"); b1.onclick = () => H().ejecutar(sesion);
     const b2 = E("button", "boton secundario", "Mi proyecto"); b2.onclick = () => miProyecto();
-    acc.append(b1, b2); c.appendChild(acc);
+    const b3 = E("button", "boton secundario", "Datos por confirmar"); b3.onclick = () => H().ejecutar(() => Biblio.porConfirmar());
+    acc.append(b1, b3, b2); c.appendChild(acc);
     tarjeta("¡Proyecto creado!", c);
     ui.hablar("Listo. Tu proyecto está en el documento. Léelo, ajústalo con tu voz y completa los datos por confirmar.");
     borrador = null;
+  }
+
+  /* ---------- Fidelidad de las citas del proyecto Pro ---------- */
+  /** Oraciones con claves [F#] comparadas con el resumen de OpenAlex de cada obra. */
+  async function revisarFidelidad(textos, obras, titulo) {
+    const { pedirHerramienta } = H();
+    const oraciones = textos.flatMap(t => String(t || "").split(/\n+/)).flatMap(p => p.replace(/\b(et al|pp?|cap|ed|eds|vol|núm|n\.º)\./gi, "$1§").split(/(?<=[.!?»])\s+(?=[A-ZÁÉÍÓÚÑ¿¡«])/).map(x => x.replace(/§/g, "."))).map(x => x.trim()).filter(x => /\[F\d+/.test(x));
+    const pares = [];
+    let sinResumen = 0;
+    oraciones.forEach(o => {
+      const ks = Array.from(new Set((o.match(/F(\d+)/g) || []).map(x => +x.slice(1) - 1))).filter(k => obras[k]);
+      const res = ks.map(k => obras[k].abstract_inverted_index ? `«${(obras[k].display_name || "").slice(0, 90)}»: ${Inv._resumenDe(obras[k].abstract_inverted_index).slice(0, 900)}` : "").filter(Boolean);
+      if (!ks.length) return;
+      if (!res.length) { sinResumen++; return; }
+      pares.push({ frase: o, resumen: res.join("\n") });
+    });
+    if (!pares.length) return { revisadas: 0, alertas: [], sinResumen };
+    const lote = pares.slice(0, 20);
+    const r = await pedirHerramienta("cita_fuente", "¿La fuente respalda lo que el texto le atribuye?",
+      { type: "object", properties: { veredictos: { type: "array", items: { type: "object", properties: {
+        n: { type: "integer" }, veredicto: { type: "string", enum: ["respaldada", "parcial", "exagerada", "no_se_puede_saber", "contradice"] }, explicacion: { type: "string" }
+      }, required: ["n", "veredicto", "explicacion"] } } }, required: ["veredictos"] },
+      `Proyecto: ${titulo}. Para cada afirmación, decide si el resumen de la fuente citada respalda lo que el texto le atribuye. Sé prudente: si el resumen no basta, responde «no_se_puede_saber». Marca «exagerada» si el texto atribuye a la fuente más de lo que dice, y «contradice» si dice lo contrario.
+
+${lote.map((x, k) => `${k + 1}. AFIRMACIÓN: ${x.frase}\n   RESUMEN DE LA FUENTE: ${x.resumen}`).join("\n\n")}`);
+    const alertas = (r.veredictos || []).filter(v => ["exagerada", "contradice", "parcial"].includes(v.veredicto) && lote[v.n - 1]).map(v => Object.assign({}, lote[v.n - 1], v));
+    return { revisadas: lote.length, alertas, sinResumen: sinResumen + Math.max(0, pares.length - lote.length) };
+  }
+  async function comentarFidelidad(alertas, citar) {
+    const ps = await Doc.leerParrafos();
+    const ETQ = { parcial: "respaldo parcial", exagerada: "posible exageración", contradice: "la fuente parece decir lo contrario" };
+    const coms = alertas.map(a => {
+      const frase = citar(a.frase);
+      const ini = frase.slice(0, 60);
+      const p = ps.find(x => x.texto.includes(ini));
+      if (!p) return null;
+      return { parrafo: p.i, fragmento: frase.length <= 255 && p.texto.includes(frase) ? frase : "", comentario: `Romus · Fidelidad de la cita (${ETQ[a.veredicto] || a.veredicto}): ${a.explicacion} Lee la fuente y ajusta la frase si hace falta.` };
+    }).filter(Boolean);
+    if (coms.length) await Doc.comentar(coms);
+    return coms.length;
   }
 
   /* ---------- Comandos de voz ---------- */
