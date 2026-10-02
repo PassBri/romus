@@ -649,3 +649,43 @@ main > .lector, main > .progreso { position: sticky; top: 0; z-index: 3; box-sha
 .ga-pasos li b { color: var(--texto); margin-right: 4px; }
 .ga-pasos li.activo { color: var(--texto); } .ga-pasos li.activo b { color: var(--acento); }
 @media (prefers-reduced-motion: reduce) { .ga-boton, .ga-clave, .ga-word, .ga-cursor { transition: none; } }
+
+/* Mis documentos */
+.arch-resumen { display: flex; flex-direction: column; margin-bottom: 8px; }
+.arch-resumen span { color: var(--texto-2); font-size: 12px; }
+.arch-zona { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 14px 10px; border: 1.5px dashed var(--linea-2); border-radius: 10px; cursor: pointer; text-align: center; background: var(--superficie); }
+.arch-zona b { color: var(--acento); } .arch-zona span { font-size: 11.5px; color: var(--texto-2); }
+.arch-zona.encima { border-color: var(--acento); background: var(--acento-suave); }
+.arch-herr { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin: 10px 0; }
+.arch-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px; border: 1px solid var(--linea); border-radius: 8px; background: var(--superficie-2); color: var(--texto); font: inherit; font-size: 11px; cursor: pointer; }
+.arch-btn span { font-size: 16px; }
+.arch-lista { display: flex; flex-direction: column; gap: 6px; }
+.arch-doc, .codigo-fila { display: flex; gap: 8px; align-items: flex-start; justify-content: space-between; padding: 7px 8px; border-radius: 8px; background: var(--superficie-2); }
+.arch-doc > div:first-child, .codigo-fila > div:nth-child(2) { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.arch-doc b, .codigo-fila b { font-size: 12.5px; overflow-wrap: anywhere; }
+.arch-doc small, .codigo-fila small { color: var(--texto-2); font-size: 11px; }
+.arch-meta { font-style: italic; }
+.arch-acc { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.enlace-sutil.peligro { color: var(--error); }
+.punto-codigo { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; flex: none; }
+.lector-texto { max-height: 60vh; overflow: auto; padding: 4px 8px; border: 1px solid var(--linea); border-radius: 8px; background: var(--superficie); font-size: 13px; line-height: 1.55; }
+.lector-texto p { margin: 0 0 8px; } .lector-texto p.resaltado { background: var(--acento-suave); border-radius: 4px; }
+.lector-texto mark { background: color-mix(in srgb, var(--oro) 22%, transparent); color: inherit; border-bottom: 2px solid; cursor: pointer; }
+.lector-pag { font-size: 10.5px; color: var(--tenue); text-transform: uppercase; letter-spacing: .04em; margin: 10px 0 4px; border-top: 1px solid var(--linea); padding-top: 4px; }
+.lector-barra { position: sticky; bottom: 0; display: flex; gap: 6px; padding: 6px 0; background: var(--superficie); }
+.cita-sel { display: block; white-space: pre-wrap; margin-bottom: 8px; }
+.codigos-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+.chip-codigo { font: inherit; font-size: 11.5px; padding: 3px 8px; border-radius: 999px; border: 1.5px solid var(--linea-2); background: var(--superficie); color: var(--texto); cursor: pointer; }
+.chip-codigo.activo { background: var(--acento-suave); font-weight: 600; }
+.arch-docs-sel { display: flex; flex-direction: column; gap: 2px; margin: 6px 0; font-size: 12px; max-height: 140px; overflow: auto; }
+.chat-docs { display: flex; flex-direction: column; gap: 8px; margin: 8px 0; }
+.chat-q { align-self: flex-end; max-width: 90%; background: var(--acento); color: var(--sobre-acento); padding: 6px 10px; border-radius: 12px 12px 2px 12px; font-size: 12.5px; }
+.chat-a { background: var(--superficie-2); padding: 8px 10px; border-radius: 12px 12px 12px 2px; font-size: 12.5px; }
+.chat-a p { margin: 0 0 4px; line-height: 1.5; }
+.chip-ref { font: inherit; font-size: 10.5px; padding: 0 6px; margin: 0 2px; border-radius: 999px; border: 1px solid var(--ok); color: var(--ok); background: var(--superficie); cursor: pointer; vertical-align: 1px; }
+.chip-ref.no { border-color: var(--error); color: var(--error); }
+.apa-hall.no-verif { border-left: 3px solid var(--error); }
+.propuesta { display: flex; gap: 6px; align-items: flex-start; padding: 6px 0; border-bottom: 1px solid var(--linea); font-size: 12px; }
+.propuesta div { display: flex; flex-direction: column; gap: 3px; } .propuesta small { color: var(--texto-2); }
+.tabla-scroll { overflow-x: auto; }
+@media (max-width: 300px) { .arch-herr { grid-template-columns: repeat(3, 1fr); } }

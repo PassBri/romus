@@ -44,7 +44,7 @@ const CORTOS = {
   literatura: "Literatura", biblioteca: "Biblioteca", matriz: "Matriz", sincita: "Sin cita", fidelidad: "Fidelidad",
   pendientes: "Por confirmar", existen: "Verificar", muestra: "Muestra", validacion: "Validación", spss: "SPSS o R",
   resumen: "Resumen", articulo: "Artículo", usoia: "Uso de IA", diapositivas: "Presentación", sustentacion: "Simulacro",
-  director: "Modo director", Ayuda: "Comandos", LeerSel: "Leer selección", Crear: "Crear ★", ruta: "Ruta de mi tesis"
+  director: "Modo director", docs: "Mis documentos", docspreguntar: "Preguntar", docsbuscar: "Buscar", docsextraer: "Extraer", docscodigos: "Codificar", docsreporte: "Reporte", Ayuda: "Comandos", LeerSel: "Leer selección", Crear: "Crear ★", ruta: "Ruta de mi tesis"
 };
 /* Estructura de la pestaña, al estilo de Word: cada grupo es una función y sus botones son las subfunciones.
    La primera es la acción principal; Word muestra las demás como botones pequeños apilados cuando el grupo
@@ -59,6 +59,7 @@ const GRUPOS = [
   { id: "Texto", nombre: "Texto", ico: "corregir", controles: ["Corregir", "Revisar", "Resumir", "Explicar", "Simplificar", "Formal", "LeerSel"] },
   { id: "Proy", nombre: "Proyecto", ico: "asesor", controles: ["Asesor", "Crear", "idear", "coherencia", "rubrica"] },
   { id: "Fuentes", nombre: "Fuentes y citas", ico: "libro", controles: ["literatura", "biblioteca", "matriz", "existen", "fidelidad", "sincita", "pendientes"] },
+  { id: "Docs", nombre: "Mis documentos", ico: "carpeta", controles: ["docs", "docspreguntar", "docsbuscar", "docsextraer", "docscodigos", "docsreporte"] },
   { id: "Metodo", nombre: "Método y datos", ico: "instrumento", controles: ["instrumento", "muestra", "validacion", "etica", "spss", "atlas"] },
   { id: "Escribir", nombre: "Escribir", ico: "discusion", controles: ["discusion", "conclusiones", "resumen", "articulo", "usoia"] },
   { id: "Apa", nombre: "APA 7", ico: "apa", controles: ["aparevisor", "apaformato", "apareferencia", "apaasesor"] },

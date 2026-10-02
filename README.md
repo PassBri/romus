@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-3.5-185abd" alt="versión 3.5">
+  <img src="https://img.shields.io/badge/versión-3.6-185abd" alt="versión 3.6">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -373,6 +373,15 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 
 ## Novedades
 
+### v3.6 · Mis documentos (como ATLAS.ti)
+- **Carga tus propios archivos**: PDF, Word (.docx), PowerPoint (.pptx) y texto (.txt, .md, .csv). Se guardan solo en tu equipo, junto a tu documento de Word.
+- **Pregúntales**: respuestas basadas solo en tus documentos, con cada cita comprobada en el texto original (las no verificadas se marcan en rojo) e inserción en Word con citas APA 7.
+- **Busca** palabras o frases en todos tus documentos (sin IA) y codifica los resultados de una vez.
+- **Extrae información**: ficha de lectura, datos y cifras, conceptos y definiciones, citas sobre un tema o matriz comparativa autor × categoría; a Excel o como tabla en Word.
+- **Codifica como en ATLAS.ti**: selecciona un fragmento y asígnale códigos, trae las categorías de tu proyecto o deja que la IA proponga citas que tú aceptas una a una. Reporte por código, tabla documento × código, Word y Excel, y **Redactar hallazgos** con las citas verificadas.
+- **Exporta a ATLAS.ti, NVivo o MAXQDA** con el formato estándar REFI-QDA (.qdpx): documentos, códigos y citas.
+- **Cita textual en Word** con su referencia APA 7 (en bloque si tiene 40 palabras o más).
+
 ### v3.5 · Conectar la IA es más fácil
 Se suman tres formas nuevas a las que ya había (la configuración manual sigue igual) y puedes cambiar entre ellas cuando quieras:
 - **⚡ Un clic con OpenRouter**: inicias sesión (también con Google), autorizas y la clave llega sola a Romus. Romus elige un modelo gratuito que maneja sus herramientas y puedes cambiarlo en Ajustes.
@@ -491,4 +500,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word y PowerPoint · v3.5</sub></p>
+<p align="center"><sub>Romus para Word y PowerPoint · v3.6</sub></p>

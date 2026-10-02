@@ -65,11 +65,17 @@ window.Herramientas = (function () {
     nivel: '<path d="M2.5 9L12 4.5 21.5 9 12 13.5z"/><path d="M6.5 11v4.5c1.6 1.6 3.4 2.4 5.5 2.4s3.9-.8 5.5-2.4V11M21.5 9v5"/>',
     enfoque: '<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
     conectar: '<path d="M9 3v4M15 3v4M7 7h10v4a5 5 0 0 1-10 0z"/><path d="M12 16v5"/>',
+    carpeta: '<path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 10v6M9 13h6"/>',
+    preguntadoc: '<path d="M6 3h9l4 4v6"/><path d="M6 3v18h6"/><path d="M14 15h7v5h-3l-2 2v-2h-2z"/>',
+    buscadoc: '<path d="M6 3h9l4 4v4"/><path d="M6 3v18h5"/><circle cx="16" cy="16" r="3.2"/><path d="M18.4 18.4L21 21"/>',
+    extraer: '<path d="M6 3h9l4 4v14H6z"/><path d="M9 11h7M9 14h7M9 17h4"/><path d="M15 3v4h4"/>',
+    etiqueta: '<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.4"/>',
+    reportedoc: '<path d="M5 3h14v18H5z"/><path d="M8 8h3M8 12h8M8 16h8"/><circle cx="15" cy="8" r="1.5"/>',
     cronometro: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5M18.5 6.5l1.5-1.5"/>',
     ayuda: '<circle cx="12" cy="12" r="9.5"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.2-2.5 3.9"/><circle cx="12" cy="17.2" r=".6"/>'
   };
 
-  const GRUPOS = { planear: "Planear", fundamentar: "Fundamentar", disenar: "Diseñar y recolectar", analizar: "Analizar datos", escribir: "Escribir resultados", apa: "Normas APA 7", entregar: "Entregar y sustentar", aprender: "Aprender", docentes: "Para directores y jurados" };
+  const GRUPOS = { planear: "Planear", fundamentar: "Fundamentar", documentos: "Mis documentos (como ATLAS.ti)", disenar: "Diseñar y recolectar", analizar: "Analizar datos", escribir: "Escribir resultados", apa: "Normas APA 7", entregar: "Entregar y sustentar", aprender: "Aprender", docentes: "Para directores y jurados" };
   // [grupo, id, nombre, descripción, ícono, acción]
   const LISTA = [
     ["planear", "ruta", "Etapas de mi tesis", "La ruta según tu nivel y enfoque", "etapas", () => Asesor.rutaTesis()],
@@ -83,6 +89,12 @@ window.Herramientas = (function () {
     ["fundamentar", "fidelidad", "¿Dicen lo que cito?", "Compara tus citas con el resumen de cada fuente", "fidelidad", run(() => Biblio.citaFuente())],
     ["fundamentar", "pendientes", "Datos por confirmar", "Completa los [datos por confirmar] con su fuente", "pendiente", () => Biblio.porConfirmar()],
     ["fundamentar", "sincita", "Frases sin cita", "Lo que el jurado preguntaría «¿según quién?»", "sincita", run(() => Biblio.sinRespaldo())],
+    ["documentos", "docs", "Mis documentos", "Carga PDF, Word o PowerPoint y trabaja sobre ellos", "carpeta", () => Archivos.abrir()],
+    ["documentos", "docspreguntar", "Preguntar a mis documentos", "Respuestas con citas verificadas", "preguntadoc", () => Archivos.preguntar()],
+    ["documentos", "docsbuscar", "Buscar en mis documentos", "Palabras o frases, sin IA", "buscadoc", () => Archivos.buscar()],
+    ["documentos", "docsextraer", "Extraer información", "Ficha, datos, conceptos, citas o matriz", "extraer", () => Archivos.extraer()],
+    ["documentos", "docscodigos", "Codificar", "Códigos y citas como en ATLAS.ti", "etiqueta", () => Archivos.codigosVista()],
+    ["documentos", "docsreporte", "Reporte de códigos", "Citas por código, Word, Excel y .qdpx", "reportedoc", () => Archivos.reporte()],
     ["disenar", "muestra", "Tamaño de muestra", "Cálculo exacto y párrafo para tu método", "muestra", () => Instrumentos.muestra()],
     ["disenar", "instrumento", "Instrumento", "Cuestionario, guion de entrevista o ficha documental", "instrumento", run(() => Instrumentos.instrumento())],
     ["disenar", "validacion", "Validación por jueces", "V de Aiken y Lawshe", "validacion", () => Instrumentos.validacion()],
@@ -138,10 +150,10 @@ window.Herramientas = (function () {
   const POR_ETAPA = {
     tema: ["ruta", "idear", "literatura", "estructura"],
     planteamiento: ["coherencia", "pendientes", "sincita", "rubrica"],
-    fundamentacion: ["biblioteca", "matriz", "fidelidad", "sincita"],
+    fundamentacion: ["docs", "biblioteca", "matriz", "fidelidad"],
     metodologia: ["muestra", "instrumento", "etica", "coherencia"],
     campo: ["validacion", "etica", "spss", "atlas"],
-    resultados: ["spss", "atlas", "aparevisor"],
+    resultados: ["spss", "atlas", "docscodigos", "aparevisor"],
     discusion: ["discusion", "conclusiones", "resumen", "apaformato"],
     sustentacion: ["sustentacion", "diapositivas", "observaciones", "articulo"]
   };

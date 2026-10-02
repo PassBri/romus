@@ -1176,7 +1176,7 @@ Reglas:
   /** Devuelve una función si el comando es del modo investigación; si no, null. n = texto normalizado; original = texto con tildes. */
   function comando(n, original, signal) {
     original = original || n;
-    const extra = ["Jurado", "Asesor", "APA", "Formato", "Datos", "Instrumentos", "Biblio", "Escritura", "Revision"].reduce((f, m) => f || (window[m] && window[m].comando ? window[m].comando(n, original) : null), null);
+    const extra = ["Archivos", "Jurado", "Asesor", "APA", "Formato", "Datos", "Instrumentos", "Biblio", "Escritura", "Revision"].reduce((f, m) => f || (window[m] && window[m].comando ? window[m].comando(n, original) : null), null);
     if (extra) return extra;
     const tarea = (fn) => async () => {
       ui.ocupar(true, "Investigación…");
