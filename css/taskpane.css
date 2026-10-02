@@ -689,3 +689,29 @@ main > .lector, main > .progreso { position: sticky; top: 0; z-index: 3; box-sha
 .propuesta div { display: flex; flex-direction: column; gap: 3px; } .propuesta small { color: var(--texto-2); }
 .tabla-scroll { overflow-x: auto; }
 @media (max-width: 300px) { .arch-herr { grid-template-columns: repeat(3, 1fr); } }
+
+/* Romus Nexus: trazabilidad, contraste, síntesis y estudio */
+.nexus-modo { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 6px 0; }
+.nexus-modo button { font: inherit; font-size: 11.5px; padding: 5px 6px; border-radius: 8px; border: 1px solid var(--linea-2); background: var(--superficie); color: var(--texto-2); cursor: pointer; }
+.nexus-modo button.activo { border-color: var(--acento); color: var(--texto); box-shadow: inset 0 0 0 1px var(--acento); font-weight: 600; }
+.trust-leyenda { display: flex; gap: 8px; flex-wrap: wrap; font-size: 10.5px; margin-top: 4px; }
+.trust-leyenda span, .t-etq { font-style: normal; font-size: 10px; font-weight: 600; padding: 0 6px; border-radius: 999px; border: 1px solid; }
+.t-documento .t-etq, .trust-leyenda .t-documento { color: var(--ok); border-color: var(--ok); }
+.t-literatura .t-etq, .trust-leyenda .t-literatura { color: var(--cian); border-color: var(--cian); }
+.t-inferencia .t-etq, .trust-leyenda .t-inferencia { color: var(--oro); border-color: var(--oro); }
+.t-sin_verificar .t-etq { color: var(--error); border-color: var(--error); }
+.afirmacion { margin: 0 0 6px; padding-left: 8px; border-left: 3px solid var(--linea-2); line-height: 1.5; }
+.afirmacion.t-documento { border-left-color: var(--ok); } .afirmacion.t-literatura { border-left-color: var(--cian); }
+.afirmacion.t-inferencia { border-left-color: var(--oro); } .afirmacion.t-sin_verificar { border-left-color: var(--error); }
+.chip-ref.lit { border-color: var(--cian); color: var(--cian); text-decoration: none; }
+.cita-trad { display: block; color: var(--texto-2); font-size: 11px; font-style: italic; margin-top: 2px; }
+.arch-docs-sel small.idioma { margin-left: 6px; color: var(--tenue); font-size: 10.5px; }
+.nexus-ok { color: var(--ok); } .nexus-tension { color: var(--magenta); } .nexus-vacio { color: var(--oro); }
+.posicion { margin: 3px 0; font-size: 12px; }
+.sintesis-par { font-size: 12.5px; line-height: 1.55; text-align: justify; margin: 0 0 8px; }
+.quiz { display: flex; flex-direction: column; gap: 6px; }
+.quiz-op { text-align: left; font: inherit; font-size: 12.5px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--linea-2); background: var(--superficie); color: var(--texto); cursor: pointer; }
+.quiz-op.ok { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 12%, transparent); }
+.quiz-op.mal { border-color: var(--error); background: color-mix(in srgb, var(--error) 10%, transparent); }
+.arch-herr { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 300px) { .arch-herr { grid-template-columns: repeat(2, 1fr); } }

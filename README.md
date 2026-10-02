@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-3.6-185abd" alt="versión 3.6">
+  <img src="https://img.shields.io/badge/versión-3.7-185abd" alt="versión 3.7">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -373,6 +373,15 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 
 ## Novedades
 
+### v3.7 · Romus Nexus (ideas de IDOC)
+Inspirado en IDOC (Brian G. Suárez Acevedo · Ruta a la Cima): de documentos que se leen a documentos con los que se piensa.
+- **Trust Layer**: cada afirmación de una respuesta dice de dónde sale: **evidencia** de tus documentos (cita verificada), **literatura** académica real (OpenAlex) o **inferencia** de la IA, con un nivel de certeza.
+- **Modo cerrado / expandido**: pregunta solo a tus documentos o a tus documentos + literatura académica, sin perder la procedencia; las fuentes de la literatura se agregan a tus referencias.
+- **Pensar · Contrastar documentos**: consensos, contradicciones y vacíos con citas verificadas, e inserción como borrador de estado del arte.
+- **Crear · Redactar desde mis documentos**: estado del arte, antecedentes, marco teórico, introducción o discusión, con citas APA verificadas y referencias.
+- **Educar · Estudiar un documento**: explicación por nivel, ideas clave con cita y preguntas de comprensión con retroalimentación.
+- **Multiidioma**: Romus detecta el idioma de cada documento (español, inglés, portugués, francés, alemán, italiano); puedes preguntar en español sobre artículos en otro idioma y recibir la cita original con su traducción («traducción propia» en APA).
+
 ### v3.6 · Mis documentos (como ATLAS.ti)
 - **Carga tus propios archivos**: PDF, Word (.docx), PowerPoint (.pptx) y texto (.txt, .md, .csv). Se guardan solo en tu equipo, junto a tu documento de Word.
 - **Pregúntales**: respuestas basadas solo en tus documentos, con cada cita comprobada en el texto original (las no verificadas se marcan en rojo) e inserción en Word con citas APA 7.
@@ -500,4 +509,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word y PowerPoint · v3.6</sub></p>
+<p align="center"><sub>Romus para Word y PowerPoint · v3.7</sub></p>

@@ -71,6 +71,9 @@ window.Herramientas = (function () {
     extraer: '<path d="M6 3h9l4 4v14H6z"/><path d="M9 11h7M9 14h7M9 17h4"/><path d="M15 3v4h4"/>',
     etiqueta: '<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.4"/>',
     reportedoc: '<path d="M5 3h14v18H5z"/><path d="M8 8h3M8 12h8M8 16h8"/><circle cx="15" cy="8" r="1.5"/>',
+    contrastar: '<path d="M4 7h13l-3-3M20 17H7l3 3"/>',
+    sintesis: '<path d="M14 4l6 6-9 9H5v-6z"/><path d="M12 6l6 6"/>',
+    estudiar: '<path d="M3 6.5C5 5 8 5 12 7c4-2 7-2 9-.5V19c-2-1.5-5-1.5-9 .5-4-2-7-2-9-.5z"/><path d="M12 7v12.5"/>',
     cronometro: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5M18.5 6.5l1.5-1.5"/>',
     ayuda: '<circle cx="12" cy="12" r="9.5"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.2-2.5 3.9"/><circle cx="12" cy="17.2" r=".6"/>'
   };
@@ -94,6 +97,9 @@ window.Herramientas = (function () {
     ["documentos", "docsbuscar", "Buscar en mis documentos", "Palabras o frases, sin IA", "buscadoc", () => Archivos.buscar()],
     ["documentos", "docsextraer", "Extraer información", "Ficha, datos, conceptos, citas o matriz", "extraer", () => Archivos.extraer()],
     ["documentos", "docscodigos", "Codificar", "Códigos y citas como en ATLAS.ti", "etiqueta", () => Archivos.codigosVista()],
+    ["documentos", "docscontrastar", "Contrastar documentos", "Consensos, contradicciones y vacíos", "contrastar", () => Archivos.contrastar()],
+    ["documentos", "docssintesis", "Redactar desde mis documentos", "Estado del arte o marco teórico con citas verificadas", "sintesis", () => Archivos.sintetizar()],
+    ["documentos", "docsestudiar", "Estudiar un documento", "Explicación por nivel y preguntas de comprensión", "estudiar", () => Archivos.estudiar()],
     ["documentos", "docsreporte", "Reporte de códigos", "Citas por código, Word, Excel y .qdpx", "reportedoc", () => Archivos.reporte()],
     ["disenar", "muestra", "Tamaño de muestra", "Cálculo exacto y párrafo para tu método", "muestra", () => Instrumentos.muestra()],
     ["disenar", "instrumento", "Instrumento", "Cuestionario, guion de entrevista o ficha documental", "instrumento", run(() => Instrumentos.instrumento())],
@@ -150,7 +156,7 @@ window.Herramientas = (function () {
   const POR_ETAPA = {
     tema: ["ruta", "idear", "literatura", "estructura"],
     planteamiento: ["coherencia", "pendientes", "sincita", "rubrica"],
-    fundamentacion: ["docs", "biblioteca", "matriz", "fidelidad"],
+    fundamentacion: ["docs", "docscontrastar", "docssintesis", "biblioteca"],
     metodologia: ["muestra", "instrumento", "etica", "coherencia"],
     campo: ["validacion", "etica", "spss", "atlas"],
     resultados: ["spss", "atlas", "docscodigos", "aparevisor"],

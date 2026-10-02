@@ -130,7 +130,8 @@ window.Archivos = (function () {
     if (/usuario|user|admin|microsoft|office|word|pdf|propietario|owner|^hp$|dell|lenovo|acer|asus|windows|^autor$|^author$|^\W*$/i.test(meta.autor || "")) meta.autor = "";
     if (/^(microsoft word - |untitled|sin título|documento\d*|presentaci[oó]n\d*)/i.test(meta.titulo || "") || /\.(docx?|pdf)$/i.test(meta.titulo || "")) meta.titulo = "";
     if (!meta.titulo) meta.titulo = file.name.replace(/\.[^.]+$/, "");
-    return { id: uid("d"), nombre: file.name, tipo: ext, bytes: file.size, fecha: new Date().toISOString(), paginas: r.paginas, conPaginas: r.conPaginas, unidad: r.unidad || "p.", palabras, meta };
+    const idioma = detectarIdioma(r.paginas.slice(0, 5).map(p => p.parrafos.join(" ")).join(" "));
+    return { id: uid("d"), nombre: file.name, tipo: ext, bytes: file.size, fecha: new Date().toISOString(), paginas: r.paginas, conPaginas: r.conPaginas, unidad: r.unidad || "p.", palabras, meta, idioma };
   }
 
   /* ================= Utilidades de texto ================= */
@@ -213,6 +214,18 @@ window.Archivos = (function () {
     if (as.length === 2) return `${ap(as[0])} y ${ap(as[1])}`;
     return `${ap(as[0])} et al.`;
   }
+  /** Autores en formato de lista de referencias APA: «Ruiz Díaz, Ana; Pérez, Luis» → «Ruiz Díaz, A. y Pérez, L.». */
+  function autoresAPA(autor) {
+    const as = String(autor || "").split(/\s*(?:;|&|\by\b|\band\b)\s*/).map(x => x.trim()).filter(Boolean).map(x => {
+      if (/^(ministerio|universidad|instituto|secretar|organizaci|unesco|unicef|banco|departamento|congreso|corte|consejo)/i.test(x)) return x; // autor institucional
+      if (x.includes(",")) { const [ap, nom] = x.split(",").map(y => y.trim()); return `${ap}, ${nom.split(/\s+/).filter(Boolean).map(n => /\.$/.test(n) ? n : n.charAt(0).toUpperCase() + ".").join(" ")}`; }
+      const p0 = Inv._partirNombre ? Inv._partirNombre(x) : { apellido: x, iniciales: "" };
+      return p0.iniciales ? `${p0.apellido}, ${p0.iniciales}` : p0.apellido;
+    });
+    return as.length <= 1 ? (as[0] || "") : as.slice(0, -1).join(", ") + " y " + as[as.length - 1];
+  }
+  const corto = (d, n) => { const t = d.nombre.replace(/\.[^.]+$/, ""); n = n || 18; return t.length > n ? t.slice(0, n - 1) + "…" : t; };
+  const minus = (t) => String(t || "").charAt(0).toLowerCase() + String(t || "").slice(1);
   const exigirIA = () => { if (Config.faltaClave()) throw new Error("Para esto necesito tu IA conectada (botón «Conectar IA» o Ajustes). Buscar en tus documentos funciona sin IA."); };
 
   /* ================= Vista principal: Mis documentos ================= */
@@ -238,14 +251,14 @@ window.Archivos = (function () {
     c.appendChild(zona);
     if (docs.length) {
       const acc = el("div", "arch-herr");
-      [["💬", "Preguntar", () => preguntar()], ["🔎", "Buscar", () => buscar()], ["🧾", "Extraer", () => extraer()], ["🏷️", "Códigos", () => codigosVista()], ["📑", "Reporte", () => reporte()]].forEach(([i, t, f]) => { const b = el("button", "arch-btn"); b.append(el("span", "", i), el("b", "", t)); b.onclick = f; acc.appendChild(b); });
+      [["💬", "Preguntar", () => preguntar()], ["🔎", "Buscar", () => buscar()], ["🧾", "Extraer", () => extraer()], ["🏷️", "Códigos", () => codigosVista()], ["⇄", "Contrastar", () => contrastar()], ["✍️", "Redactar", () => sintetizar()], ["🎓", "Estudiar", () => estudiar()], ["📑", "Reporte", () => reporte()]].forEach(([i, t, f]) => { const b = el("button", "arch-btn"); b.append(el("span", "", i), el("b", "", t)); b.onclick = f; acc.appendChild(b); });
       c.appendChild(acc);
       const lista = el("div", "arch-lista");
       docs.sort((a, b) => a.nombre.localeCompare(b.nombre, "es")).forEach(d => {
         const f = el("div", "arch-doc");
         const n = citas.filter(x => x.doc === d.id).length;
         const info = el("div", "");
-        info.append(el("b", "", d.nombre), el("small", "", `${d.tipo.toUpperCase()} · ${d.conPaginas ? d.paginas.length + (d.unidad === "diap." ? " diap." : " pág.") + " · " : ""}${d.palabras.toLocaleString("es-CO")} palabras${n ? ` · ${n} citas` : ""}`), el("small", "arch-meta", d.meta.autor ? `${apellidos(d.meta.autor)} (${d.meta.anio || "s. f."})` : "Sin autor: agrégalo para citar en APA"));
+        info.append(el("b", "", d.nombre), el("small", "", `${d.tipo.toUpperCase()} · ${nombreIdioma(idiomaDe(d))} · ${d.conPaginas ? d.paginas.length + (d.unidad === "diap." ? " diap." : " pág.") + " · " : ""}${d.palabras.toLocaleString("es-CO")} palabras${n ? ` · ${n} citas` : ""}`), el("small", "arch-meta", d.meta.autor ? `${apellidos(d.meta.autor)} (${d.meta.anio || "s. f."})` : "Sin autor: agrégalo para citar en APA"));
         const bA = el("button", "enlace-sutil", "Abrir"); bA.onclick = () => leer(d.id);
         const bD = el("button", "enlace-sutil", "Datos"); bD.onclick = () => datosDoc(d.id);
         const bQ = el("button", "enlace-sutil peligro", "Quitar"); bQ.onclick = async () => { if (!confirm(`¿Quitar «${d.nombre}» y sus citas de Romus? (El archivo original no se borra.)`)) return; await borrar("docs", d.id); for (const x of citas.filter(x => x.doc === d.id)) await borrar("citas", x.id); abrir(); };
@@ -349,7 +362,8 @@ window.Archivos = (function () {
     const acc = el("div", "inv-acciones");
     const bV = el("button", "enlace-sutil", "← Mis documentos"); bV.onclick = () => abrir();
     const bP = el("button", "enlace-sutil", "Preguntar a este documento"); bP.onclick = () => preguntar(id);
-    acc.append(bV, bP); c.appendChild(acc);
+    const bE = el("button", "enlace-sutil", "Estudiarlo"); bE.onclick = () => estudiar(id);
+    acc.append(bV, bP, bE); c.appendChild(acc);
     tarjeta(d.nombre, c);
     if (enfocar) setTimeout(() => { const p = cuerpo.querySelector(`p[data-pag="${enfocar.pag}"][data-par="${enfocar.par}"]`); if (p) { p.scrollIntoView({ block: "center" }); p.classList.add("resaltado"); } }, 60);
   }
@@ -474,8 +488,57 @@ window.Archivos = (function () {
     codigosVista();
   }
 
-  /* ================= Preguntar a los documentos (IA con citas verificadas) ================= */
+  /* ================= Idioma de los documentos (lo pertinente del i18n de IDOC) ================= */
+  const IDIOMAS = {
+    es: ["Español", "de la que el los las en y a se del un por con para una es al lo como más pero sus le ya o este sí porque esta entre cuando muy sin sobre también"],
+    en: ["Inglés", "the of and to in is that it for as with was on be by this are from or an which have not but their has were they its can more"],
+    pt: ["Portugués", "de que o a e do da em um para é com não uma os no se na por mais as dos como mas foi ao ele das tem à seu sua ou ser quando muito nos já"],
+    fr: ["Francés", "de la le et les des en un une du est que dans qui par pour pas sur au plus ne ce il sont avec se aux ou"],
+    de: ["Alemán", "der die und in den von zu das mit sich des auf für ist im dem nicht ein eine als auch es an werden aus er hat dass sie nach"],
+    it: ["Italiano", "di e il la che in un per è non una del le si da con sono gli della al alla ma come più anche"]
+  };
+  const PAL_IDIOMA = Object.fromEntries(Object.entries(IDIOMAS).map(([k, [, l]]) => [k, new Set(l.split(" "))]));
+  function detectarIdioma(texto) {
+    const ws = String(texto || "").toLowerCase().split(/[^a-záéíóúñüçàèìòùâêîôûäöß]+/).filter(Boolean).slice(0, 4000);
+    if (ws.length < 20) return "es";
+    const pts = Object.keys(PAL_IDIOMA).map(k => [k, ws.reduce((a, w) => a + (PAL_IDIOMA[k].has(w) ? 1 : 0), 0)]).sort((a, b) => b[1] - a[1]);
+    return pts[0][1] >= 3 ? pts[0][0] : "es";
+  }
+  const idiomaDe = (d) => d.idioma || (d.idioma = detectarIdioma(d.paginas.slice(0, 5).map(p => p.parrafos.join(" ")).join(" ")));
+  const nombreIdioma = (k) => (IDIOMAS[k] || [k])[0];
+  /** Para preguntar en español sobre documentos en otro idioma: términos de búsqueda en el idioma del documento. */
+  async function terminosEnIdiomas(pregunta, docs) {
+    const otros = Array.from(new Set(docs.map(idiomaDe))).filter(k => k !== "es");
+    if (!otros.length || Config.faltaClave()) return "";
+    try {
+      const r = await H().pedirHerramienta("terminos_busqueda", "Términos de búsqueda traducidos.",
+        { type: "object", properties: { terminos: { type: "string", description: "Palabras clave de la pregunta traducidas, separadas por espacios" } }, required: ["terminos"] },
+        `Traduce las ideas clave de esta pregunta a ${otros.map(nombreIdioma).join(" y ")} como palabras clave para buscar en documentos (incluye sinónimos técnicos). Solo las palabras.\n\nPREGUNTA: ${pregunta}`);
+      return r.terminos || "";
+    } catch (e) { return ""; }
+  }
+
+  /* ================= Preguntar (Trust Layer + modo cerrado/expandido) ================= */
+  // Cada afirmación de la respuesta dice de dónde sale: de tus documentos (evidencia verificada),
+  // de la literatura académica (OpenAlex) o de la inferencia de la IA.
+  const TIPO = { documento: ["Evidencia", "de tus documentos"], literatura: ["Literatura", "fuente académica real (OpenAlex)"], inferencia: ["Inferencia", "razonamiento de la IA, sin cita"], sin_verificar: ["Sin verificar", "la cita no está en el texto"] };
   let conversacion = [];
+  /** Literatura académica real para el modo expandido. */
+  async function literaturaPara(consulta) {
+    try {
+      const obras = await H().buscarOpenAlex(consulta, false);
+      return obras.filter(w => w.abstract_inverted_index).slice(0, 5).map(w => { const a = H().apa(w); return { obra: w, apa: a, texto: Inv._resumenDe(w.abstract_inverted_index).slice(0, 1200) }; });
+    } catch (e) { return []; }
+  }
+  function textoDeAfirmaciones(r, conAPA) {
+    return r.afirmaciones.map(a => {
+      if (!conAPA) return a.texto;
+      if (a.tipo === "documento" && a.ok) return `${a.texto.replace(/[.\s]+$/, "")} ${citaAPA(a.doc, a.ref + (a.traduccion ? ", traducción propia" : ""))}.`;
+      if (a.tipo === "literatura" && a.lit) return `${a.texto.replace(/[.\s]+$/, "")} ${a.lit.apa.cita}.`;
+      if (a.tipo === "sin_verificar") return `${a.texto} [no verificado en tus documentos: revísalo]`;
+      return a.texto;
+    }).join(" ");
+  }
   async function preguntar(soloDoc, preguntaInicial) {
     const { el, tarjeta } = H();
     const docs = await todos("docs");
@@ -483,30 +546,42 @@ window.Archivos = (function () {
     const c = el("div", "inv-cuerpo docs-chat");
     const selD = el("select", "ajuste"); [["", `Todos mis documentos (${docs.length})`]].concat(docs.map(d => [d.id, d.nombre])).forEach(([v, t]) => { const o = el("option", "", t); o.value = v; selD.appendChild(o); }); selD.value = soloDoc || "";
     c.appendChild(selD);
+    const modo = el("div", "nexus-modo");
+    const bCer = el("button", "activo", "🔒 Solo mis documentos"), bExp = el("button", "", "🌐 + Literatura académica");
+    let expandido = !!Config.get().nexusExpandido;
+    const pintarModo = () => { bCer.classList.toggle("activo", !expandido); bExp.classList.toggle("activo", expandido); };
+    bCer.onclick = () => { expandido = false; Config.set({ nexusExpandido: false }); pintarModo(); };
+    bExp.onclick = () => { expandido = true; Config.set({ nexusExpandido: true }); pintarModo(); };
+    modo.append(bCer, bExp); pintarModo(); c.appendChild(modo);
     const hist = el("div", "chat-docs"); c.appendChild(hist);
     const fila = el("div", "con-boton"); const q = el("textarea", "ajuste"); q.rows = 2; q.placeholder = "Pregunta lo que quieras: ¿qué concluye el autor?, ¿qué dicen sobre la saturación?, compara los dos estudios…"; q.value = preguntaInicial || "";
     const b = el("button", "boton primario", "Preguntar"); fila.append(q, b); c.appendChild(fila);
-    c.appendChild(el("p", "inv-nota", "Romus responde solo con lo que dicen tus documentos y comprueba cada cita en el texto original."));
+    const ley = el("div", "trust-leyenda"); Object.entries(TIPO).slice(0, 3).forEach(([k, [n, dsc]]) => { const s = el("span", "t-" + k, n); s.title = dsc; ley.appendChild(s); }); c.appendChild(ley);
     const pintar = (r) => {
-      const m = el("div", "chat-q", r.pregunta); hist.appendChild(m);
+      hist.appendChild(el("div", "chat-q", r.pregunta));
       const a = el("div", "chat-a");
-      const p = el("p", "");
-      String(r.respuesta).split(/(\[\d+\])/).forEach(seg => {
-        const k = seg.match(/^\[(\d+)\]$/);
-        if (!k) { p.appendChild(document.createTextNode(seg)); return; }
-        const ci = r.citas.find(x => x.n === +k[1]);
-        const s = el("button", "chip-ref" + (ci && ci.ok ? "" : " no"), ci ? `${ci.docNombre.slice(0, 18)}, ${ci.ref}` : `[${k[1]}]`);
-        if (ci) { s.title = (ci.ok ? "Cita verificada: " : "No encontré esta cita literal: ") + ci.fragmento; s.onclick = () => leer(ci.docId, { pag: ci.pag, par: ci.par }); }
-        p.appendChild(s);
+      r.afirmaciones.forEach(x => {
+        const f = el("p", "afirmacion t-" + x.tipo);
+        f.appendChild(el("i", "t-etq", TIPO[x.tipo][0])); f.lastChild.title = TIPO[x.tipo][1];
+        f.appendChild(document.createTextNode(" " + x.texto + " "));
+        if (x.tipo === "documento" || x.tipo === "sin_verificar") {
+          const s = el("button", "chip-ref" + (x.ok ? "" : " no"), `${corto(x.doc)}, ${x.ref}`);
+          s.title = (x.ok ? "Cita verificada: «" : "No encontré esta cita literal: «") + x.cita + "»" + (x.traduccion ? `\nTraducción: «${x.traduccion}»` : "");
+          s.onclick = () => leer(x.docId, { pag: x.pag, par: x.par }); f.appendChild(s);
+          if (x.traduccion && x.ok) f.appendChild(el("small", "cita-trad", `«${x.cita}» → «${x.traduccion}»`));
+        }
+        if (x.tipo === "literatura" && x.lit) { const s = el("a", "chip-ref lit", x.lit.apa.cita.replace(/[()]/g, "")); s.href = x.lit.apa.doi || "#"; s.target = "_blank"; s.rel = "noopener"; s.title = x.lit.apa.texto; f.appendChild(s); }
+        a.appendChild(f);
       });
-      a.appendChild(p);
-      const malas = r.citas.filter(x => !x.ok).length;
-      a.appendChild(el("small", "inv-nota", r.citas.length ? `${r.citas.length - malas} de ${r.citas.length} citas verificadas en el texto${malas ? " · revisa las marcadas en rojo" : ""}.` : "Sin citas."));
+      const ev = r.afirmaciones.filter(x => x.tipo === "documento" && x.ok).length, tot = r.afirmaciones.length;
+      const cert = tot && ev / tot >= 0.7 ? "alta" : tot && (ev + r.afirmaciones.filter(x => x.tipo === "literatura").length) / tot >= 0.4 ? "media" : "baja";
+      a.appendChild(el("small", "inv-nota", `Certeza ${cert}: ${ev} de ${tot} afirmaciones con evidencia verificada en tus documentos${r.afirmaciones.some(x => x.tipo === "sin_verificar") ? " · revisa las marcadas en rojo" : ""}.`));
       const acc = el("div", "inv-acciones");
       const bI = el("button", "enlace-sutil", "Insertar en Word"); bI.onclick = () => H().ejecutar(async () => {
-        const texto = String(r.respuesta).replace(/\s*\[(\d+)\]/g, (_, n) => { const ci = r.citas.find(x => x.n === +n); return ci && ci.ok ? " " + citaAPA(ci.doc, ci.ref) : " [no verificado en tus documentos: revísalo]"; });
+        const texto = textoDeAfirmaciones(r, true);
         await Word.run(async (ctx) => { (await parrafoDelCursor(ctx)).insertParagraph(texto, "After"); await ctx.sync(); });
-        H().ui.confirmar("Inserté la respuesta con sus citas APA después del cursor. Reescríbela con tu voz.");
+        for (const x of r.afirmaciones.filter(y => y.tipo === "literatura" && y.lit)) { try { await Inv.citarObra(x.lit.apa, false); } catch (e) { /* referencia opcional */ } }
+        H().ui.confirmar("Inserté la respuesta con sus citas APA después del cursor. Las inferencias van sin cita: reescríbelas con tu voz o respáldalas.");
       });
       acc.appendChild(bI); a.appendChild(acc);
       hist.appendChild(a);
@@ -517,35 +592,229 @@ window.Archivos = (function () {
       const pregunta = q.value.trim(); if (!pregunta) { q.focus(); return; }
       const usados = selD.value ? docs.filter(d => d.id === selD.value) : docs;
       const total = usados.reduce((a, d) => a + d.palabras, 0);
-      // Documentos cortos: van completos; si no, solo los fragmentos más relevantes.
       const anteriores = conversacion.slice(-2).map(r => r.pregunta).join(" ");
-      let frs = total < 9000 ? fragmentos(usados) : relevantes(usados, pregunta + " " + anteriores, 16);
+      const extra = await terminosEnIdiomas(pregunta, usados);
+      let frs = total < 9000 ? fragmentos(usados) : relevantes(usados, `${pregunta} ${anteriores} ${extra}`, 16);
       if (!frs.length) frs = fragmentos(usados).slice(0, 10);
-      const lista = frs.map((f, k) => `[${k + 1}] (${f.doc.nombre}, ${ref(f.doc, f.pag, indiceGlobal(f.doc, f.pag, f.par))})\n${f.texto}`).join("\n\n");
-      const previo = conversacion.slice(-3).map(r => `P: ${r.pregunta}\nR: ${String(r.respuesta).slice(0, 600)}`).join("\n");
-      const d = await H().pedirHerramienta("respuesta_documentos", "Respuesta basada solo en los documentos del usuario, con citas verificables.",
-        { type: "object", properties: {
-          respuesta: { type: "string", description: "Respuesta en español, clara y completa, con marcas [n] del fragmento que respalda cada afirmación" },
-          citas: { type: "array", items: { type: "object", properties: { n: { type: "integer", description: "Número del fragmento" }, fragmento: { type: "string", description: "Texto LITERAL copiado del fragmento (máx. 40 palabras)" } }, required: ["n", "fragmento"] } },
-          sin_respuesta: { type: "boolean", description: "true si los documentos no responden la pregunta" }
-        }, required: ["respuesta", "citas"] },
-        `Responde la pregunta usando SOLO estos fragmentos de los documentos del usuario. Marca cada afirmación con [n]. Si los documentos no lo dicen, dilo con claridad y no completes con conocimiento propio.
+      const lits = expandido ? await literaturaPara(extra || pregunta) : [];
+      const lista = frs.map((f, k) => `[${k + 1}] (${f.doc.nombre}, ${ref(f.doc, f.pag, indiceGlobal(f.doc, f.pag, f.par))}, idioma: ${nombreIdioma(idiomaDe(f.doc))})\n${f.texto}`).join("\n\n");
+      const listaL = lits.map((l, k) => `[L${k + 1}] ${l.apa.cita} «${l.apa.titulo}»: ${l.texto}`).join("\n\n");
+      const previo = conversacion.slice(-3).map(r => `P: ${r.pregunta}\nR: ${textoDeAfirmaciones(r).slice(0, 600)}`).join("\n");
+      const d = await H().pedirHerramienta("respuesta_trazable", "Respuesta en afirmaciones, cada una con su procedencia.",
+        { type: "object", properties: { afirmaciones: { type: "array", items: { type: "object", properties: {
+          texto: { type: "string", description: "Una afirmación de la respuesta, en español" },
+          tipo: { type: "string", enum: ["documento", "literatura", "inferencia"], description: "documento: sale de un fragmento [n]; literatura: sale de una fuente [Ln]; inferencia: conclusión tuya que no está escrita en las fuentes" },
+          fuente: { type: "string", description: "«3» para el fragmento [3], «L2» para la literatura [L2]; vacío si es inferencia" },
+          cita: { type: "string", description: "Si es documento: texto LITERAL copiado del fragmento, en su idioma original (máx. 40 palabras)" },
+          traduccion: { type: "string", description: "Si la cita no está en español: su traducción al español" }
+        }, required: ["texto", "tipo"] } } }, required: ["afirmaciones"] },
+        `Responde en español la pregunta del usuario con afirmaciones breves. Cada una debe declarar su procedencia con honestidad: «documento» solo si un fragmento [n] lo dice (copia la cita literal), «literatura» solo si una fuente [Ln] lo dice, «inferencia» si es una conclusión tuya. Si las fuentes no responden, dilo como inferencia y no inventes.
 ${previo ? "\nCONVERSACIÓN PREVIA:\n" + previo + "\n" : ""}
 PREGUNTA: ${pregunta}
 
-FRAGMENTOS:
-${lista}`);
-      const citas = (d.citas || []).map(x => { const f = frs[x.n - 1]; if (!f) return null; const ok = ubicar(x.fragmento, f.texto) >= 0; return { n: x.n, fragmento: x.fragmento, ok, doc: f.doc, docId: f.doc.id, docNombre: f.doc.nombre, pag: f.pag, par: f.par, ref: ref(f.doc, f.pag, indiceGlobal(f.doc, f.pag, f.par)) }; }).filter(Boolean);
-      // Marcas [n] sin cita: se ligan al fragmento aunque no haya texto literal.
-      (String(d.respuesta).match(/\[(\d+)\]/g) || []).forEach(m => { const n = +m.slice(1, -1); if (!citas.some(x => x.n === n) && frs[n - 1]) { const f = frs[n - 1]; citas.push({ n, fragmento: f.texto.slice(0, 120), ok: true, doc: f.doc, docId: f.doc.id, docNombre: f.doc.nombre, pag: f.pag, par: f.par, ref: ref(f.doc, f.pag, indiceGlobal(f.doc, f.pag, f.par)) }); } });
-      const r = { doc: selD.value, pregunta, respuesta: d.respuesta, citas };
+FRAGMENTOS DE LOS DOCUMENTOS DEL USUARIO:
+${lista}${listaL ? "\n\nLITERATURA ACADÉMICA (resúmenes de OpenAlex):\n" + listaL : ""}`);
+      const afirmaciones = (d.afirmaciones || []).map(x => {
+        const fu = String(x.fuente || "").trim();
+        if (x.tipo === "literatura") { const l = lits[+fu.replace(/\D/g, "") - 1]; return l ? Object.assign({}, x, { lit: l }) : Object.assign({}, x, { tipo: "inferencia" }); }
+        if (x.tipo === "documento") {
+          const f = frs[+fu.replace(/\D/g, "") - 1];
+          if (!f) return Object.assign({}, x, { tipo: "inferencia" });
+          const ok = !!x.cita && ubicar(x.cita, f.texto) >= 0;
+          return Object.assign({}, x, { tipo: ok ? "documento" : "sin_verificar", ok, doc: f.doc, docId: f.doc.id, docNombre: f.doc.nombre, pag: f.pag, par: f.par, ref: ref(f.doc, f.pag, indiceGlobal(f.doc, f.pag, f.par)), traduccion: idiomaDe(f.doc) !== "es" ? x.traduccion : "" });
+        }
+        return Object.assign({}, x, { tipo: "inferencia" });
+      });
+      const r = { doc: selD.value, pregunta, afirmaciones };
       conversacion.push(r); pintar(r); q.value = "";
-      H().registrar("Pregunta a mis documentos", pregunta.slice(0, 60), "modelo");
-      H().ui.hablar(String(d.respuesta).replace(/\[\d+\]/g, "").slice(0, 400));
+      H().registrar("Pregunta a mis documentos", `${pregunta.slice(0, 50)} · ${expandido ? "modo expandido" : "modo cerrado"}`, "modelo");
+      H().ui.hablar(textoDeAfirmaciones(r).slice(0, 400));
     });
     b.onclick = enviar; q.onkeydown = (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); } };
     tarjeta("Preguntar a mis documentos", c);
     if (preguntaInicial) enviar(); else setTimeout(() => q.focus(), 50);
+  }
+
+  /* ================= Pensar: contrastar documentos ================= */
+  function selectorDocs(c, docs, todosMarcados) {
+    const { el } = H();
+    const caja = el("div", "arch-docs-sel");
+    docs.forEach((d, k) => { const l = el("label", ""); const ch = el("input"); ch.type = "checkbox"; ch.checked = todosMarcados || docs.length <= 5 || k < 3; ch.value = d.id; l.append(ch, document.createTextNode(` ${d.nombre}`), el("small", "idioma", nombreIdioma(idiomaDe(d)))); caja.appendChild(l); });
+    c.appendChild(caja);
+    return () => { const ids = Array.from(caja.querySelectorAll("input:checked")).map(x => x.value); return docs.filter(d => ids.includes(d.id)); };
+  }
+  /** Fragmentos de varios documentos, repartidos para que todos estén representados. */
+  function fragmentosRepartidos(docs, tema, porDoc) {
+    return docs.flatMap(d => d.palabras < 2500 ? fragmentos([d]) : (tema ? relevantes([d], tema, porDoc) : fragmentos([d]).filter((_, i, a) => i % Math.max(1, Math.ceil(a.length / porDoc)) === 0).slice(0, porDoc)));
+  }
+  const listaFr = (frs) => frs.map((f, k) => `[${k + 1}] (${f.doc.nombre}${f.doc.meta.autor ? " · " + apellidos(f.doc.meta.autor) + " " + (f.doc.meta.anio || "s. f.") : ""}, ${ref(f.doc, f.pag, indiceGlobal(f.doc, f.pag, f.par))})\n${f.texto}`).join("\n\n");
+  function verificarCita(frs, n, cita) { const f = frs[n - 1]; return f && cita && ubicar(cita, f.texto) >= 0 ? f : null; }
+  async function contrastar() {
+    const { el, tarjeta, etiqueta } = H();
+    const docs = await todos("docs"); if (docs.length < 2) { H().ui.hablar("Para contrastar necesitas al menos dos documentos."); return abrir(); }
+    const c = el("div", "inv-cuerpo");
+    c.appendChild(el("p", "guia-resumen", "Romus compara tus documentos y te muestra en qué coinciden, en qué se contradicen y qué vacíos dejan: la base de tu estado del arte y de tu justificación."));
+    const elegidos = selectorDocs(c, docs, docs.length <= 6);
+    const tema = el("input", "ajuste"); tema.placeholder = "Tema o pregunta para contrastar (opcional)"; c.appendChild(tema);
+    const b = el("button", "boton primario", "Contrastar"); c.appendChild(b);
+    const out = el("div", ""); c.appendChild(out);
+    b.onclick = () => H().ejecutar(async () => {
+      exigirIA();
+      const us = elegidos(); if (us.length < 2) throw new Error("Elige al menos dos documentos.");
+      const extra = await terminosEnIdiomas(tema.value, us);
+      const frs = fragmentosRepartidos(us, `${tema.value} ${extra}`.trim(), Math.max(4, Math.floor(28 / us.length)));
+      const ref1 = { type: "object", properties: { n: { type: "integer" }, cita: { type: "string", description: "Texto LITERAL del fragmento" } }, required: ["n", "cita"] };
+      const d = await H().pedirHerramienta("contrastar_documentos", "Consensos, contradicciones y vacíos entre documentos.",
+        { type: "object", properties: {
+          consensos: { type: "array", items: { type: "object", properties: { afirmacion: { type: "string" }, evidencias: { type: "array", items: ref1 } }, required: ["afirmacion", "evidencias"] } },
+          contradicciones: { type: "array", items: { type: "object", properties: { tema: { type: "string" }, posiciones: { type: "array", items: { type: "object", properties: { postura: { type: "string" }, n: { type: "integer" }, cita: { type: "string" } }, required: ["postura", "n", "cita"] } } }, required: ["tema", "posiciones"] } },
+          vacios: { type: "array", items: { type: "object", properties: { vacio: { type: "string", description: "Lo que ningún documento resuelve" }, importancia: { type: "string", description: "Por qué importa para una investigación" } }, required: ["vacio"] } },
+          supuestos: { type: "array", items: { type: "string" }, description: "Supuestos que los documentos dan por sentados sin demostrarlos" }
+        }, required: ["consensos", "contradicciones", "vacios"] },
+        `Contrasta estos documentos${tema.value ? ` sobre «${tema.value}»` : ""}. Consensos: ideas en las que coinciden al menos dos documentos distintos (con una cita literal de cada uno). Contradicciones o tensiones: dónde difieren (posición de cada documento con su cita literal). Vacíos: lo que ninguno resuelve. Responde en español; las citas, literales en su idioma original. No inventes.
+
+FRAGMENTOS:
+${listaFr(frs)}`);
+      out.innerHTML = "";
+      out.appendChild(etiqueta("modelo", "citas comprobadas en tus documentos; los vacíos son inferencia"));
+      const fila = (f, texto) => { const bb = el("button", "chip-ref" + (f ? "" : " no"), f ? `${corto(f.doc)}, ${ref(f.doc, f.pag, indiceGlobal(f.doc, f.pag, f.par))}` : "sin verificar"); bb.title = texto || ""; if (f) bb.onclick = () => leer(f.doc.id, f); return bb; };
+      const sec = (t, cls) => { const h = el("div", "inv-sub nexus-" + cls, t); out.appendChild(h); };
+      sec(`✓ Consensos (${(d.consensos || []).length})`, "ok");
+      (d.consensos || []).forEach(x => { const p = el("div", "apa-hall"); p.appendChild(el("b", "", x.afirmacion)); const g = el("div", ""); (x.evidencias || []).forEach(e => g.appendChild(fila(verificarCita(frs, e.n, e.cita), e.cita))); p.appendChild(g); out.appendChild(p); });
+      sec(`⇄ Contradicciones y tensiones (${(d.contradicciones || []).length})`, "tension");
+      (d.contradicciones || []).forEach(x => { const p = el("div", "apa-hall"); p.appendChild(el("b", "", x.tema)); (x.posiciones || []).forEach(po => { const l = el("div", "posicion"); l.append(document.createTextNode(po.postura + " "), fila(verificarCita(frs, po.n, po.cita), po.cita)); p.appendChild(l); }); out.appendChild(p); });
+      sec(`◌ Vacíos (${(d.vacios || []).length}) · inferencia`, "vacio");
+      (d.vacios || []).forEach(x => { const p = el("div", "apa-hall"); p.append(el("b", "", x.vacio), el("span", "", x.importancia || "")); out.appendChild(p); });
+      if ((d.supuestos || []).length) { sec("Supuestos que dan por sentados · inferencia", "vacio"); const ul = el("ul", "guia-puntos"); d.supuestos.forEach(s0 => ul.appendChild(el("li", "", s0))); out.appendChild(ul); }
+      const cita = (n, ct) => { const f = verificarCita(frs, n, ct); return f ? citaAPA(f.doc, ref(f.doc, f.pag, indiceGlobal(f.doc, f.pag, f.par))) : ""; };
+      const acc = el("div", "inv-acciones");
+      const bW = el("button", "boton secundario", "Insertar como borrador de estado del arte");
+      bW.onclick = () => H().ejecutar(async () => {
+        const ps = [];
+        (d.consensos || []).forEach(x => { const cs = Array.from(new Set((x.evidencias || []).map(e => cita(e.n, e.cita)).filter(Boolean))); if (cs.length) ps.push(`${x.afirmacion.replace(/[.\s]+$/, "")} ${cs.join("; ").replace(/\)\s*;\s*\(/g, "; ")}.`); });
+        (d.contradicciones || []).forEach(x => { const pos = (x.posiciones || []).map(po => { const ct = cita(po.n, po.cita); return ct ? `${po.postura.replace(/[.\s]+$/, "")} ${ct}` : ""; }).filter(Boolean); if (pos.length > 1) ps.push(`En cuanto a ${minus(x.tema)}, hay posiciones distintas: ${pos.map(minus).join("; mientras que ")}.`.replace(/\ba el\b/g, "al").replace(/\bde el\b/g, "del")); });
+        if ((d.vacios || []).length) ps.push(`Sin embargo, persisten vacíos en los estudios revisados: ${d.vacios.map(v => minus(v.vacio).replace(/[.\s]+$/, "")).join("; ")}. [Inferencia de Romus: confírmala con tu revisión]`);
+        await Word.run(async (ctx) => { let p = await parrafoDelCursor(ctx); ps.forEach(t => { p = p.insertParagraph(t, "After"); }); await ctx.sync(); });
+        H().ui.confirmar("Inserté el borrador después del cursor, con citas APA. Reescríbelo con tu voz.");
+      });
+      acc.appendChild(bW); out.appendChild(acc);
+      H().registrar("Contraste de documentos", `${us.length} documentos`, "modelo");
+    });
+    tarjeta("Contrastar documentos", c);
+  }
+
+  /* ================= Crear: síntesis maestra ================= */
+  const SECCIONES = { estado: "Estado del arte", antecedentes: "Antecedentes", marco: "Marco teórico", discusion: "Discusión con la literatura", introduccion: "Introducción" };
+  async function sintetizar() {
+    const { el, tarjeta } = H();
+    const docs = await todos("docs"); if (!docs.length) return abrir();
+    const c = el("div", "inv-cuerpo");
+    c.appendChild(el("p", "guia-resumen", "Romus redacta una sección de tu trabajo a partir de tus documentos, con cada cita comprobada y en APA 7. Es un borrador: reescríbelo con tu voz."));
+    const selS = el("select", "ajuste"); Object.entries(SECCIONES).forEach(([k, n]) => { const o = el("option", "", n); o.value = k; selS.appendChild(o); }); c.appendChild(selS);
+    const elegidos = selectorDocs(c, docs, docs.length <= 6);
+    const foco = el("input", "ajuste"); foco.placeholder = "Enfoque (ej.: el juego cooperativo y la convivencia)"; c.appendChild(foco);
+    const b = el("button", "boton primario", "Redactar"); c.appendChild(b);
+    const out = el("div", ""); c.appendChild(out);
+    b.onclick = () => H().ejecutar(async () => {
+      exigirIA();
+      const us = elegidos(); if (!us.length) throw new Error("Elige al menos un documento.");
+      const extra = await terminosEnIdiomas(foco.value, us);
+      const frs = fragmentosRepartidos(us, `${foco.value} ${extra}`.trim(), Math.max(5, Math.floor(30 / us.length)));
+      let proyecto = ""; try { proyecto = (await H().documentoNumerado()).parrafos.filter(p => /objetivo|pregunta/i.test(p.texto)).map(p => p.texto).join("\n").slice(0, 2500); } catch (e) { /* sin documento */ }
+      const d = await H().pedirHerramienta("sintesis_documentos", "Sección académica redactada desde los documentos del usuario.",
+        { type: "object", properties: { parrafos: { type: "array", items: { type: "object", properties: {
+          texto: { type: "string", description: "Párrafo académico en español con marcas [n] donde se apoya en un fragmento" },
+          citas: { type: "array", items: { type: "object", properties: { n: { type: "integer" }, cita: { type: "string", description: "Texto LITERAL del fragmento [n] que respalda el párrafo" } }, required: ["n", "cita"] } }
+        }, required: ["texto", "citas"] } } }, required: ["parrafos"] },
+        `Redacta la sección «${SECCIONES[selS.value]}» (4 a 7 párrafos, APA 7, tercera persona, tono académico) usando SOLO estos fragmentos${foco.value ? `, con el enfoque: ${foco.value}` : ""}. Organiza por ideas, no autor por autor; contrasta cuando haya diferencias. Marca con [n] cada idea que venga de un fragmento y copia la cita literal en «citas». No inventes datos ni autores.${proyecto ? "\n\nOBJETIVOS DEL PROYECTO (para orientar la sección):\n" + proyecto : ""}
+
+FRAGMENTOS:
+${listaFr(frs)}`);
+      out.innerHTML = "";
+      let okN = 0, malN = 0;
+      const parrafos = (d.parrafos || []).map(p => {
+        const ver = {}; (p.citas || []).forEach(x => { const f = verificarCita(frs, x.n, x.cita); ver[x.n] = f; f ? okN++ : malN++; });
+        const texto = String(p.texto).replace(/((?:\s*\[\d+\])+)/g, (m) => {
+          const ns = Array.from(new Set((m.match(/\d+/g) || []).map(Number)));
+          const cs = ns.map(n => { const f = ver[n] || (frs[n - 1] && !(p.citas || []).some(x => x.n === n) ? frs[n - 1] : null); return f ? citaAPA(f.doc, ref(f.doc, f.pag, indiceGlobal(f.doc, f.pag, f.par))).replace(/^\(|\)$/g, "") : null; });
+          const buenas = cs.filter(Boolean);
+          return (buenas.length ? ` (${buenas.join("; ")})` : "") + (buenas.length < cs.length ? " [cita sin verificar]" : "");
+        });
+        return texto;
+      });
+      out.appendChild(el("p", "inv-nota", `${parrafos.length} párrafos · ${okN} citas verificadas${malN ? ` · ${malN} sin verificar (marcadas)` : ""}.`));
+      parrafos.forEach(t => out.appendChild(el("p", "sintesis-par", t)));
+      const usadosDocs = Array.from(new Set(frs.map(f => f.doc)));
+      const acc = el("div", "inv-acciones");
+      const bW = el("button", "boton primario", "Insertar en Word");
+      bW.onclick = () => H().ejecutar(async () => {
+        await Word.run(async (ctx) => { let p = (await parrafoDelCursor(ctx)).insertParagraph(SECCIONES[selS.value], "After"); p.styleBuiltIn = "Heading2"; parrafos.forEach(t => { p = p.insertParagraph(t, "After"); p.styleBuiltIn = "Normal"; }); await ctx.sync(); });
+        // Referencias de los documentos con autor y año
+        for (const dd of usadosDocs.filter(x => x.meta.autor)) { const tit = (dd.meta.titulo || dd.nombre).replace(/\.$/, ""); try { await Inv.citarObra({ texto: `${autoresAPA(dd.meta.autor)} (${dd.meta.anio || "s. f."}). ${tit}.`, cursiva: tit, cita: citaAPA(dd, "").replace(/, \)$/, ")"), titulo: tit }, false); } catch (e) { /* opcional */ } }
+        const sinAutor = usadosDocs.filter(x => !x.meta.autor).length;
+        H().ui.confirmar(`Inserté la sección y agregué las referencias de tus documentos.${sinAutor ? ` ${sinAutor} documentos no tienen autor: complétalo en «Datos» para que su cita quede bien.` : ""}`);
+      });
+      acc.appendChild(bW); out.appendChild(acc);
+      H().registrar("Síntesis desde mis documentos", `${SECCIONES[selS.value]} · ${us.length} documentos`, "modelo");
+    });
+    tarjeta("Redactar desde mis documentos", c);
+  }
+
+  /* ================= Educar: estudiar un documento ================= */
+  async function estudiar(docId) {
+    const { el, tarjeta } = H();
+    const docs = await todos("docs"); if (!docs.length) return abrir();
+    const c = el("div", "inv-cuerpo");
+    const selD = el("select", "ajuste"); docs.forEach(d => { const o = el("option", "", d.nombre); o.value = d.id; selD.appendChild(o); }); if (docId) selD.value = docId; c.appendChild(selD);
+    const selN = el("select", "ajuste"); [["sencillo", "Explícamelo sencillo"], ["universitario", "Nivel universitario"], ["experto", "Nivel experto (para sustentar)"]].forEach(([v, t]) => { const o = el("option", "", t); o.value = v; selN.appendChild(o); }); selN.value = "universitario"; c.appendChild(selN);
+    const b = el("button", "boton primario", "Estudiar"); c.appendChild(b);
+    const out = el("div", ""); c.appendChild(out);
+    b.onclick = () => H().ejecutar(async () => {
+      exigirIA();
+      const d = docs.find(x => x.id === selD.value);
+      const frs = d.palabras < 9000 ? fragmentos([d]) : fragmentos([d]).filter((_, i, a) => i % Math.ceil(a.length / 22) === 0);
+      const r = await H().pedirHerramienta("estudiar_documento", "Explicación y preguntas de comprensión de un documento.",
+        { type: "object", properties: {
+          explicacion: { type: "string", description: "Explicación del documento en español, 2 a 4 párrafos separados por \\n" },
+          ideas: { type: "array", items: { type: "object", properties: { idea: { type: "string" }, n: { type: "integer" }, cita: { type: "string", description: "Texto LITERAL del fragmento" } }, required: ["idea", "n", "cita"] } },
+          preguntas: { type: "array", items: { type: "object", properties: { pregunta: { type: "string" }, opciones: { type: "array", items: { type: "string" } }, correcta: { type: "integer", description: "Índice (0 a 3) de la opción correcta" }, explicacion: { type: "string" }, n: { type: "integer" } }, required: ["pregunta", "opciones", "correcta", "explicacion"] } }
+        }, required: ["explicacion", "ideas", "preguntas"] },
+        `Ayuda al usuario a comprender este documento (nivel: ${selN.value}). Explícalo en español; da 4 a 6 ideas clave con cita literal; y crea 5 preguntas de opción múltiple (4 opciones, una correcta) que evalúen comprensión, no memoria. Todo debe salir del texto.
+
+DOCUMENTO: ${d.nombre} (idioma: ${nombreIdioma(idiomaDe(d))})
+FRAGMENTOS:
+${frs.map((f, k) => `[${k + 1}] (${ref(d, f.pag, indiceGlobal(d, f.pag, f.par))}) ${f.texto}`).join("\n\n")}`);
+      out.innerHTML = "";
+      String(r.explicacion || "").split(/\n+/).filter(Boolean).forEach(t => out.appendChild(el("p", "guia-resumen", t)));
+      out.appendChild(el("div", "inv-sub", "Ideas clave"));
+      (r.ideas || []).forEach(x => { const f = verificarCita(frs, x.n, x.cita); const p = el("div", "apa-hall" + (f ? "" : " no-verif")); p.append(el("b", "", x.idea), el("code", "", `«${x.cita}»${f ? " — " + ref(d, f.pag, indiceGlobal(d, f.pag, f.par)) + " ✓" : " ⚠"}`)); if (f) p.onclick = () => leer(d.id, f); out.appendChild(p); });
+      const pregs = (r.preguntas || []).filter(x => Array.isArray(x.opciones) && x.opciones.length >= 2);
+      if (pregs.length) {
+        out.appendChild(el("div", "inv-sub", "Ponte a prueba"));
+        let k = 0, aciertos = 0;
+        const caja = el("div", "quiz"); out.appendChild(caja);
+        const mostrar = () => {
+          caja.innerHTML = "";
+          if (k >= pregs.length) { caja.appendChild(el("p", "resultado-calc", `${aciertos} / ${pregs.length}`)); caja.appendChild(el("p", "inv-nota", aciertos === pregs.length ? "¡Dominas el documento!" : "Repasa las ideas clave y vuelve a intentarlo.")); const bR = el("button", "enlace-sutil", "Repetir"); bR.onclick = () => { k = 0; aciertos = 0; mostrar(); }; caja.appendChild(bR); H().ui.hablar(`Obtuviste ${aciertos} de ${pregs.length}.`); return; }
+          const x = pregs[k];
+          caja.appendChild(el("b", "", `${k + 1}. ${x.pregunta}`));
+          x.opciones.forEach((o, i) => {
+            const bo = el("button", "quiz-op", o);
+            bo.onclick = () => {
+              caja.querySelectorAll(".quiz-op").forEach((y, j) => { y.disabled = true; if (j === x.correcta) y.classList.add("ok"); });
+              if (i === x.correcta) aciertos++; else bo.classList.add("mal");
+              caja.appendChild(el("p", "inv-nota", (i === x.correcta ? "✓ Correcto. " : "✗ No es esa. ") + x.explicacion));
+              const bS = el("button", "boton secundario", k + 1 < pregs.length ? "Siguiente" : "Ver resultado"); bS.onclick = () => { k++; mostrar(); }; caja.appendChild(bS);
+            };
+            caja.appendChild(bo);
+          });
+        };
+        mostrar();
+      }
+      H().registrar("Estudio de un documento", d.nombre, "modelo");
+    });
+    tarjeta("Estudiar un documento", c);
+    if (docId) b.click();
   }
 
   /* ================= Extraer información ================= */
@@ -841,9 +1110,12 @@ ${lote.map((f, k) => `[${k + 1}] ${f.texto}`).join("\n\n")}`);
     if (/^(extrae|extraer|saca) (informacion|datos|citas|la ficha)( de mis documentos)?$/.test(n)) return tarea(() => extraer(/datos/.test(n) ? "datos" : /citas/.test(n) ? "citas" : "ficha"));
     if (/^((mis )?codigos|codifica(r)? (mis )?documentos)$/.test(n)) return tarea(codigosVista);
     if (/^reporte de (codigos|citas)$/.test(n)) return tarea(() => reporte());
+    if (/^(contrasta|compara|contrastar|comparar) (mis )?(documentos|archivos)$/.test(n)) return tarea(contrastar);
+    if (/^(redacta|escribe|sintetiza)( el| la| un| una)? (estado del arte|antecedentes|marco teorico|sintesis)( con| desde| de)? (mis )?(documentos|archivos)$/.test(n)) return tarea(sintetizar);
+    if (/^(estudia|estudiar|explicame|quiero estudiar) (este |un |mi )?(documento|archivo)$/.test(n)) return tarea(() => estudiar());
     return null;
   }
 
-  return { abrir, cargar, leer, buscar, preguntar, extraer, codigosVista, reporte, exportarQDPX, comando,
+  return { abrir, cargar, leer, buscar, preguntar, extraer, codigosVista, reporte, exportarQDPX, contrastar, sintetizar, estudiar, comando, _detectarIdioma: detectarIdioma,
     _leerArchivo: leerArchivo, _relevantes: relevantes, _ubicar: ubicar, _buscarEn: buscarEn, _todos: todos, _citaAPA: citaAPA, _textoPlano: textoPlano };
 })();
