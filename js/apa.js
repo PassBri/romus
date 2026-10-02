@@ -294,7 +294,6 @@ window.APA = (function () {
     const add = (cat, p, fragmento, mensaje, arreglo) => hall.push({ cat, parrafo: p.i, fragmento: String(fragmento || "").slice(0, 200), mensaje, arreglo });
     const esTit = (p) => Doc.esTitulo(p.estilo);
     const cuerpo = ps.filter(p => p.texto.trim() && !enRefs(p.i) && p.i !== ini);
-    const textoCuerpo = cuerpo.filter(p => !esTit(p)).map(p => p.texto).join("\n");
 
     cuerpo.forEach(p => {
       const t = p.texto;
@@ -375,6 +374,7 @@ window.APA = (function () {
       else if (/recuperado (de|desde)\s+https?:/i.test(r.texto)) add("refs", p, (r.texto.match(/recuperado (de|desde)/i) || [""])[0], "En APA 7 la URL va sola, sin «Recuperado de» (salvo contenidos que cambian, con fecha de consulta).", { buscar: (r.texto.match(/recuperado (de|desde)\s+/i) || [""])[0], reemplazar: "" });
       if (/\b(Vol\.|No\.|Núm\.|N\.°)\s*\d/i.test(r.texto)) add("refs", p, (r.texto.match(/\b(Vol\.|No\.|Núm\.|N\.°)\s*\d+/i) || [""])[0], "En artículos, el volumen va en cursiva y el número entre paréntesis, sin «Vol.» ni «No.»: 12(3).");
       if (/\d+\s*\(\d+\)/.test(r.texto) && /\bpp\.\s*\d/.test(r.texto)) add("refs", p, (r.texto.match(/\bpp\.\s*/) || [""])[0], "En artículos de revista las páginas van sin «pp.».", { buscar: (r.texto.match(/,\s*pp\.\s*/) || [""])[0], reemplazar: ", " });
+      if ((m = r.texto.match(/[?!]\.(?=\s|$)/))) add("refs", p, r.texto.slice(Math.max(0, m.index - 30), m.index + 2), "Si el título termina en signo de interrogación o de exclamación, no se agrega punto después.", { buscar: r.texto.slice(Math.max(0, m.index - 30), m.index + 2), reemplazar: r.texto.slice(Math.max(0, m.index - 30), m.index + 1) });
       if ((m = r.texto.match(/\(((?:19|20)\d{2}[a-z]?|s\. f\.)\)\s+[A-ZÁÉÍÓÚÑ¿]/))) add("refs", p, m[0], "Falta el punto después de la fecha: (2020). Título…", { buscar: m[0], reemplazar: m[0].replace(/\)\s+/, "). ") });
       const pals = String(r.titulo || "").split(/\s+/).filter(w => w.length > 3);
       if (pals.length >= 4 && pals.slice(1).filter(w => /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]/.test(w)).length / Math.max(1, pals.length - 1) > 0.6) add("refs", p, r.titulo.slice(0, 50), "En la lista de referencias los títulos de artículos, libros y capítulos van con mayúscula solo al inicio (y en nombres propios).");

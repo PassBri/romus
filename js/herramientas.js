@@ -75,7 +75,7 @@ window.Herramientas = (function () {
     ["fundamentar", "matriz", "Matriz de antecedentes", "Con tus fichas de lectura", "matriz", () => Biblio.todas().some(x => x.ficha) ? Biblio.matriz() : Biblio.abrir()],
     ["fundamentar", "sincita", "Frases sin cita", "Lo que el jurado preguntaría «¿según quién?»", "sincita", run(() => Biblio.sinRespaldo())],
     ["disenar", "muestra", "Tamaño de muestra", "Cálculo exacto y párrafo para tu método", "muestra", () => Instrumentos.muestra()],
-    ["disenar", "instrumento", "Instrumento", "Cuestionario o guion de entrevista", "instrumento", run(() => Instrumentos.instrumento())],
+    ["disenar", "instrumento", "Instrumento", "Cuestionario, guion de entrevista o ficha documental", "instrumento", run(() => Instrumentos.instrumento())],
     ["disenar", "validacion", "Validación por jueces", "V de Aiken y Lawshe", "validacion", () => Instrumentos.validacion()],
     ["disenar", "etica", "Ética", "Consentimientos, asentimiento y carta", "etica", run(() => Instrumentos.etica())],
     ["analizar", "spss", "SPSS o R", "Sintaxis y resultados en APA verificados", "spss", () => Datos.inicio("cuanti")],

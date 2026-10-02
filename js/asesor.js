@@ -264,7 +264,7 @@ ${doc.texto}`);
     // Formulario de la fase 1 (Descubrir)
     const campos = [
       ["tema", "¿Sobre qué quieres investigar? *", "Ej.: el juego cooperativo para mejorar la convivencia en el recreo", temaInicial || ""],
-      ["poblacion", "¿Con quiénes y dónde?", "Ej.: estudiantes de 6.º de un colegio público de Floridablanca", ""],
+      ["poblacion", "¿Con quiénes y dónde? (si es teórica: ¿qué autores u obras?)", "Ej.: estudiantes de 6.º de un colegio público de Floridablanca", ""],
       ["problema", "¿Qué problema has observado? (opcional)", "Ej.: muchos conflictos y agresiones durante el recreo", ""],
       ["recursos", "¿Cuánto tiempo y qué recursos tienes? (opcional)", "Ej.: 6 meses, acceso a dos cursos, sin presupuesto externo", ""]
     ];
@@ -275,7 +275,7 @@ ${doc.texto}`);
     });
     const fila = el("div", "inv-selectores");
     const sN = el("select"); Object.entries(Inv.NIVELES).forEach(([id, n]) => { const o = el("option", "", n.nombre); o.value = id; sN.appendChild(o); }); sN.value = Inv.nivel().id;
-    const sE = el("select"); [["auto", "Que Romus elija el enfoque"], ["cuantitativo", "Cuantitativo"], ["cualitativo", "Cualitativo"], ["mixto", "Mixto"]].forEach(([v, t]) => { const o = el("option", "", t); o.value = v; sE.appendChild(o); });
+    const sE = el("select"); [["auto", "Que Romus elija el enfoque"], ["cuantitativo", "Cuantitativo"], ["cualitativo", "Cualitativo"], ["mixto", "Mixto"], ["teorico", "Teórico-documental (filosofía, teoría)"]].forEach(([v, t]) => { const o = el("option", "", t); o.value = v; sE.appendChild(o); });
     fila.append(sN, sE); c.appendChild(fila);
     const ir = el("button", "boton primario", "Empezar →");
     ir.onclick = () => {
@@ -284,7 +284,7 @@ ${doc.texto}`);
       H().ejecutar(() => fase2({ tema: vals.tema.value.trim(), poblacion: vals.poblacion.value.trim(), problema: vals.problema.value.trim(), recursos: vals.recursos.value.trim(), enfoque: sE.value }));
     };
     c.appendChild(ir);
-    c.appendChild(el("p", "inv-nota", "Romus no inventa datos ni resultados: construye la propuesta (anteproyecto). Los resultados salen de tu trabajo de campo."));
+    c.appendChild(el("p", "inv-nota", "Romus no inventa datos ni resultados: construye la propuesta (anteproyecto). Los resultados salen de tu trabajo de campo o de tu análisis del corpus."));
     tarjeta("Crear proyecto desde cero", c);
     setTimeout(() => vals.tema.focus(), 50);
     H().ui.hablar("Vamos a crear tu proyecto. Cuéntame sobre qué quieres investigar.");
@@ -304,11 +304,11 @@ ${doc.texto}`);
     const n = Inv.nivel();
     const d = await pedirHerramienta("delimitar_proyecto", "Delimita un proyecto de investigación a partir de la entrevista.",
       { type: "object", properties: {
-        titulo: { type: "string" }, enfoque: { type: "string", enum: ["cuantitativo", "cualitativo", "mixto"] },
+        titulo: { type: "string" }, enfoque: { type: "string", enum: ["cuantitativo", "cualitativo", "mixto", "teorico"], description: "teorico = investigación teórico-documental (filosofía, epistemología, teoría): trabaja con un corpus de textos y argumentos, sin participantes" },
         problema: { type: "string", description: "Planteamiento del problema en 2 o 3 párrafos separados por \\n, sin datos inventados: donde falte evidencia, indica [dato por confirmar]" },
         pregunta: { type: "string" }, objetivo_general: { type: "string" }, objetivos_especificos: { type: "array", items: { type: "string" } },
         justificacion: { type: "string", description: "1 o 2 párrafos" },
-        hipotesis: { type: "string", description: "Hipótesis (cuantitativo/mixto) o supuestos orientadores (cualitativo)" },
+        hipotesis: { type: "string", description: "Hipótesis (cuantitativo/mixto), supuestos orientadores (cualitativo) o tesis a defender (teorico)" },
         palabras_clave_ingles: { type: "array", items: { type: "string" }, description: "2 búsquedas de 3 a 5 palabras clave en inglés para encontrar literatura" }
       }, required: ["titulo", "enfoque", "problema", "pregunta", "objetivo_general", "objetivos_especificos", "justificacion", "palabras_clave_ingles"] },
       `Nivel: ${n.nombre} (${n.producto}). Enfoque pedido: ${datos.enfoque === "auto" ? "elige el más adecuado y justifícalo en la justificación" : datos.enfoque}.
@@ -325,8 +325,8 @@ Redacta con calidad académica en español. No inventes cifras, autores ni citas
     progresoFases(c, 1);
     c.appendChild(etiqueta("modelo", "revísalo antes de aprobar"));
     const bloque = (t, v) => { if (!v || (Array.isArray(v) && !v.length)) return; c.appendChild(el("div", "inv-sub", t)); if (Array.isArray(v)) { const ol = el("ol", "guia-puntos"); v.forEach(x => ol.appendChild(el("li", "", x))); c.appendChild(ol); } else c.appendChild(el("p", "guia-resumen chico", v)); };
-    bloque("Título", d.titulo); bloque("Enfoque", d.enfoque); bloque("Pregunta", d.pregunta); bloque("Objetivo general", d.objetivo_general);
-    bloque("Objetivos específicos", d.objetivos_especificos); bloque(d.enfoque === "cualitativo" ? "Supuestos" : "Hipótesis", d.hipotesis);
+    bloque("Título", d.titulo); bloque("Enfoque", (Inv.ENFOQUES[d.enfoque] || {}).nombre || d.enfoque); bloque("Pregunta", d.pregunta); bloque("Objetivo general", d.objetivo_general);
+    bloque("Objetivos específicos", d.objetivos_especificos); bloque(d.enfoque === "teorico" ? "Tesis a defender" : d.enfoque === "cualitativo" ? "Supuestos" : "Hipótesis", d.hipotesis);
     const det = el("details", "guia-mas"); det.appendChild(el("summary", "", "Problema y justificación"));
     det.appendChild(el("p", "guia-resumen chico", d.problema)); det.appendChild(el("p", "guia-resumen chico", d.justificacion)); c.appendChild(det);
     const aj = el("textarea"); aj.rows = 2; aj.placeholder = "¿Algo que cambiar? Ej.: «enfócalo en niñas», «hazlo cualitativo»"; aj.className = "ajuste";
@@ -385,9 +385,18 @@ Redacta con calidad académica en español. No inventes cifras, autores ni citas
       `Proyecto de ${n.nombre}: ${d.titulo}. Tiempo y recursos: ${datos.recursos || "6 meses, recursos propios"}. Objetivos: ${d.objetivos_especificos.join("; ")}. Presupuesto realista en pesos colombianos (COP) para un estudiante.`);
     // Escribir en Word
     pinta(5, "Escribiendo el proyecto en tu documento…");
-    const citar = (txt) => String(txt || "").replace(/\[F(\d+)\]/g, (_, k) => { const f = fuentes[+k - 1]; return f ? f.cita : ""; }).replace(/\s+\./g, ".");
-    const usadas = new Set(); [m.antecedentes, m.marco_teorico].forEach(t => (String(t).match(/\[F(\d+)\]/g) || []).forEach(x => usadas.add(+x.slice(2, -1) - 1)));
-    const refs = Array.from(usadas).map(k => fuentes[k]).filter(Boolean).map(f => f.texto).sort((a, b) => a.localeCompare(b, "es"));
+    // [F1][F2] o [F1; F2] → una sola cita APA «(A, 2020; B, 2021)». Si el autor ya está nombrado
+    // justo antes («Searle [F2] sostiene»), queda como cita narrativa: «Searle (1980) sostiene».
+    const esc = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const citar = (txt) => String(txt || "").replace(/((?:[^\s[]+\s+){0,3})\[F\d+(?:\s*[\];,]+\s*\[?F\d+)*\]?/g, (todo, previa) => {
+      const ks = Array.from(new Set((todo.slice(previa.length).match(/F(\d+)/g) || []).map(x => +x.slice(1) - 1))).filter(k => fuentes[k]);
+      if (!ks.length) return previa.replace(/\s+$/, "");
+      const ap = fuentes[ks[0]].autores[0];
+      if (ks.length === 1 && ap && new RegExp(esc(ap) + "(\\s+et al\\.?|\\s+y\\s+\\S+)?$").test(previa.trim())) return `${previa}(${fuentes[ks[0]].anio})`;
+      return previa + "(" + ks.map(k => fuentes[k].cita.replace(/^\(|\)$/g, "")).sort((a, b) => a.localeCompare(b, "es")).join("; ") + ")";
+    }).replace(/\s+([.,;])/g, "$1").replace(/\(\s*\)/g, "");
+    const usadas = new Set(); [m.antecedentes, m.marco_teorico].forEach(t => (String(t).match(/\[F[^\]]*\]?/g) || []).forEach(x => (x.match(/F(\d+)/g) || []).forEach(y => usadas.add(+y.slice(1) - 1))));
+    const refs = Array.from(usadas).map(k => fuentes[k]).filter(Boolean).sort((a, b) => a.texto.localeCompare(b.texto, "es"));
     await Word.run(async (ctx) => {
       const body = ctx.document.body;
       const ps = body.paragraphs; ps.load("items/text"); await ctx.sync();
@@ -403,7 +412,7 @@ Redacta con calidad académica en español. No inventes cifras, autores ni citas
       H1("Objetivos"); H2("Objetivo general"); P(d.objetivo_general);
       H2("Objetivos específicos"); d.objetivos_especificos.forEach((o, k) => P(`${k + 1}. ${o}`));
       H1("Justificación"); P(d.justificacion);
-      if (d.hipotesis) { H1(e.id === "cualitativo" ? "Supuestos y preguntas orientadoras" : "Hipótesis"); P(d.hipotesis); }
+      if (d.hipotesis) { H1(e.id === "teorico" ? "Tesis y supuestos de partida" : e.id === "cualitativo" ? "Supuestos y preguntas orientadoras" : "Hipótesis"); P(d.hipotesis); }
       H1("Marco referencial"); H2("Antecedentes"); P(citar(m.antecedentes)); H2("Marco teórico"); P(citar(m.marco_teorico));
       if ((m.marco_conceptual || []).length) { H2("Marco conceptual"); m.marco_conceptual.forEach(x => P(`${x.concepto}: ${x.definicion}`)); }
       H1(n.id === "doctorado" || n.id === "posdoctorado" ? "Diseño metodológico" : "Metodología");
@@ -413,7 +422,11 @@ Redacta con calidad académica en español. No inventes cifras, autores ni citas
       H1("Presupuesto"); const total = (plan.presupuesto || []).reduce((a, x) => a + (x.valor_cop || 0), 0);
       tabla([["Rubro", "Descripción", "Valor (COP)"]].concat((plan.presupuesto || []).map(x => [x.rubro, x.descripcion, "$" + (x.valor_cop || 0).toLocaleString("es-CO")])).concat([["Total", "", "$" + total.toLocaleString("es-CO")]]));
       H1("Referencias");
-      if (refs.length) refs.forEach(r => { const p = body.insertParagraph(r, "End"); p.styleBuiltIn = "Normal"; try { p.leftIndent = 36; p.firstLineIndent = -36; } catch (x) { /* opcional */ } });
+      const cursivas = [];
+      if (refs.length) refs.forEach(r => { const p = body.insertParagraph(r.texto, "End"); p.styleBuiltIn = "Normal"; try { p.leftIndent = 36; p.firstLineIndent = -36; } catch (x) { /* opcional */ } if (r.cursiva) cursivas.push([p, r.cursiva]); });
+      // APA 7: revista y volumen (o título del libro) en cursiva.
+      const hall = cursivas.map(([p, t]) => { const s = p.search(t.slice(0, 250), { matchCase: true }); s.load("items"); return s; });
+      if (hall.length) { await ctx.sync(); hall.forEach(s => { if (s.items.length) s.items[0].font.italic = true; }); }
       else P("[Completar con fuentes: di «busca literatura sobre…» y «cita el uno».]");
       await ctx.sync();
     });
@@ -445,7 +458,7 @@ Redacta con calidad académica en español. No inventes cifras, autores ni citas
     if (/^((abre|muestra|ver|como va) )?(mi proyecto|el proyecto|mi avance|mi cronograma|cronograma|como voy|en que etapa voy)$/.test(n)) return tarea(miProyecto);
     if (/^((haz|hagamos|quiero|dame|inicia)( una)? )?(sesion de asesoria|asesoria|revisa mi avance|revision de avance)$/.test(n)) return tarea(sesion);
     if (/^(bitacora|mis sesiones|historial de asesorias)$/.test(n)) return () => bitacora();
-    const m = original.match(/^\s*(?:crea|crear|creame|haz|hazme|arma|armame|construye|genera)\s+(?:mi |un |el )?proyecto(?: completo)?(?: de investigaci[oó]n)?(?: desde cero)?(?:\s+(?:sobre|de|acerca de|para)\s+(.+))?$/i);
+    const m = String(original || n).match(/^\s*(?:crea|crear|creame|haz|hazme|arma|armame|construye|genera)\s+(?:mi |un |el )?proyecto(?: completo)?(?: de investigaci[oó]n)?(?: desde cero)?(?:\s+(?:sobre|de|acerca de|para)\s+(.+))?$/i);
     if (m && /proyecto/.test(n)) return () => nuevoProyecto((m[1] || "").replace(/[.?!]+$/, ""));
     return null;
   }

@@ -147,8 +147,7 @@ ${obs.map(o => `${o.n}. OBSERVACIÓN (${o.autor}): ${o.texto}\n   TEXTO COMENTAD
   const CLAVE_DIR = "romus.director.v1";
   const historial = () => { try { return JSON.parse(localStorage.getItem(CLAVE_DIR) || "[]"); } catch (e) { return []; } };
   async function director(signal) {
-    const { el, tarjeta, etiqueta, pedirHerramienta, documentoNumerado, verificar, registrar } = H();
-    const ui = H().ui;
+    const { el, tarjeta } = H();
     const c0 = el("div", "inv-cuerpo");
     // Datos del estudiante evaluado (no se mezclan con los datos propios)
     const iE = el("input", "ajuste"), iT = el("input", "ajuste"), iD = el("input", "ajuste");
@@ -172,7 +171,7 @@ ${obs.map(o => `${o.n}. OBSERVACIÓN (${o.autor}): ${o.texto}\n   TEXTO COMENTAD
     if (Config.faltaClave()) throw new Error("El modo director necesita tu IA conectada (Ajustes).");
     ui.ocupar(true, "Revisando el trabajo…");
     let rub = null, apa = null, avance = null;
-    try { rub = await Inv.evaluarRubrica(signal); } catch (e) { rub = null; }
+    try { rub = await Inv.evaluarRubrica(signal); } catch (e) { if (e.status || /clave|límite|conectar|saturad|temporal/i.test(e.message)) { ui.ocupar(false); throw e; } rub = null; }
     try { apa = await APA.revisar(); } catch (e) { apa = null; }
     try { avance = await Asesor.avance(); } catch (e) { avance = null; }
     const doc = await documentoNumerado();

@@ -14,7 +14,7 @@ window.Presentacion = (function () {
     if (window.PptxGenJS) return Promise.resolve();
     return new Promise((ok, mal) => {
       const s = document.createElement("script");
-      s.src = "vendor/pptxgen.bundle.js?v=3.1";
+      s.src = "vendor/pptxgen.bundle.js?v=3.2";
       s.onload = () => window.PptxGenJS ? ok() : mal(new Error("No pude cargar el generador de PowerPoint."));
       s.onerror = () => mal(new Error("No pude cargar el generador de PowerPoint. Revisa tu conexión."));
       document.head.appendChild(s);
@@ -80,9 +80,14 @@ window.Presentacion = (function () {
         esfera(s, W - 3.2, Hh / 2, tipo === "seccion" ? 1.7 : 2.2, tipo === "seccion" ? 160 : 260);
         if (tipo === "portada") {
           s.addShape("rect", { x: 0.75, y: 1.55, w: 0.12, h: 2.1, fill: { color: C.azulClaro }, line: { type: "none" } });
-          s.addText(x.titulo || datos.titulo || "", { x: 1.05, y: 1.35, w: 7.4, h: 2.5, fontFace: FUENTE, fontSize: 34, bold: true, color: "FFFFFF", valign: "middle", fit: "shrink" });
+          const tit = x.titulo || datos.titulo || "";
+          // Si la IA acortó el título («Conocer sin creer»), el subtítulo conserva el resto del título real.
+          let subt = (x.puntos || [])[0] || "";
+          if (!subt && datos.titulo && datos.titulo !== tit) subt = datos.titulo.startsWith(tit) ? datos.titulo.slice(tit.length).replace(/^[\s:·.,-]+/, "") : datos.titulo;
+          s.addText(tit, { x: 1.05, y: 1.25, w: 7.4, h: subt ? 1.8 : 2.5, fontFace: FUENTE, fontSize: 34, bold: true, color: "FFFFFF", valign: subt ? "bottom" : "middle", fit: "shrink" });
+          if (subt) s.addText(subt.charAt(0).toUpperCase() + subt.slice(1), { x: 1.05, y: 3.1, w: 7.4, h: 0.85, fontFace: FUENTE, fontSize: 18, color: "FFFFFF", valign: "top", fit: "shrink" });
           const sub = [datos.estudiante, datos.programa, datos.institucion].filter(Boolean).join("\n");
-          s.addText(sub || (x.puntos || []).join("\n"), { x: 1.05, y: 4.1, w: 7.4, h: 1.5, fontFace: FUENTE, fontSize: 16, color: "C9D6EA", valign: "top" });
+          s.addText(sub || (x.puntos || []).slice(1).join("\n"), { x: 1.05, y: 4.1, w: 7.4, h: 1.5, fontFace: FUENTE, fontSize: 16, color: "C9D6EA", valign: "top" });
           const pie2 = [datos.asesor ? "Asesor(a): " + datos.asesor : "", Docx.fechaLarga()].filter(Boolean).join("  ·  ");
           s.addText(pie2, { x: 1.05, y: 6.2, w: 8, h: 0.4, fontFace: FUENTE, fontSize: 12, color: "8FA3C2" });
         } else if (tipo === "seccion") {
@@ -146,6 +151,9 @@ Reglas: poco texto por diapositiva (ideas, no párrafos); los números de los gr
 DOCUMENTO:
 ${doc.texto}`, signal);
     const set = numerosDoc(doc.texto);
+    // Evita tres diapositivas seguidas solo con texto (la revisión de PowerPoint lo marcaría).
+    let seguidas = 0;
+    (d.diapositivas || []).forEach(x => { if ((x.tipo || "contenido") !== "contenido") { seguidas = 0; return; } if (x.visual || x.grafico) { seguidas = 0; return; } if (++seguidas >= 3) { x.visual = `Esquema que resuma «${x.titulo}»`; seguidas = 0; } });
     let conGrafico = 0, descartados = 0;
     (d.diapositivas || []).forEach(x => { if (x.grafico) { x.graficoOk = graficoVerificado(x.grafico, set); if (x.graficoOk) conGrafico++; else { descartados++; if (!x.visual) x.visual = `Gráfico: ${x.grafico.titulo || "con los datos de tus resultados"}`; } } });
     const datos = Docx.datos();

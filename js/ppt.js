@@ -82,7 +82,7 @@ window.RomusPPT = (function () {
       prepararEnsayo(); revisar();
     } catch (e) {
       estadoOrbe("reposo", "No pude leer la presentación");
-      aviso(e.message + " Guarda la presentación y pulsa ⟳ arriba.");
+      aviso(/zip|central directory|corrupt/i.test(e.message) ? "No pude leer el archivo de la presentación. Guárdala (Ctrl + G) y pulsa ⟳ arriba. Si es un archivo antiguo (.ppt), guárdalo como .pptx." : e.message + " Guarda la presentación y pulsa ⟳ arriba.");
     }
     return diapos;
   }
@@ -217,7 +217,7 @@ window.RomusPPT = (function () {
     const porMin = diapos.length / min;
     const global = [];
     if (porMin > 1.2) global.push(`Tienes ${diapos.length} diapositivas para ${min} minutos: son muchas. Lo recomendable es una por minuto o menos.`);
-    if (porMin < 0.4) global.push(`Tienes ${diapos.length} diapositivas para ${min} minutos: quizá pocas para mostrar tu trabajo completo.`);
+    if (porMin < 0.4) global.push(`Tienes ${diapos.length} diapositiva${diapos.length === 1 ? "" : "s"} para ${min} minutos: quizá pocas para mostrar tu trabajo completo.`);
     const pun = el("div", "inv-puntaje");
     const sanas = diapos.length - new Set(h.map(x => x[0])).size;
     pun.append(el("b", "", `${sanas}/${diapos.length}`), el("span", "", "diapositivas sin observaciones")); c.appendChild(pun);
@@ -256,15 +256,7 @@ window.RomusPPT = (function () {
   /* ================= IA ================= */
   async function pedir(nombre, descripcion, esquema, mensaje) {
     const nivel = { pregrado: "pregrado", especializacion: "especialización", maestria: "maestría", doctorado: "doctorado", posdoctorado: "posdoctorado" }[Config.get().nivelInvestigacion] || "posgrado";
-    const r = await IA.llamar({
-      system: [{ type: "text", text: `Eres Romus, asesor de sustentaciones de trabajos de grado de ${nivel}. Respondes en español claro, con respeto y precisión.` }],
-      messages: [{ role: "user", content: mensaje }],
-      tools: [{ name: nombre, description: descripcion, input_schema: esquema }],
-      tool_choice: { type: "tool", name: nombre }, max_tokens: 4000
-    });
-    const ll = IA.herramientasDe(r).find(x => x.nombre === nombre);
-    if (!ll) throw new Error("La IA no devolvió el resultado esperado. Prueba de nuevo.");
-    return ll.datos;
+    return IA.pedirHerramienta(`Eres Romus, asesor de sustentaciones de trabajos de grado de ${nivel}. Respondes en español claro, con respeto y precisión.`, nombre, descripcion, esquema, mensaje, null, 4000);
   }
 
   /* ================= 3. Simulacro de jurado ================= */

@@ -214,6 +214,79 @@ Reglas:
     }
   ];
 
+
+  /* ===================== Respuestas de herramientas: validar y reparar ===================== */
+  /** Ajusta los datos de una herramienta a su esquema: corrige tipos, descarta elementos inválidos
+      y devuelve qué campos obligatorios faltan. Así un modelo descuidado no rompe a Romus. */
+  function ajustarAEsquema(datos, esquema, ruta) {
+    const faltan = [];
+    const ajustar = (v, e, r, item) => {
+      if (!e) return v;
+      const tipo = e.type;
+      if (tipo === "object") {
+        if (!v || typeof v !== "object" || Array.isArray(v)) return undefined;
+        const o = {};
+        Object.keys(v).forEach(k => { o[k] = v[k]; });
+        Object.entries(e.properties || {}).forEach(([k, sub]) => {
+          const x = ajustar(v[k], sub, r ? r + "." + k : k, item);
+          if (x === undefined) delete o[k]; else o[k] = x;
+        });
+        for (const k of e.required || []) {
+          const x = o[k];
+          // Dentro de una lista, un texto vacío es válido (p. ej., «sugerencia» de un eslabón coherente);
+          // en el nivel superior, un texto obligatorio vacío cuenta como faltante.
+          if (x === undefined || x === null || (!item && typeof x === "string" && !x.trim())) { faltan.push(r ? r + "." + k : k); }
+        }
+        return o;
+      }
+      if (tipo === "array") {
+        let a = v;
+        if (a == null) return undefined;
+        if (!Array.isArray(a)) a = (typeof a === "string" && (!e.items || e.items.type === "string")) ? a.split(/\n+/).map(x => x.replace(/^\s*[-•*\d.)]+\s*/, "").trim()).filter(Boolean) : [];
+        if (!e.items) return a;
+        const antes = faltan.length;
+        const sal = [];
+        a.forEach(x => {
+          const marca = faltan.length;
+          const y = ajustar(x, e.items, null, true);
+          const incompleto = faltan.length > marca;
+          faltan.length = marca; // un elemento incompleto se descarta, no hace fallar todo
+          if (y !== undefined && !incompleto) sal.push(y);
+        });
+        faltan.length = antes;
+        return sal;
+      }
+      if (tipo === "string") { if (v == null) return undefined; if (typeof v === "string") return v; if (typeof v === "number" || typeof v === "boolean") return String(v); if (Array.isArray(v)) return v.filter(x => typeof x === "string" || typeof x === "number").join("\n"); return undefined; }
+      if (tipo === "number" || tipo === "integer") { const n = typeof v === "number" ? v : Number(String(v == null ? "" : v).replace(",", ".")); if (!isFinite(n)) return undefined; return tipo === "integer" ? Math.round(n) : n; }
+      if (tipo === "boolean") { if (typeof v === "boolean") return v; if (v === "true" || v === "si" || v === "sí") return true; if (v === "false" || v === "no") return false; return undefined; }
+      return v;
+    };
+    const d = ajustar(datos, esquema, ruta || "");
+    if (d === undefined) return { datos: {}, faltan: (esquema.required || []).slice() };
+    return { datos: d, faltan };
+  }
+
+  /** Pide a la IA una herramienta concreta; reintenta una vez si no la usa o si la respuesta viene incompleta. */
+  async function pedirHerramienta(sistema, nombre, descripcion, esquema, mensaje, signal, maxTokens) {
+    const mensajes = [{ role: "user", content: mensaje }];
+    let ultimo = null;
+    for (let intento = 0; intento < 2; intento++) {
+      const r = await llamar({
+        system: [{ type: "text", text: sistema }], messages: mensajes,
+        tools: [{ name: nombre, description: descripcion, input_schema: esquema }],
+        tool_choice: { type: "tool", name: nombre }, max_tokens: maxTokens || 6000
+      }, signal);
+      const ll = llamadasDeHerramienta(r).find(x => x.nombre === nombre);
+      if (!ll) { ultimo = "sin-herramienta"; mensajes.push({ role: "user", content: `Responde SOLO usando la herramienta «${nombre}», con todos sus campos.` }); continue; }
+      const a = ajustarAEsquema(ll.datos, esquema);
+      if (!a.faltan.length) return a.datos;
+      ultimo = a.faltan;
+      mensajes.push({ role: "user", content: `Tu respuesta anterior no incluyó: ${a.faltan.join(", ")}. Vuelve a responder con la herramienta «${nombre}» y completa todos los campos obligatorios.` });
+    }
+    if (ultimo === "sin-herramienta") throw new Error("La IA no devolvió el resultado esperado. Prueba de nuevo o elige un modelo más capaz en Ajustes.");
+    throw new Error(`La IA respondió incompleto (faltó: ${ultimo.slice(0, 4).join(", ")}). Prueba de nuevo o elige un modelo más capaz en Ajustes.`);
+  }
+
   /* ===================== Conexión con el proveedor ===================== */
 
   function describirError(status, mensaje, prov) {
@@ -223,6 +296,7 @@ Reglas:
     if (status === 404) return `El modelo o la dirección no existen en ${quien}. Revisa el modelo en Ajustes (usa «Cargar modelos»).`;
     if (status === 429) return `${quien}: se alcanzó el límite de uso. Espera un momento e inténtalo de nuevo.`;
     if (status === 529 || status === 503 || status === 502) return `${quien} está saturado. Inténtalo de nuevo en unos segundos.`;
+    if (status >= 500) return `${quien} tuvo un problema temporal (error ${status}). Inténtalo de nuevo en unos minutos; si sigue igual, cambia de modelo en Ajustes.`;
     if (/credit|balance|quota|billing|insufficient/i.test(mensaje || "")) return `Tu cuenta de ${quien} no tiene saldo o cuota disponible.`;
     return `Error de ${quien} (${status}): ${mensaje || "sin detalle"}`;
   }
@@ -261,7 +335,7 @@ Reglas:
       if (r.ok) return r.json();
       let mensaje = "";
       try { const j = await r.json(); mensaje = (j.error && (j.error.message || j.error)) || j.message || ""; if (typeof mensaje !== "string") mensaje = JSON.stringify(mensaje); } catch (e) { /* ignorar */ }
-      if ([429, 529, 503, 502].includes(r.status) && intento < 2) {
+      if ([429, 529, 503, 502, 500, 504].includes(r.status) && intento < 2) {
         await new Promise(res => setTimeout(res, 2500 * (intento + 1)));
         continue;
       }
@@ -473,5 +547,5 @@ Reglas:
     return { segundos, total: correcciones.length, validas: validas.length, herramientas: !!llamada };
   }
 
-  return { interpretar, revisarLote, probarConexion, listarModelos, llamar, herramientasDe: llamadasDeHerramienta, textoLibre };
+  return { interpretar, revisarLote, probarConexion, listarModelos, llamar, herramientasDe: llamadasDeHerramienta, textoLibre, ajustarAEsquema, pedirHerramienta };
 })();

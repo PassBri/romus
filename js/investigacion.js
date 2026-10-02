@@ -76,6 +76,10 @@ window.Inv = (function () {
     "Rigor cualitativo": "Dependencia (consistencia), credibilidad, transferencia y confirmabilidad: triangulación, auditoría, descripción densa, chequeo con participantes y reflexividad del investigador.",
     "Diseño mixto": "Secuencial explicativo (CUAN → cual), secuencial exploratorio (CUAL → cuan), convergente o anidado. Justifica la prioridad y la secuencia de cada enfoque.",
     "Integración de resultados": "Cómo y en qué momento se integran los datos cuantitativos y cualitativos (metainferencias).",
+    "Diseño teórico-documental": "Hermenéutico, análisis conceptual, argumentativo-crítico, genealógico o revisión sistemática. Explica por qué la pregunta se responde con textos y argumentos, no con datos de campo.",
+    "Corpus y criterios de selección": "Qué obras y documentos analizas (fuentes primarias y secundarias), con criterios de inclusión y exclusión, bases consultadas y cómo se cerró el corpus (suficiencia teórica).",
+    "Técnica de análisis documental": "Fichaje, análisis conceptual, reconstrucción de argumentos (premisas → conclusión) y matriz autor × categoría. Indica las categorías a priori y cómo registrarás las emergentes.",
+    "Rigor teórico": "Trazabilidad de cada afirmación a su fuente con página, precisión conceptual, triangulación teórica entre tradiciones, principio de caridad ante las objeciones y reflexividad.",
     "Referencias": "En APA 7. Solo fuentes citadas en el texto. Romus puede buscar y citar literatura real: di «busca literatura sobre…»."
   };
 
@@ -134,8 +138,11 @@ window.Inv = (function () {
   const ENFOQUES = {
     cuantitativo: { nombre: "Cuantitativo", metodo: ["Alcance de la investigación", "Hipótesis y variables", "Diseño de investigación", "Muestra", "Instrumentos: confiabilidad y validez", "Análisis estadístico", "Consideraciones éticas"] },
     cualitativo: { nombre: "Cualitativo", metodo: ["Paradigma y posicionamiento epistemológico", "Diseño cualitativo", "Participantes y muestreo cualitativo", "Técnicas de recolección", "Categorización y análisis", "Rigor cualitativo", "Consideraciones éticas"] },
-    mixto: { nombre: "Mixto", metodo: ["Paradigma y posicionamiento epistemológico", "Diseño mixto", "Muestra", "Técnicas de recolección", "Instrumentos: confiabilidad y validez", "Análisis estadístico", "Categorización y análisis", "Integración de resultados", "Consideraciones éticas"] }
+    mixto: { nombre: "Mixto", metodo: ["Paradigma y posicionamiento epistemológico", "Diseño mixto", "Muestra", "Técnicas de recolección", "Instrumentos: confiabilidad y validez", "Análisis estadístico", "Categorización y análisis", "Integración de resultados", "Consideraciones éticas"] },
+    teorico: { nombre: "Teórico-documental", metodo: ["Paradigma y posicionamiento epistemológico", "Diseño teórico-documental", "Corpus y criterios de selección", "Técnica de análisis documental", "Categorización y análisis", "Rigor teórico", "Consideraciones éticas"] }
   };
+  /** Enfoques sin hipótesis estadísticas (usan supuestos o tesis). */
+  function sinHipotesis(e) { return /^(cualitativo|teorico)$/.test((e || enfoque()).id); }
   function enfoque() { const id = Config.get().enfoqueInvestigacion || "cuantitativo"; return Object.assign({ id }, ENFOQUES[id] || ENFOQUES.cuantitativo); }
   function fijarEnfoque(id) { if (ENFOQUES[id]) { Config.set({ enfoqueInvestigacion: id }); if ($("selEnfoque")) $("selEnfoque").value = id; } return enfoque(); }
   /** Secciones del nivel con la metodología ajustada al enfoque. */
@@ -151,7 +158,8 @@ window.Inv = (function () {
         if (n.secciones.some(([x]) => /hip[oó]tesis/i.test(x))) m = m.map(x => x === "Hipótesis y variables" ? "Variables o categorías" : x);
         return [t, m];
       }
-      if (/^Hip[oó]tesis o supuestos$/.test(t) && e.id === "cualitativo") return ["Supuestos y preguntas orientadoras"];
+      if (/^Hip[oó]tesis o supuestos$/.test(t) && sinHipotesis(e)) return [e.id === "teorico" ? "Tesis y supuestos de partida" : "Supuestos y preguntas orientadoras"];
+      if (/^Preguntas e hip[oó]tesis$/.test(t) && e.id === "teorico") return ["Preguntas y tesis a defender"];
       return [t, subs];
     });
   }
@@ -226,7 +234,9 @@ window.Inv = (function () {
 
   const VACIAS = new Set("para como sobre entre desde hasta donde cuando cual cuales este esta estos estas ese esa esos esas aquel aquella mediante traves través partir dentro fuera hacia según segun durante sobre ante bajo cabe contra mismo misma mismos mismas otro otra otros otras cada todo toda todos todas nivel niveles forma manera proceso parte tipo tipos caso casos además ademas tambien también objetivo objetivos general especifico especificos específicos estudio investigacion investigación analizar determinar identificar describir establecer diseñar disenar evaluar proponer implementar comparar caracterizar desarrollar fortalecer mejorar conocer relacion relación entre efecto efectos influencia incidencia".split(" "));
   function conceptos(texto) {
-    return Array.from(new Set(norm(texto).replace(/[^a-zñ0-9 ]/g, " ").split(" ").filter(w => w.length >= 6 && !VACIAS.has(w))));
+    // Solo sustantivos y adjetivos de contenido: fuera verbos conjugados, infinitivos, participios y adverbios.
+    const NO_CONCEPTO = /(arse|erse|irse|ando|iendo|mente|ados?|adas?|idos?|idas?)$|^(pueden?|deben?|permiten?|tienen?|existen?|logran?|buscan?|requieren?|considera\w*|precise|permita)$/;
+    return Array.from(new Set(norm(texto).replace(/[^a-zñ0-9 ]/g, " ").split(" ").filter(w => w.length >= 6 && !VACIAS.has(w) && !NO_CONCEPTO.test(w) && !/^[a-zñ]+(ar|er|ir)$/.test(w))));
   }
 
   async function documentoNumerado() {
@@ -237,7 +247,7 @@ window.Inv = (function () {
   function sistemaAsesor() {
     const n = nivel(), e = enfoque();
     return `Eres Romus en modo asesor metodológico (método Kuetz). Acompañas un proyecto de nivel ${n.nombre} (${n.producto}) con enfoque ${e.nombre.toLowerCase()}.
-Marco de trabajo (método Kuetz; aplícalo con tus propias palabras): rutas cuantitativa, cualitativa y mixta; el planteamiento incluye objetivos, preguntas, justificación (conveniencia, relevancia social, implicaciones prácticas, valor teórico, utilidad metodológica), viabilidad y deficiencias en el conocimiento; alcances exploratorio, descriptivo, correlacional y explicativo; hipótesis y variables con definición conceptual y operacional; diseños experimentales y no experimentales; muestreo probabilístico y no probabilístico; confiabilidad, validez y objetividad. En lo cualitativo: planteamiento abierto y emergente, inmersión en el campo, muestras intencionales y saturación, diseños (teoría fundamentada, etnográfico, narrativo, fenomenológico, investigación-acción) y rigor (dependencia, credibilidad, transferencia, confirmabilidad). En lo mixto: diseños secuenciales, convergentes y anidados, e integración. Epistemología: todo método está inserto en un paradigma; la cientificidad exige rigor, sistematicidad y criticidad. Usa también la Teoría de Brian Suárez (axiomas, postulados, supuestos, constructos, modelos, MICC).
+Marco de trabajo (método Kuetz; aplícalo con tus propias palabras): rutas cuantitativa, cualitativa, mixta y teórico-documental (para tesis filosóficas o teóricas: diseño hermenéutico, análisis conceptual o argumentativo; corpus con criterios de selección en lugar de muestra; fichas y matriz de análisis documental en lugar de cuestionarios; tesis a defender en lugar de hipótesis estadísticas; rigor por trazabilidad, triangulación teórica y principio de caridad); el planteamiento incluye objetivos, preguntas, justificación (conveniencia, relevancia social, implicaciones prácticas, valor teórico, utilidad metodológica), viabilidad y deficiencias en el conocimiento; alcances exploratorio, descriptivo, correlacional y explicativo; hipótesis y variables con definición conceptual y operacional; diseños experimentales y no experimentales; muestreo probabilístico y no probabilístico; confiabilidad, validez y objetividad. En lo cualitativo: planteamiento abierto y emergente, inmersión en el campo, muestras intencionales y saturación, diseños (teoría fundamentada, etnográfico, narrativo, fenomenológico, investigación-acción) y rigor (dependencia, credibilidad, transferencia, confirmabilidad). En lo mixto: diseños secuenciales, convergentes y anidados, e integración. Epistemología: todo método está inserto en un paradigma; la cientificidad exige rigor, sistematicidad y criticidad. Usa también la Teoría de Brian Suárez (axiomas, postulados, supuestos, constructos, modelos, MICC).
 No menciones autores de manuales de metodología salvo que el usuario pida bibliografía; en ese caso, ofrece buscar literatura real.
 Reglas:
 - Eres riguroso y honesto: señalas vacíos y debilidades con precisión, y propones cómo resolverlos.
@@ -248,16 +258,7 @@ Reglas:
   }
 
   async function pedirHerramienta(nombre, descripcion, esquema, mensaje, signal) {
-    const r = await IA.llamar({
-      system: [{ type: "text", text: sistemaAsesor() }],
-      messages: [{ role: "user", content: mensaje }],
-      tools: [{ name: nombre, description: descripcion, input_schema: esquema }],
-      tool_choice: { type: "tool", name: nombre },
-      max_tokens: 6000
-    }, signal);
-    const ll = IA.herramientasDe(r).find(x => x.nombre === nombre);
-    if (!ll) throw new Error("La IA no devolvió el resultado esperado. Prueba de nuevo o usa un modelo más capaz.");
-    return ll.datos;
+    return IA.pedirHerramienta(sistemaAsesor(), nombre, descripcion, esquema, mensaje, signal, 6000);
   }
 
   /* ================= Panel de resultados ================= */
@@ -481,10 +482,39 @@ Reglas:
   function partirNombre(nombre) {
     const t = String(nombre || "").trim().split(/\s+/).filter(Boolean);
     if (t.length <= 1) return { apellido: t[0] || "", iniciales: "" };
-    const nApe = t.length >= 3 ? 2 : 1; // nombres hispanos: dos apellidos
-    const apellido = t.slice(-nApe).join(" ");
-    const iniciales = t.slice(0, -nApe).map(x => x.replace(/[^A-Za-zÀ-ÿ-]/g, "").split("-").map(s => s.charAt(0).toUpperCase() + ".").join("-")).join(" ");
+    const esInicial = (x) => /^[A-ZÀ-Ý]\.?(-[A-ZÀ-Ý]\.?)?$/.test(x);
+    const PART = /^(de|del|la|las|los|da|das|do|dos|van|von|der|den|di|du|le|y|e|bin|al|ten|ter)$/i;
+    // Nombres hispanos: dos apellidos («Brian Gonzalo Suárez Acevedo»). Pero si el penúltimo es una
+    // inicial («John R. Searle», «Emily M. Bender»), el apellido es solo el último.
+    let ini = t.length - 1;
+    if (t.length >= 3 && !esInicial(t[t.length - 2]) && !PART.test(t[t.length - 2])) ini = t.length - 2;
+    // Partículas pegadas al apellido: «Juan de la Cruz», «Ludwig van Beethoven».
+    while (ini > 1 && PART.test(t[ini - 1])) ini--;
+    const apellido = t.slice(ini).join(" ");
+    const iniciales = t.slice(0, ini).map(x => x.replace(/[^A-Za-zÀ-ÿ-]/g, "").split("-").filter(Boolean).map(s => s.charAt(0).toUpperCase() + ".").join("-")).filter(Boolean).join(" ");
     return { apellido, iniciales };
+  }
+
+  /* Títulos en tipo oración (APA 7). OpenAlex suele traer los títulos en inglés con Mayúscula En Cada Palabra.
+     Solo se pasan a minúscula palabras comunes conocidas: los nombres propios desconocidos (Turing, Colombia…) se respetan. */
+  const COMUNES = new Set(("a an the of in on at to for from by with without and or but nor as is are be was were been being can could may might should would will do does did not no its it this that these those their our your his her they we you what which who whom whose why how when where whether if than then so yet into onto over under between among through toward towards about against across after before during within beyond via vs versus upon per " +
+    "new old large small big high low long short good bad better best more most less least many much few other others same different further toward early late recent current future past present general special social public private human natural artificial machine machines model models language languages learning deep neural network networks system systems agent agents synthetic intelligence intelligent mind minds brain brains thought thinking knowledge belief beliefs justified justification true truth false meaning understanding reasoning reason argument arguments theory theories theoretical philosophy philosophical science scientific sciences epistemology epistemic ethics ethical moral account accounts approach approaches analysis analyses review study studies research case cases evidence effect effects impact role nature scope limits limit consequences consequence dangers danger risk risks debate debates problem problems question questions answer answers challenge challenges perspective perspectives framework frameworks method methods methodology methodological design data information computation computational computer computing simulation simulations novelty program programs programs talking talk words word testimony trust trustworthy trustworthiness reliability reliable process processes concept concepts conceptual introduction overview guide handbook education educational teaching teachers teacher students student school schools university higher learning children child adolescents youth young adults adult people health medical clinical care practice practices policy policies development developing developmental assessment evaluation measurement scale validation validity reliability quality performance use uses using based towards beyond within across factors factor relationship relationships association associations between among effectiveness efficacy intervention interventions program training skills skill competence competences competencies teaching physical activity sport sports games game play cooperative violence conflict coexistence school environment environmental change climate economic economy business management organizational organization organizations work workers family families community communities culture cultural society societies political politics power state states government law legal rights right history historical world global local national international regional urban rural women men gender identity self mental emotional emotions emotion social media digital technology technologies technological tools tool online virtual reality augmented robots robot robotic automation automated ai-generated generated generative text texts large-scale scale scaling understanding semantic semantics syntax grammar communication dialogue conversation conversational chat chatbots chatbot assistant assistants explanation explanations explainable interpretability transparency bias fairness accountability responsibility autonomy autonomous agency moral mechanism mechanisms representation representations consciousness experience experiences perception cognition cognitive extended embodied situated distributed collective individual subject object objects body bodies life living being beings what's toward ontology ontological metaphysics metaphysical logic logical formal informal can too part i ii iii one two three four five first second third stochastic parrot parrots computing machinery engine engines mechanical automata automaton test tests testing imitation game believe know knowing knower knowers known believing claim claims assertion assertions sense senses reference referential grounding grounded symbol symbols symbolic connectionism connectionist representation functionalism functionalist argument chinese room roots foundations foundation essay essays notes note remarks source sources reply replies response responses critique critical toward virtue virtues internalism externalism reliabilism social epistemology science sciences crisis open closed hard easy problem age era revolution turn turning point view views position positions defense defence against case for why how matter matters really still beyond el la los las un una unos unas de del al y e o u en con sin por para sobre entre desde hacia hasta como que su sus lo se es son estudio estudios análisis analisis revisión revision sistemática sistematica investigación investigacion educación educacion física fisica escolar escuela escuelas estudiantes docentes profesores niños niñas jóvenes jovenes adolescentes universidad universitarios aprendizaje enseñanza enseñanza calidad desarrollo evaluación evaluacion propuesta modelo modelos teoría teoria teorías conocimiento conocimientos inteligencia artificial agentes agente sintéticos sinteticos filosofía filosofia epistemología epistemologia ética etica lenguaje lenguajes perspectiva perspectivas enfoque juegos juego cooperativos cooperativo convivencia violencia conflicto conflictos salud mental social sociales cultura cultural política politica políticas derechos tecnología tecnologia tecnologías digital digitales uso usos efecto efectos impacto relación relacion factores estrategias estrategia práctica prácticas practica formación formacion competencias habilidades nuevo nueva nuevos nuevas caso casos experiencia experiencias aportes aporte hacia problema problemas pregunta preguntas").split(/\s+/));
+  function aOracion(t) {
+    const pals = String(t || "").split(/\s+/).filter(Boolean);
+    const largas = pals.slice(1).filter(w => w.replace(/[^A-Za-zÀ-ÿ]/g, "").length >= 4);
+    const cap = largas.filter(w => /^[^A-Za-zÀ-ÿ]*[A-ZÁÉÍÓÚÑ][a-záéíóúñ]/.test(w)).length;
+    if (pals.length < 3 || !largas.length || cap / largas.length < 0.6) return t; // ya está en tipo oración o no se puede saber
+    let tras = true; // primera palabra y la que sigue a «:» conservan la mayúscula
+    return pals.map(w => {
+      const out = tras ? w : w.split("-").map(p => {
+        const m = p.match(/^([^A-Za-zÀ-ÿ]*)([A-ZÁÉÍÓÚÑ][a-záéíóúñü']*)([^A-Za-zÀ-ÿ]*)$/);
+        if (!m) return p; // siglas (GPT-3, AI), mayúsculas internas (McMillan) o números
+        const base = m[2].toLowerCase(), raiz = base.replace(/'s$/, "");
+        return COMUNES.has(raiz) || COMUNES.has(raiz.replace(/s$/, "")) ? m[1] + base + m[3] : p;
+      }).join("-");
+      tras = /[:?!.]$/.test(w);
+      return out;
+    }).join(" ");
   }
 
   function apa(w) {
@@ -496,21 +526,37 @@ Reglas:
     else if (autores.length <= 20) lista = autores.slice(0, -1).map(fmt).join(", ") + " y " + fmt(autores[autores.length - 1]); // APA 7 en español: sin coma antes de «y»
     else lista = autores.slice(0, 19).map(fmt).join(", ") + ", … " + fmt(autores[autores.length - 1]);
     const anio = w.publication_year || "s. f.";
-    const titulo = (w.display_name || w.title || "").replace(/\.$/, "");
-    const fuente = w.primary_location && w.primary_location.source ? w.primary_location.source.display_name : "";
+    const titulo = aOracion((w.display_name || w.title || "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().replace(/\.$/, ""));
+    const src = (w.primary_location && w.primary_location.source) || {};
+    const fuente = src.display_name || "";
+    const editorial = src.host_organization_name || (/press|editorial|ediciones|springer|routledge|wiley|elsevier|sage|publisher|universidad|university/i.test(fuente) ? fuente : "");
     const b = w.biblio || {};
-    let detalle = "";
-    if (b.volume) detalle += `, ${b.volume}`;
-    if (b.issue) detalle += `(${b.issue})`;
-    if (b.first_page) detalle += `, ${b.first_page}${b.last_page && b.last_page !== b.first_page ? "-" + b.last_page : ""}`;
+    const pags = b.first_page ? `${b.first_page}${b.last_page && b.last_page !== b.first_page ? "–" + b.last_page : ""}` : "";
     const doi = w.doi ? " " + w.doi : "";
-    const texto = `${lista ? lista + " " : ""}(${anio}). ${titulo}.${fuente ? " " + fuente + detalle + "." : ""}${doi}`;
+    const tipo = String(w.type || "").toLowerCase();
+    const fin = /[?!]$/.test(titulo) ? "" : "."; // «¿…?» no lleva punto adicional
+    const autoria = lista ? `${lista} (${anio}). ${titulo}${fin}` : `${titulo}${fin} (${anio}).`; // sin autor: el título pasa al lugar del autor
+    let texto, cursiva;
+    if (tipo === "book" || tipo === "monograph" || tipo === "edited-book") {
+      // Libro: el título va en cursiva y luego la editorial.
+      texto = `${autoria}${editorial ? " " + editorial + "." : ""}${doi}`; cursiva = titulo;
+    } else if (tipo === "book-chapter") {
+      const libro = fuente && fuente !== editorial ? aOracion(fuente) : "";
+      texto = `${autoria}${libro ? ` En ${libro}${pags ? ` (pp. ${pags})` : ""}.` : ""}${editorial ? " " + editorial + "." : ""}${doi}`; cursiva = libro;
+    } else {
+      let detalle = "";
+      if (b.volume) detalle += `, ${b.volume}`;
+      if (b.issue) detalle += `(${b.issue})`;
+      if (pags) detalle += `, ${pags}`;
+      texto = `${autoria}${fuente ? " " + fuente + detalle + "." : ""}${doi}`;
+      cursiva = fuente ? fuente + (b.volume ? ", " + b.volume : "") : ""; // revista y volumen en cursiva
+    }
     let cita;
     if (!autores.length) cita = `(${titulo.split(" ").slice(0, 4).join(" ")}, ${anio})`;
     else if (autores.length === 1) cita = `(${autores[0].apellido}, ${anio})`;
     else if (autores.length === 2) cita = `(${autores[0].apellido} y ${autores[1].apellido}, ${anio})`;
     else cita = `(${autores[0].apellido} et al., ${anio})`;
-    return { texto, cita, fuente, titulo, anio, doi: w.doi || "", citas: w.cited_by_count || 0, abierto: !!(w.open_access && w.open_access.is_oa), autores: autores.map(a => a.apellido) };
+    return { texto, cita, fuente, cursiva, titulo, anio, doi: w.doi || "", citas: w.cited_by_count || 0, abierto: !!(w.open_access && w.open_access.is_oa), autores: autores.map(a => a.apellido) };
   }
 
   /** OpenAlex guarda el resumen como índice invertido: lo reconstruye. */
@@ -611,8 +657,9 @@ Reglas:
       }
       nuevo.styleBuiltIn = "Normal";
       try { nuevo.leftIndent = 36; nuevo.firstLineIndent = -36; } catch (e) { /* sangría francesa opcional */ }
-      if (w.fuente) {
-        const r = nuevo.search(w.fuente.slice(0, 250), { matchCase: true });
+      const cur = w.cursiva || w.fuente;
+      if (cur) {
+        const r = nuevo.search(cur.slice(0, 250), { matchCase: true });
         r.load("items");
         await ctx.sync();
         if (r.items.length) r.items[0].font.italic = true;
@@ -649,13 +696,14 @@ Reglas:
   const METODO_ENFOQUE = {
     cuantitativo: ["Define el alcance (exploratorio, descriptivo, correlacional o explicativo)", "Formula hipótesis coherentes con el alcance, o justifica por qué no las hay", "Define las variables conceptual y operacionalmente", "Declara el diseño (experimental o no experimental) y lo justifica", "Delimita población y muestra y su tipo de muestreo", "Reporta confiabilidad y validez de los instrumentos", "Explica el análisis estadístico", "Incluye consideraciones éticas"],
     cualitativo: ["Declara el paradigma o posicionamiento epistemológico", "Nombra el diseño cualitativo (teoría fundamentada, etnográfico, narrativo, fenomenológico, investigación-acción…)", "Describe participantes, muestreo intencional y criterio de saturación", "Describe las técnicas de recolección y la inmersión en el campo", "Explica la categorización y el análisis", "Expone criterios de rigor (credibilidad, dependencia, transferencia, confirmabilidad)", "Incluye consideraciones éticas"],
+    teorico: ["Declara el paradigma o posicionamiento epistemológico", "Nombra el diseño teórico (hermenéutico, análisis conceptual, argumentativo, genealógico o revisión sistemática) y justifica por qué la pregunta se responde con textos", "Delimita el corpus con criterios de inclusión y exclusión, y distingue fuentes primarias y secundarias", "Describe la técnica de análisis documental (fichas, matriz de categorías, reconstrucción de argumentos)", "Define categorías teóricas a priori y prevé las emergentes", "Expone criterios de rigor teórico (trazabilidad, triangulación teórica, principio de caridad)", "Incluye consideraciones éticas (integridad, derechos de autor, uso declarado de IA)"],
     mixto: ["Declara el paradigma que justifica combinar enfoques", "Nombra el diseño mixto (secuencial, convergente o anidado) y la prioridad de cada enfoque", "Describe la muestra de cada fase", "Reporta confiabilidad y validez de los instrumentos cuantitativos", "Explica el análisis estadístico y el cualitativo", "Explica cómo se integran los resultados", "Incluye consideraciones éticas"]
   };
 
   function rubricaNivel() {
     const n = nivel(), e = enfoque();
     const base = RUBRICA_BASE.map(c => c[0] === "metodo" ? ["metodo", "Metodología (" + e.nombre.toLowerCase() + ")", 22, METODO_ENFOQUE[e.id]] : c);
-    return base.concat((RUBRICA_EXTRA[n.id] || []).filter(c => !(e.id === "cualitativo" && c[0] === "rigor"))).map(([id, nombre, peso, items]) => ({ id, nombre, peso, items: items.map((t, k) => ({ id: `${id}.${k + 1}`, texto: t })) }));
+    return base.concat((RUBRICA_EXTRA[n.id] || []).filter(c => !(sinHipotesis(e) && c[0] === "rigor"))).map(([id, nombre, peso, items]) => ({ id, nombre, peso, items: items.map((t, k) => ({ id: `${id}.${k + 1}`, texto: t })) }));
   }
 
   async function evaluarRubrica(signal) {
@@ -739,8 +787,9 @@ Reglas:
     const reg = leerRegistro();
     const p = Config.perfil();
     const conteo = {};
-    reg.forEach(r => { conteo[r.accion] = (conteo[r.accion] || 0) + 1; });
-    const usos = Object.entries(conteo).map(([a, n]) => `${a.toLowerCase()} (${n})`).join(", ");
+    // «Proyecto creado desde cero (Pro)» → «proyecto creado desde cero»; se respetan siglas (APA, SPSS, IA).
+    reg.forEach(r => { const k = String(r.accion || "").replace(/\s*\([^)]*\)/g, "").trim(); if (k) conteo[k] = (conteo[k] || 0) + 1; });
+    const usos = Object.entries(conteo).map(([a, n]) => `${/^[A-ZÁÉÍÓÚÑ]{2}/.test(a) ? a : a.charAt(0).toLowerCase() + a.slice(1)}${n > 1 ? ` (${n} veces)` : ""}`).join(", ");
     const modelos = Array.from(new Set(reg.map(r => r.modelo).filter(Boolean)));
     const parrafo = reg.length
       ? `En la elaboración de este documento se utilizó el asistente Romus para Microsoft Word, con el modelo de inteligencia artificial ${modelos.join(" y ") || (p.nombre + " · " + p.modelo)}, como apoyo en las siguientes tareas: ${usos}. Las referencias bibliográficas sugeridas provienen de la base académica abierta OpenAlex y fueron revisadas por el autor. Las propuestas generadas por la IA se tomaron como orientación; el análisis, las decisiones metodológicas y la redacción final son responsabilidad del autor.`
@@ -1097,6 +1146,7 @@ Reglas:
 
   /** Devuelve una función si el comando es del modo investigación; si no, null. n = texto normalizado; original = texto con tildes. */
   function comando(n, original, signal) {
+    original = original || n;
     const extra = ["Jurado", "Asesor", "APA", "Formato", "Datos", "Instrumentos", "Biblio", "Escritura", "Revision"].reduce((f, m) => f || (window[m] && window[m].comando ? window[m].comando(n, original) : null), null);
     if (extra) return extra;
     const tarea = (fn) => async () => {
@@ -1106,8 +1156,8 @@ Reglas:
     let m = n.match(/^(nivel|modo|el nivel es|trabajo de|es (una|un) (tesis|trabajo|proyecto) de|soy (estudiante|investigador) de) ?(de )?(pregrado|especializacion|maestria|doctorado|posdoctorado|postdoctorado)$/) ||
             n.match(/^(cambia|pon|usa) (el )?nivel (a |de )?(pregrado|especializacion|maestria|doctorado|posdoctorado|postdoctorado)$/);
     if (m) return () => { const id = n.match(RE_NIVEL)[1].replace("postdoctorado", "posdoctorado"); const v = fijarNivel(id); ui.agregarMensaje("ia", `Nivel: ${v.nombre} (${v.producto}).`); ui.hablar(`Perfecto, trabajamos a nivel de ${v.nombre}.`); };
-    m = n.match(/^(enfoque|ruta|metodo|investigacion|es|sera) ?(es )?(cuantitativ[oa]|cualitativ[oa]|mixt[oa])$/) || n.match(/^(cambia|pon|usa) (el )?(enfoque|la ruta) (a |de )?(cuantitativ[oa]|cualitativ[oa]|mixt[oa])$/);
-    if (m) return () => { const id = n.match(/(cuantitativ|cualitativ|mixt)/)[1]; const v = fijarEnfoque({ cuantitativ: "cuantitativo", cualitativ: "cualitativo", mixt: "mixto" }[id]); ui.agregarMensaje("ia", `Enfoque: ${v.nombre}.`); ui.hablar(`Entendido, enfoque ${v.nombre.toLowerCase()}.`); };
+    m = n.match(/^(enfoque|ruta|metodo|investigacion|es|sera) ?(es )?(cuantitativ[oa]|cualitativ[oa]|mixt[oa]|teoric[oa]|documental|teorico documental)$/) || n.match(/^(cambia|pon|usa) (el )?(enfoque|la ruta) (a |de )?(cuantitativ[oa]|cualitativ[oa]|mixt[oa]|teoric[oa]|documental|teorico documental)$/);
+    if (m) return () => { const id = n.match(/(cuantitativ|cualitativ|mixt|teoric|documental)/)[1]; const v = fijarEnfoque({ cuantitativ: "cuantitativo", cualitativ: "cualitativo", mixt: "mixto", teoric: "teorico", documental: "teorico" }[id]); ui.agregarMensaje("ia", `Enfoque: ${v.nombre}.`); ui.hablar(`Entendido, enfoque ${v.nombre.toLowerCase()}.`); };
     if (/^(inserta|crea|arma|genera|pon|dame) (la |una )?(estructura|plantilla)( de (la|mi|una) (tesis|proyecto|trabajo|propuesta))?( de (pregrado|especializacion|maestria|doctorado|posdoctorado))?$/.test(n)) {
       const nv = n.match(RE_NIVEL); if (nv) fijarNivel(nv[1]);
       return tarea(insertarEstructura);
@@ -1146,10 +1196,10 @@ Reglas:
   function conectar(funciones) { ui = funciones; }
 
   return {
-    NIVELES, ENFOQUES, nivel, fijarNivel, enfoque, fijarEnfoque, secciones, conectar, comando, etiqueta, registrar, leerRegistro,
+    NIVELES, ENFOQUES, nivel, fijarNivel, enfoque, fijarEnfoque, sinHipotesis, secciones, conectar, comando, etiqueta, registrar, leerRegistro,
     insertarEstructura, idear, coherencia, literatura, citar, evaluarRubrica, declaracion,
     preguntar, indiceGuia, mostrarTema, construir, asesor, iniciarTutorial, pasoTutorial, salirTutorial,
-    _apa: apa, _verificar: verificar, _partirNombre: partirNombre,
+    _apa: apa, _verificar: verificar, _partirNombre: partirNombre, _aOracion: aOracion,
     // Utilidades compartidas con otros módulos (jurado.js)
     _resumenDe: resumenDe,
     _h: { tarjeta, el, etiqueta, registrar, documentoNumerado, pedirHerramienta, verificar, norm, ejecutar, irA, buscarOpenAlex, apa, claveDoc, get ui() { return ui; } }

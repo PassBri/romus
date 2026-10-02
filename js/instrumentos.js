@@ -77,7 +77,7 @@ window.Instrumentos = (function () {
     const c = el("div", "inv-cuerpo muestra");
     c.appendChild(el("p", "guia-resumen", "Calculo el tamaño mínimo de tu muestra y te dejo el párrafo redactado para la metodología."));
     const sel = el("select", "ajuste");
-    [["finita", "Encuesta · conozco el tamaño de la población"], ["infinita", "Encuesta · población desconocida o muy grande"], ["medias", "Comparar dos grupos (pre/post, experimental/control)"], ["correlacion", "Relación entre dos variables (correlación)"], ["cualitativo", "Estudio cualitativo"]].forEach(([k, t]) => { const o = el("option", "", t); o.value = k; sel.appendChild(o); });
+    [["finita", "Encuesta · conozco el tamaño de la población"], ["infinita", "Encuesta · población desconocida o muy grande"], ["medias", "Comparar dos grupos (pre/post, experimental/control)"], ["correlacion", "Relación entre dos variables (correlación)"], ["cualitativo", "Estudio cualitativo"], ["corpus", "Investigación teórica · corpus documental"]].forEach(([k, t]) => { const o = el("option", "", t); o.value = k; sel.appendChild(o); });
     const l0 = el("label", "campo-pro"); l0.append(el("span", "", "¿Qué vas a hacer?"), sel); c.appendChild(l0);
     const campos = el("div", "apa-campos"); c.appendChild(campos);
     const salida = el("div", "inv-cuerpo"); c.appendChild(salida);
@@ -90,12 +90,21 @@ window.Instrumentos = (function () {
       if (t === "finita" || t === "infinita") { campo("error", "Margen de error (%)", 5, "Lo usual es 5 %. Si tu población es pequeña, puedes usar 5 a 10 %."); campo("p", "Proporción esperada p (%)", 50, "Si no la conoces, deja 50 %: da la muestra más segura."); }
       if (t === "medias") campo("d", "Tamaño del efecto esperado (d de Cohen)", 0.5, "0,2 pequeño · 0,5 mediano · 0,8 grande. Si no hay estudios previos, usa 0,5.");
       if (t === "correlacion") campo("r", "Correlación esperada (r)", 0.3, "0,1 débil · 0,3 moderada · 0,5 fuerte.");
-      if (t !== "cualitativo") { campo("confianza", "Nivel de confianza", 95); if (t === "medias" || t === "correlacion") campo("potencia", "Potencia estadística", 80); campo("perdida", "Pérdida esperada de participantes (%)", 10, "Para compensar a quienes no respondan o se retiren."); }
+      if (t !== "cualitativo" && t !== "corpus") { campo("confianza", "Nivel de confianza", 95); if (t === "medias" || t === "correlacion") campo("potencia", "Potencia estadística", 80); campo("perdida", "Pérdida esperada de participantes (%)", 10, "Para compensar a quienes no respondan o se retiren."); }
       pintar();
     }
     function pintar() {
       salida.innerHTML = "";
       const t = sel.value;
+      if (t === "corpus") {
+        salida.appendChild(etiqueta("guia", "orientación"));
+        salida.appendChild(el("p", "guia-resumen", "En una investigación teórica no hay muestra de personas: hay un corpus de textos. No se calcula con fórmulas; se justifica con criterios explícitos y se cierra por suficiencia teórica (cuando nuevas obras ya no cambian el mapa de posiciones)."));
+        const tb = el("table", "tabla-mini");
+        [["Qué declarar", "Ejemplo"], ["Fuentes primarias", "Las obras de los autores que interpretas"], ["Fuentes secundarias", "Artículos y libros que las comentan"], ["Criterios de inclusión", "Periodo, idioma, tradición, tipo de texto"], ["Criterios de exclusión", "Textos divulgativos, duplicados, sin revisión por pares"], ["Bases consultadas", "Scopus, PhilPapers, OpenAlex, Dialnet, SciELO"], ["Cierre del corpus", "Suficiencia teórica o flujo PRISMA"]].forEach((f, i) => { const tr = el("tr"); f.forEach(x => tr.appendChild(el(i ? "td" : "th", "", x))); tb.appendChild(tr); });
+        salida.appendChild(tb);
+        salida.appendChild(el("p", "inv-nota", "Romus puede ayudarte a construir el corpus: busca literatura, guárdala en tu biblioteca y genera la matriz de análisis."));
+        return;
+      }
       if (t === "cualitativo") {
         salida.appendChild(etiqueta("guia", "orientación"));
         salida.appendChild(el("p", "guia-resumen", "En la investigación cualitativa no se calcula la muestra con fórmulas: se elige a propósito y se cierra cuando los datos nuevos ya no aportan categorías nuevas (saturación)."));
@@ -121,7 +130,7 @@ window.Instrumentos = (function () {
       acc.appendChild(b); salida.appendChild(acc);
     }
     sel.onchange = armar;
-    sel.value = Inv.enfoque().id === "cualitativo" ? "cualitativo" : "finita";
+    sel.value = { cualitativo: "cualitativo", teorico: "corpus" }[Inv.enfoque().id] || "finita";
     armar();
     tarjeta("Tamaño de la muestra", c);
     H().ui.hablar("Elige qué vas a hacer y llena los datos. Calculo la muestra y te dejo el párrafo para la metodología.");
@@ -133,7 +142,9 @@ window.Instrumentos = (function () {
     const { documentoNumerado, pedirHerramienta, el, tarjeta, etiqueta, registrar } = H();
     const ui = H().ui;
     const doc = await documentoNumerado();
-    const cuali = tipoForzado ? tipoForzado === "guion" : Inv.enfoque().id === "cualitativo";
+    const tipo = tipoForzado || ({ cualitativo: "guion", teorico: "ficha" }[Inv.enfoque().id] || "cuestionario");
+    if (tipo === "ficha") return fichaDocumental(doc, signal);
+    const cuali = tipo === "guion";
     let d;
     if (!cuali) {
       d = await pedirHerramienta("cuestionario", "Cuestionario tipo Likert construido desde la operacionalización del proyecto.",
@@ -205,8 +216,55 @@ ${doc.texto}`, signal);
     ui.hablar(cuali ? `Listo: un guion con ${k} preguntas. También te dejo el formato para los jueces.` : `Listo: un cuestionario de ${k} ítems. También te dejo el formato para los jueces expertos.`);
     return d;
   }
+  /* Ficha de análisis documental (enfoque teórico-documental). */
+  async function fichaDocumental(doc, signal) {
+    const { pedirHerramienta, el, tarjeta, etiqueta, registrar } = H();
+    const ui = H().ui;
+    const d = await pedirHerramienta("ficha_documental", "Ficha de análisis documental y categorías teóricas para una investigación teórica.",
+      { type: "object", properties: {
+        titulo: { type: "string" },
+        corpus: { type: "string", description: "Qué tipo de textos se analizan y con qué criterios de inclusión y exclusión (según el documento)" },
+        categorias: { type: "array", items: { type: "object", properties: {
+          categoria: { type: "string" }, subcategoria: { type: "string" }, definicion: { type: "string", description: "Definición teórica de la categoría" },
+          preguntas: { type: "array", items: { type: "object", properties: { pregunta: { type: "string", description: "Pregunta analítica que se le hace a cada texto" } }, required: ["pregunta"] } }
+        }, required: ["categoria", "preguntas"] } },
+        advertencias: { type: "array", items: { type: "string" } }
+      }, required: ["titulo", "categorias"] },
+      `Diseña la ficha de análisis documental del proyecto (investigación teórica: el corpus son textos, no personas). Define 3 a 6 categorías teóricas a priori desde el marco teórico y los objetivos, cada una con su definición y 2 a 4 preguntas analíticas que el investigador le hará a cada texto (qué tesis sostiene, qué argumento da, qué supuestos tiene, qué objeciones recibe…). Si el documento no tiene categorías, propónlas desde los objetivos y anótalo en «advertencias».
+
+DOCUMENTO:
+${doc.texto}`, signal);
+    d.tipo = "ficha";
+    let k = 0;
+    (d.categorias || []).forEach(ct => (ct.preguntas || []).forEach(q => { q.codigo = "A" + (++k); }));
+    d.total = k;
+    ultimoInstrumento = d;
+    try { localStorage.setItem("romus.instrumento." + H().claveDoc(), JSON.stringify(d)); } catch (e) { /* opcional */ }
+    registrar("Ficha de análisis documental", `${(d.categorias || []).length} categorías · ${k} preguntas analíticas`, "modelo");
+    const c = el("div", "inv-cuerpo instrumento");
+    c.appendChild(etiqueta("modelo", "borrador para ajustar con tu director"));
+    c.appendChild(el("p", "guia-resumen", `Ficha con ${(d.categorias || []).length} categorías teóricas y ${k} preguntas analíticas. Llena una ficha por cada texto del corpus.`));
+    const det = el("details", "apa-cat"); det.appendChild(el("summary", "", "Ver categorías"));
+    (d.categorias || []).forEach(ct => { det.appendChild(el("b", "", ct.categoria + (ct.subcategoria ? " · " + ct.subcategoria : ""))); if (ct.definicion) det.appendChild(el("p", "inv-nota", ct.definicion)); const ul = el("ul", "guia-puntos"); (ct.preguntas || []).forEach(q => ul.appendChild(el("li", "", `${q.codigo}. ${q.pregunta}`))); det.appendChild(ul); });
+    c.appendChild(det);
+    if ((d.advertencias || []).length) { const f = el("div", "guia-caja error"); f.appendChild(el("b", "", "Debes decidir tú")); const ul = el("ul", "guia-puntos"); d.advertencias.forEach(x => ul.appendChild(el("li", "", x))); f.appendChild(ul); c.appendChild(f); }
+    c.appendChild(el("div", "inv-sub", "Documentos"));
+    c.appendChild(el("span", "inv-nota", "Ficha para llenar con cada texto del corpus:"));
+    c.appendChild(Docx.botones(() => docInstrumento(d), "ficha-analisis-documental.docx", { tam: 11 }));
+    c.appendChild(el("span", "inv-nota", "Formato para que expertos validen las categorías:"));
+    c.appendChild(Docx.botones(() => docValidacion(d), "formato-validacion-categorias.docx", { tam: 10, horizontal: true }, "Abrir formato de validación"));
+    const acc = el("div", "inv-acciones");
+    const bM = el("button", "boton secundario", "Insertar matriz de categorías");
+    bM.onclick = () => H().ejecutar(async () => { await insertarTabla(matriz(d), "Tabla X|Matriz de categorías de análisis"); ui.confirmar("Agregué la matriz después del cursor. Ajusta el número de la tabla."); });
+    acc.append(bM); c.appendChild(acc);
+    c.appendChild(el("p", "inv-nota", "Para comparar autores, guarda tus fuentes en la biblioteca y genera la matriz autor × categoría."));
+    tarjeta("Ficha de análisis documental", c);
+    ui.hablar(`Listo: una ficha con ${(d.categorias || []).length} categorías teóricas. Llena una por cada texto de tu corpus.`);
+    return d;
+  }
+
   function matriz(d) {
-    if (d.tipo === "guion") {
+    if (d.tipo === "guion" || d.tipo === "ficha") {
       const f = [["Categoría", "Subcategoría", "Definición", "Preguntas"]];
       (d.categorias || []).forEach(ct => f.push([ct.categoria, ct.subcategoria || "", ct.definicion || "", (ct.preguntas || []).map(q => q.codigo).join(", ")]));
       return f;
@@ -219,6 +277,21 @@ ${doc.texto}`, signal);
     const dp = Docx.datos();
     const b = [{ t: "titulo", texto: d.titulo }];
     if (dp.institucion) b.push({ texto: dp.institucion, centrado: true });
+    if (d.tipo === "ficha") {
+      if (d.corpus) b.push({ t: "h2", texto: "Corpus" }, { texto: d.corpus, justificado: true });
+      b.push({ t: "h2", texto: "Identificación del texto" });
+      b.push({ t: "tabla", filas: [["Código de la ficha", ""], ["Referencia (APA 7)", ""], ["Tipo de fuente", "☐ Primaria   ☐ Secundaria"], ["Tradición o enfoque", ""], ["Fecha de lectura", ""]], cabecera: false, anchos: [3000, 6000] });
+      b.push({ t: "h2", texto: "Contenido general" });
+      b.push({ t: "tabla", filas: [["Tesis central", ""], ["Conceptos clave", ""], ["Argumento (premisas → conclusión)", ""], ["Objeciones que recibe o que plantea", ""]], cabecera: false, anchos: [3000, 6000] });
+      (d.categorias || []).forEach(ct => {
+        b.push({ t: "h2", texto: ct.categoria + (ct.subcategoria ? " · " + ct.subcategoria : "") });
+        if (ct.definicion) b.push({ texto: "_" + ct.definicion + "_", justificado: true });
+        b.push({ t: "tabla", filas: [["Código", "Pregunta analítica", "Hallazgo en el texto", "Cita textual y página"]].concat((ct.preguntas || []).map(q => [q.codigo, q.pregunta, "", ""])), anchos: [800, 3000, 3000, 2200], tam: 10 });
+      });
+      b.push({ t: "h2", texto: "Valoración crítica" });
+      b.push({ t: "tabla", filas: [["Aporte a la pregunta de investigación", ""], ["Límites o debilidades del argumento", ""], ["Categorías emergentes", ""]], cabecera: false, anchos: [3000, 6000] });
+      return b;
+    }
     if (d.tipo === "guion") {
       b.push({ t: "h2", texto: "Presentación" }, { texto: d.presentacion || "" });
       b.push({ t: "tabla", filas: [["Código del entrevistado", ""], ["Fecha", ""], ["Lugar", ""], ["Duración", ""]], cabecera: false, anchos: [3000, 6000] });
@@ -255,13 +328,14 @@ ${doc.texto}`, signal);
     b.push({ texto: "Califique cada ítem de 1 a 4 en cada criterio: 1 = No cumple, 2 = Nivel bajo, 3 = Nivel moderado, 4 = Nivel alto. Si tiene sugerencias, escríbalas en la columna de observaciones.", justificado: true });
     b.push({ t: "tabla", filas: [["Criterio", "¿Qué se evalúa?"], ["Claridad", "El ítem se comprende fácilmente; su sintaxis y semántica son adecuadas."], ["Coherencia", "El ítem tiene relación lógica con la dimensión o categoría que mide."], ["Relevancia", "El ítem es esencial o importante y debe incluirse."], ["Suficiencia", "Los ítems de la dimensión bastan para medirla (se califica por dimensión)."]], anchos: [2500, 10000] });
     b.push({ t: "h2", texto: "Evaluación de los ítems" });
-    const filas = [["Código", d.tipo === "guion" ? "Categoría" : "Dimensión", d.tipo === "guion" ? "Pregunta" : "Ítem", "Claridad", "Coherencia", "Relevancia", "Observaciones"]];
-    if (d.tipo === "guion") (d.categorias || []).forEach(ct => (ct.preguntas || []).forEach(q => filas.push([q.codigo, ct.categoria, q.pregunta, "", "", "", ""])));
+    const cat = d.tipo === "guion" || d.tipo === "ficha";
+    const filas = [["Código", cat ? "Categoría" : "Dimensión", cat ? "Pregunta" : "Ítem", "Claridad", "Coherencia", "Relevancia", "Observaciones"]];
+    if (cat) (d.categorias || []).forEach(ct => (ct.preguntas || []).forEach(q => filas.push([q.codigo, ct.categoria, q.pregunta, "", "", "", ""])));
     else (d.dimensiones || []).forEach(dm => (dm.indicadores || []).forEach(ind => (ind.items || []).forEach(it => filas.push([it.codigo, dm.dimension, it.texto, "", "", "", ""]))));
     b.push({ t: "tabla", filas, anchos: [900, 2000, 4500, 1100, 1200, 1200, 2000], tam: 9 });
     b.push({ t: "h2", texto: "Suficiencia por dimensión" });
     const suf = [["Dimensión o categoría", "Suficiencia (1 a 4)", "Observaciones"]];
-    (d.tipo === "guion" ? (d.categorias || []).map(c => c.categoria) : (d.dimensiones || []).map(x => x.dimension)).forEach(n => suf.push([n, "", ""]));
+    (cat ? (d.categorias || []).map(c => c.categoria) : (d.dimensiones || []).map(x => x.dimension)).forEach(n => suf.push([n, "", ""]));
     b.push({ t: "tabla", filas: suf, anchos: [5000, 2500, 5500] });
     b.push({ t: "h2", texto: "Concepto general" });
     b.push({ texto: "☐ Aplicable    ☐ Aplicable después de corregir    ☐ No aplicable" });
@@ -485,7 +559,9 @@ ${doc.texto.slice(0, 60000)}`, signal));
   function comando(n) {
     const tarea = (fn) => async () => { H().ui.ocupar(true, "Instrumentos…"); try { await fn(); } catch (e) { H().ui.mostrarError(e); } finally { H().ui.ocupar(false); } };
     if (/(calcula|calcular|calculame|cual es|de cuanto es|cuantos participantes|tamano)( el| la| de| mi)* (tamano de (la )?)?muestra|^muestra$|calculadora de muestra/.test(n)) return () => muestra();
-    if (/(disena|crea|creame|haz|hazme|arma|genera|construye|elabora)( me)?( el| un| mi)? (cuestionario|encuesta|instrumento)/.test(n)) return tarea(() => instrumento("cuestionario"));
+    if (/(disena|crea|creame|haz|hazme|arma|genera|construye|elabora)( me)?( el| un| mi| la)? (ficha|matriz) de analisis (documental|de contenido)|ficha documental/.test(n)) return tarea(() => instrumento("ficha"));
+    if (/(disena|crea|creame|haz|hazme|arma|genera|construye|elabora)( me)?( el| un| mi)? (cuestionario|encuesta)/.test(n)) return tarea(() => instrumento("cuestionario"));
+    if (/(disena|crea|creame|haz|hazme|arma|genera|construye|elabora)( me)?( el| un| mi)? instrumento/.test(n)) return tarea(() => instrumento());
     if (/(disena|crea|creame|haz|hazme|arma|genera|construye|elabora)( me)?( el| un| mi)? (guion|guia) de (la )?entrevista/.test(n)) return tarea(() => instrumento("guion"));
     if (/(v de aiken|aiken|lawshe|juicio de expertos|validez de contenido|valida(r)? (el |mi )?instrumento|validacion por (jueces|expertos))/.test(n)) return () => validacion();
     if (/(consentimiento|asentimiento|documentos de etica|carta (a|para) la institucion|tratamiento de datos|comite de etica|etica)/.test(n) && !/(declaracion|uso de ia)/.test(n)) return tarea(() => etica());

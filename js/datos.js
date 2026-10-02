@@ -114,6 +114,11 @@ window.Datos = (function () {
     const c = el("div", "inv-cuerpo asesor");
     c.appendChild(el("p", "guia-resumen", "Romus conecta tu proyecto con tus programas de análisis: prepara lo que necesitas antes de analizar y, después, redacta los resultados en APA comprobando cada dato."));
     const cuanti = foco !== "cuali", cuali = foco !== "cuanti";
+    if (!foco && window.Inv && Inv.enfoque().id === "teorico") {
+      const caja = el("div", "guia-caja"); caja.append(el("b", "", "Tu enfoque es teórico-documental"), el("span", "", "Tu «dato» es un corpus de textos. Lo usual es la ficha de análisis documental y la matriz autor × categoría; ATLAS.ti te sirve si codificas los textos del corpus."));
+      const b1 = el("button", "enlace-sutil", "Crear la ficha de análisis documental"); b1.onclick = () => H().ejecutar(() => Instrumentos.instrumento("ficha"));
+      caja.appendChild(b1); c.appendChild(caja);
+    }
     if (cuanti) {
       c.appendChild(el("div", "inv-sub", "Cuantitativo · SPSS o PSPP"));
       c.appendChild(opcion("📜", "Sintaxis de SPSS desde mi proyecto", "Etiquetas, valores, confiabilidad y una prueba por hipótesis, lista para ejecutar.", () => H().ejecutar(sintaxis)));

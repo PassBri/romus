@@ -18,10 +18,10 @@ window.Guia = (function () {
       ejemplo: "Preguntarse por qué hay conflictos en el recreo y diseñar cómo estudiarlo con datos es investigar; leer opiniones en internet sobre el tema, no.",
       error: "Confundir una revisión bibliográfica o un ensayo de opinión con una investigación.",
       fuente: HS + ", cap. 1" },
-    { id: "enfoques", cat: "Fundamentos", titulo: "Enfoques: cuantitativo, cualitativo y mixto",
+    { id: "enfoques", cat: "Fundamentos", titulo: "Enfoques: cuantitativo, cualitativo, mixto y teórico",
       claves: ["enfoque", "enfoques", "ruta", "rutas", "cuantitativo", "cualitativo", "mixto", "diferencia entre cuantitativo y cualitativo", "paradigma"],
       resumen: "El enfoque cuantitativo mide, prueba hipótesis y generaliza con estadística; es secuencial. El cualitativo comprende significados desde la perspectiva de los participantes; es inductivo, flexible y en espiral. El mixto combina ambos para obtener una visión más completa.",
-      puntos: ["Cuantitativo: variables, medición, muestras representativas, análisis estadístico.", "Cualitativo: categorías, datos en palabras o imágenes, muestras intencionales, interpretación.", "Mixto: integra datos de ambos tipos y produce metainferencias.", "Ningún enfoque es «mejor»: se elige según la pregunta."],
+      puntos: ["Cuantitativo: variables, medición, muestras representativas, análisis estadístico.", "Cualitativo: categorías, datos en palabras o imágenes, muestras intencionales, interpretación.", "Mixto: integra datos de ambos tipos y produce metainferencias.", "Teórico-documental: trabaja con textos y argumentos, no con datos de campo (filosofía, epistemología, teoría).", "Ningún enfoque es «mejor»: se elige según la pregunta."],
       ejemplo: "¿Cuánto mejora la convivencia con un programa de juegos? → cuantitativo. ¿Cómo viven los estudiantes el conflicto en el recreo? → cualitativo.",
       error: "Elegir el enfoque antes de tener clara la pregunta, o mezclar lenguaje de ambos (por ejemplo, «hipótesis» y «saturación» sin justificar un diseño mixto).",
       fuente: HS + ", cap. 1", accion: "enfoque" },
@@ -225,6 +225,36 @@ window.Guia = (function () {
       error: "Llamar «mixto» a un estudio que solo agrega una pregunta abierta a una encuesta, sin integrar los resultados.",
       fuente: HS + ", cap. 17" },
 
+    /* ---------- Ruta teórico-documental ---------- */
+    { id: "investigacion-teorica", cat: "Ruta teórico-documental", titulo: "Investigación teórica y documental",
+      claves: ["investigacion teorica", "investigacion documental", "enfoque teorico", "teorico documental", "hermeneutica", "hermeneutico", "analisis conceptual", "filosofia", "tesis teorica", "estudio teorico", "revision documental", "investigacion bibliografica", "sin trabajo de campo", "sin participantes"],
+      resumen: "Una investigación teórica produce conocimiento a partir de textos, conceptos y argumentos, no de datos de campo. Es la ruta habitual en filosofía, epistemología, teoría educativa, derecho o historia de las ideas. Su rigor depende de cómo se elige el corpus y de cómo se analiza.",
+      puntos: ["Diseños: hermenéutico (interpretar textos en su horizonte), análisis conceptual (precisar y reconstruir un concepto), argumentativo o crítico (evaluar tesis y objeciones), genealógico o histórico-conceptual, y revisión sistemática o documental.", "La «muestra» es un corpus: obras, autores, documentos o casos teóricos elegidos con criterios explícitos.", "El instrumento es la ficha o matriz de análisis documental, no un cuestionario.", "No lleva hipótesis estadísticas: se formulan tesis o supuestos que se defienden con argumentos.", "El producto es una tesis argumentada: un modelo, una distinción conceptual o una teoría."],
+      ejemplo: "«¿Puede un sistema de lenguaje saber algo?» → análisis conceptual del saber (Gettier, fiabilismo) aplicado a los modelos de lenguaje, sobre un corpus de 40 obras de epistemología e IA.",
+      error: "Disfrazar una tesis teórica de cualitativa (con «participantes» y «saturación») o de cuantitativa (con hipótesis y variables) para que parezca más empírica.",
+      fuente: "Romus (método Kuetz)" },
+    { id: "corpus-documental", cat: "Ruta teórico-documental", titulo: "Corpus y criterios de selección",
+      claves: ["corpus", "corpus documental", "seleccion de fuentes", "criterios de inclusion", "criterios de exclusion", "fuentes primarias", "fuentes secundarias", "muestra documental", "muestra teorica"],
+      resumen: "En la ruta teórica el corpus reemplaza a la muestra. Debes decir qué textos analizas, por qué esos y no otros, y cómo los encontraste, para que otro investigador pueda reconstruir tu base documental.",
+      puntos: ["Distingue fuentes primarias (las obras de los autores que interpretas) de secundarias (comentarios y estudios sobre ellas).", "Declara criterios de inclusión y exclusión: periodo, idioma, tipo de texto, tradición, relevancia para la pregunta.", "Si haces revisión sistemática, documenta bases de datos, cadenas de búsqueda y el flujo de selección (PRISMA).", "El corpus se cierra por suficiencia teórica: cuando nuevas obras ya no cambian el mapa de posiciones."],
+      ejemplo: "«Corpus primario: Turing (1950), Searle (1980), Clark y Chalmers (1998). Secundario: 32 artículos de 2015 a 2025 indexados en Scopus y PhilPapers sobre conocimiento y modelos de lenguaje».",
+      error: "Citar solo lo que se encontró a mano, sin criterios, o presentar un corpus sesgado hacia una sola posición.",
+      fuente: "Romus (método Kuetz)" },
+    { id: "analisis-documental", cat: "Ruta teórico-documental", titulo: "Análisis documental y conceptual",
+      claves: ["analisis documental", "ficha de analisis", "matriz de analisis", "ficha documental", "fichaje", "analisis de contenido", "reconstruccion argumentativa", "analisis de argumentos", "categorias teoricas", "categorias apriori"],
+      resumen: "El análisis documental organiza lo que dicen los textos en categorías teóricas y reconstruye sus argumentos para compararlos y evaluarlos. La ficha de análisis documental es el instrumento que lo hace sistemático.",
+      puntos: ["Define categorías a priori desde tu marco teórico y deja abiertas las emergentes.", "En cada ficha registra: referencia, tesis central, conceptos clave, argumento (premisas → conclusión), objeciones y cita textual con página.", "Compara posiciones en una matriz autor × categoría.", "Evalúa los argumentos: validez, supuestos ocultos, contraejemplos.", "Romus puede generar la ficha y la matriz desde tu biblioteca."],
+      ejemplo: "Categoría «justificación»: Goldman (1979) la funda en procesos fiables; Lackey (2008) la desplaza al testimonio. ¿Aplica alguna a un modelo de lenguaje?",
+      error: "Hacer resúmenes de autores uno tras otro sin categorías ni comparación (el «desfile de autores»).",
+      fuente: "Romus (método Kuetz)" },
+    { id: "rigor-teorico", cat: "Ruta teórico-documental", titulo: "Rigor en la investigación teórica",
+      claves: ["rigor teorico", "validez teorica", "triangulacion teorica", "coherencia argumentativa", "rigor documental", "calidad de una tesis teorica"],
+      resumen: "Una tesis teórica es rigurosa si su corpus es trazable, sus conceptos están definidos con precisión y sus argumentos resisten las mejores objeciones.",
+      puntos: ["Trazabilidad: cada afirmación remite a una fuente con página.", "Precisión conceptual: define los términos técnicos y no cambies su sentido a mitad del texto.", "Triangulación teórica: contrasta tu interpretación con tradiciones distintas.", "Principio de caridad: reconstruye la mejor versión de la posición que criticas.", "Reflexividad: declara tu posición y sus límites."],
+      ejemplo: "«Para evitar el sesgo de confirmación, cada tesis se contrastó con la objeción más fuerte de la tradición opuesta (p. ej., el argumento de la habitación china frente al funcionalismo)».",
+      error: "Atacar una versión débil de la posición contraria (falacia del hombre de paja).",
+      fuente: "Romus (método Kuetz)" },
+
     /* ---------- Escritura y normas ---------- */
     { id: "etica", cat: "Escritura y ética", titulo: "Ética en la investigación",
       claves: ["etica", "consentimiento", "consentimiento informado", "asentimiento", "confidencialidad", "comite de etica", "menores", "datos personales", "ley 1581", "habeas data"],
@@ -253,6 +283,7 @@ window.Guia = (function () {
   const RUTAS = {
     cuantitativo: ["investigacion", "enfoques", "idea", "planteamiento", "objetivos", "preguntas", "justificacion", "viabilidad", "marco-teorico", "revision-literatura", "alcance", "hipotesis", "variables", "diseno-experimental", "diseno-no-experimental", "muestra", "instrumentos", "analisis-cuantitativo", "etica", "reporte-cuantitativo", "apa", "uso-ia"],
     cualitativo: ["investigacion", "enfoques", "epistemologia", "idea", "planteamiento-cualitativo", "preguntas", "justificacion", "viabilidad", "marco-teorico", "revision-literatura", "disenos-cualitativos", "muestreo-cualitativo", "recoleccion-cualitativa", "analisis-cualitativo", "rigor-cualitativo", "etica", "reporte-cualitativo", "cientificidad", "apa", "uso-ia"],
+    teorico: ["investigacion", "enfoques", "epistemologia", "investigacion-teorica", "idea", "planteamiento", "preguntas", "objetivos", "justificacion", "viabilidad", "marco-teorico", "revision-literatura", "corpus-documental", "analisis-documental", "rigor-teorico", "apa", "uso-ia"],
     mixto: ["investigacion", "enfoques", "epistemologia", "idea", "planteamiento", "objetivos", "preguntas", "justificacion", "marco-teorico", "revision-literatura", "mixtos", "muestra", "muestreo-cualitativo", "instrumentos", "recoleccion-cualitativa", "analisis-cuantitativo", "analisis-cualitativo", "rigor-cualitativo", "etica", "apa", "uso-ia"]
   };
 

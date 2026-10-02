@@ -256,7 +256,7 @@ ${xs.map((x, k) => `[${k + 1}] Cita: ${x.cita}\nHallazgos: ${x.ficha.hallazgos}\
 
   /* ---------- Afirmaciones sin respaldo ---------- */
   const RE_CITA = /\((?:[^()]*?(?:19|20)\d{2}[a-z]?|[^()]*?s\. ?f\.)[^()]*\)|[A-ZÁÉÍÓÚÑ][\wáéíóúñ'-]+(?: et al\.)? \((?:19|20)\d{2}/;
-  const RE_ALERTA = /\b(\d+(?:[.,]\d+)?\s?%|seg[uú]n (estudios|investigaciones|expertos|datos)|(diversos|varios|numerosos|muchos) (estudios|autores|investigadores)|est[aá] (demostrado|comprobado)|se ha demostrado|la (mayor[ií]a|literatura)|las investigaciones (muestran|indican)|cifras?|estad[ií]sticas?)\b/i;
+  const RE_ALERTA = /\b(\d+(?:[.,]\d+)?\s?%|seg[uú]n (estudios|investigaciones|expertos|datos)|(diversos|varios|numerosos|muchos) (estudios|autores|investigadores)|est[aá] (demostrado|comprobado)|se ha demostrado|la mayor[ií]a de (los|las)|la literatura (muestra|indica|señala|coincide|reporta|demuestra|sugiere|evidencia)|las investigaciones (muestran|indican)|cifras?|estad[ií]sticas?)\b/i;
   function oraciones(t) { return String(t).match(/[^.!?]+[.!?]+(\s|$)|[^.!?]+$/g) || []; }
   async function sinRespaldo(signal) {
     const { documentoNumerado, pedirHerramienta, el, tarjeta, etiqueta, verificar, irA, registrar } = H();
@@ -266,7 +266,7 @@ ${xs.map((x, k) => `[${k + 1}] Cita: ${x.cita}\nHallazgos: ${x.ficha.hallazgos}\
     const cuerpo = doc.parrafos.filter(p => p.texto.trim().length > 40 && !Doc.esTitulo(p.estilo) && !(ini >= 0 && p.i >= ini && p.i <= fin));
     // 1) Reglas: datos o generalizaciones sin cita en la misma oración
     const hall = [];
-    cuerpo.forEach(p => oraciones(p.texto).forEach(o => { if (RE_ALERTA.test(o) && !RE_CITA.test(o) && !/\b(en este estudio|los resultados de (este|la presente)|se encontr[oó] que el \d+)/i.test(o)) hall.push({ parrafo: p.i, frase: o.trim(), motivo: /%|\d/.test(o) ? "Dato o cifra sin fuente" : "Generalización sin fuente", origen: "reglas" }); }));
+    cuerpo.forEach(p => oraciones(p.texto).forEach(o => { if (RE_ALERTA.test(o.replace(/\[[^\]]*\]/g, "")) && !RE_CITA.test(o) && !/\b(en este estudio|los resultados de (este|la presente)|se encontr[oó] que el \d+)/i.test(o)) hall.push({ parrafo: p.i, frase: o.trim(), motivo: /%|\d/.test(o) ? "Dato o cifra sin fuente" : "Generalización sin fuente", origen: "reglas" }); }));
     // 2) IA: afirmaciones teóricas o causales sin respaldo
     if (!Config.faltaClave()) {
       try {

@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-3.1-185abd" alt="versión 3.1">
+  <img src="https://img.shields.io/badge/versión-3.2-185abd" alt="versión 3.2">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -373,6 +373,13 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 
 ## Novedades
 
+### v3.2 · Investigación teórica y más rigor
+- **Nuevo enfoque teórico-documental** para tesis de filosofía, epistemología o teoría: metodología con corpus y criterios de selección, ficha de análisis documental (en lugar de cuestionario), tesis a defender (en lugar de hipótesis), rúbrica propia y ruta en la guía.
+- **Referencias APA 7 más exactas** desde OpenAlex: títulos en tipo oración, libros y capítulos con su formato, cursivas en revista y volumen (o en el título del libro), sin punto tras «?» y apellidos correctos en nombres con iniciales («John R. Searle» → Searle, J. R.).
+- **Citas mejor armadas** en el proyecto Pro: citas múltiples juntas y en orden alfabético «(A, 2020; B, 2021)» y citas narrativas «Searle (1980) sostiene…».
+- **Más robusto con la IA**: si la respuesta llega incompleta o con otro formato, Romus la ajusta o reintenta, y explica con claridad los errores temporales del servicio.
+- Menos falsas alarmas en «afirmaciones sin respaldo» y en la matriz de coherencia; panel usable hasta 260 px de ancho.
+
 ### v3.1 · Sustentación en PowerPoint
 - **Presentación .pptx real desde Word**: diseño Romus, notas del orador con tiempos y gráficos nativos solo con datos verificados en tu documento.
 - **Romus en PowerPoint** (mismo complemento e instalador): ensayo con cronómetro por diapositiva, revisión de diapositivas y simulacro de jurado por voz.
@@ -462,4 +469,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word y PowerPoint · v3.1</sub></p>
+<p align="center"><sub>Romus para Word y PowerPoint · v3.2</sub></p>

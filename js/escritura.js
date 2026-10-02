@@ -114,6 +114,7 @@ DOCUMENTO:
 ${doc.texto}`, signal);
     const pares = (d.pares || []).map(p => Object.assign(p, { iO: verificar(p.objetivo, doc.parrafos), iC: p.conclusion ? verificar(p.conclusion, doc.parrafos) : -1 })).filter(p => p.iO >= 0);
     pares.forEach(p => { if (p.conclusion && p.iC < 0) { p.estado = "sin_conclusion"; p.conclusion = ""; } });
+    if (!pares.length) throw new Error("No encontré tus objetivos en el documento. Escríbelos bajo un título «Objetivos» y vuelve a intentarlo.");
     const sobran = (d.conclusiones_sin_objetivo || []).filter(x => verificar(x, doc.parrafos) >= 0);
     const ok = pares.filter(p => p.estado === "respondido").length;
     registrar("Conclusiones vs. objetivos", `${ok}/${pares.length}`, "documento");

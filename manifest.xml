@@ -10,7 +10,7 @@
            xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
            xsi:type="TaskPaneApp">
   <Id>5f564e3f-5a46-472e-8454-27f2c1cdfc22</Id>
-  <Version>3.1.0.0</Version>
+  <Version>3.2.0.0</Version>
   <ProviderName>Brian Suárez</ProviderName>
   <DefaultLocale>es-ES</DefaultLocale>
   <DisplayName DefaultValue="Romus"/>
@@ -409,7 +409,7 @@
         <bt:String id="T.sincita" DefaultValue="Lo que el jurado preguntaría «¿según quién?»"/>
         <bt:String id="T.M.Disenar" DefaultValue="Diseñar y analizar: Tamaño de muestra, Instrumento, Validación por jueces, Ética, SPSS o R, ATLAS.ti."/>
         <bt:String id="T.muestra" DefaultValue="Cálculo exacto y párrafo para tu método"/>
-        <bt:String id="T.instrumento" DefaultValue="Cuestionario o guion de entrevista"/>
+        <bt:String id="T.instrumento" DefaultValue="Cuestionario, guion de entrevista o ficha documental"/>
         <bt:String id="T.validacion" DefaultValue="V de Aiken y Lawshe"/>
         <bt:String id="T.etica" DefaultValue="Consentimientos, asentimiento y carta"/>
         <bt:String id="T.spss" DefaultValue="Sintaxis y resultados en APA verificados"/>

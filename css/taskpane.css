@@ -588,3 +588,10 @@ main > .lector, main > .progreso { position: sticky; top: 0; z-index: 3; box-sha
 .inv-herramientas { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
 .etapa-herr { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 @media (max-width: 300px) { .herramientas-etapa, .etapa-herr { grid-template-columns: 1fr; } }
+@media (max-width: 300px) {
+  .barra { padding-left: 8px; }
+  .barra .estado { display: none; }
+  .acciones-barra { gap: 0; }
+  .acciones-barra .icono { width: 30px; }
+  .marca-txt small { display: none; }
+}
