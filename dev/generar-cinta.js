@@ -55,6 +55,11 @@ function control(c, dentroMenu) {
 function menu(m) {
   return `<Control xsi:type="Menu" id="Romus.Menu.${m.menu}"><Label resid="${etiqueta("M." + m.menu, m.nombre)}"/><Supertip><Title resid="L.M.${m.menu}"/><Description resid="${tip("M." + m.menu, m.nombre + ": " + m.items.map(k => (EXTRA[k] ? EXTRA[k][0] : HT.porId(k).nombre)).join(", ") + ".")}"/></Supertip>${icono(m.ico)}<Items>${m.items.map(k => control(k, true)).join("")}</Items></Control>`;
 }
+const PPT = [
+  ["romusPptEnsayo", "Ensayo", "Ensaya tu sustentación con cronómetro por diapositiva, tiempo total y tus notas del orador.", "cronometro"],
+  ["romusPptRevision", "Revisar diapositivas", "Avisa cuando hay demasiado texto, letra pequeña, muchas viñetas o diapositivas sin notas.", "revisor"],
+  ["romusPptJurado", "Simulacro de jurado", "Romus te pregunta como un jurado sobre tus diapositivas y evalúa tus respuestas por voz.", "sustentacion"]
+];
 const grupos = GRUPOS.map(g => `<Group id="Romus.G.${g.id}"><Label resid="${etiqueta("G." + g.id, g.nombre)}"/>${g.ico === "logo" ? iconoLogo : icono(g.ico)}${g.controles.map(c => typeof c === "string" ? control(c) : menu(c)).join("")}</Group>`).join("\n              ");
 
 const manifiesto = `<?xml version="1.0" encoding="UTF-8"?>
@@ -73,7 +78,7 @@ const manifiesto = `<?xml version="1.0" encoding="UTF-8"?>
   <ProviderName>Brian Suárez</ProviderName>
   <DefaultLocale>es-ES</DefaultLocale>
   <DisplayName DefaultValue="Romus"/>
-  <Description DefaultValue="Romus: asistente de voz con IA y asesor de investigación para Word. Lee, corrige, aplica normas APA 7 y te acompaña desde la idea hasta la sustentación."/>
+  <Description DefaultValue="Romus: asistente de voz con IA y asesor de investigación para Word y PowerPoint. Lee, corrige, aplica normas APA 7, te acompaña desde la idea hasta la sustentación y te ayuda a ensayarla."/>
   <IconUrl DefaultValue="${BASE}/assets/iconos/icon-32.png"/>
   <HighResolutionIconUrl DefaultValue="${BASE}/assets/iconos/icon-64.png"/>
   <SupportUrl DefaultValue="${BASE}/"/>
@@ -82,12 +87,8 @@ const manifiesto = `<?xml version="1.0" encoding="UTF-8"?>
   </AppDomains>
   <Hosts>
     <Host Name="Document"/>
+    <Host Name="Presentation"/>
   </Hosts>
-  <Requirements>
-    <Sets DefaultMinVersion="1.1">
-      <Set Name="WordApi" MinVersion="1.3"/>
-    </Sets>
-  </Requirements>
   <DefaultSettings>
     <SourceLocation DefaultValue="${BASE}/taskpane.html"/>
   </DefaultSettings>
@@ -125,6 +126,35 @@ const manifiesto = `<?xml version="1.0" encoding="UTF-8"?>
           </ExtensionPoint>
         </DesktopFormFactor>
       </Host>
+      <Host xsi:type="Presentation">
+        <Runtimes>
+          <Runtime resid="Ppt.Url" lifetime="long"/>
+        </Runtimes>
+        <DesktopFormFactor>
+          <GetStarted>
+            <Title resid="GetStarted.Title"/>
+            <Description resid="GetStarted.DescPpt"/>
+            <LearnMoreUrl resid="GetStarted.LearnMoreUrl"/>
+          </GetStarted>
+          <FunctionFile resid="Ppt.Url"/>
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <CustomTab id="Romus.TabPpt">
+              <Group id="Romus.G.Sustentacion">
+                <Label resid="L.G.Sust"/>
+                ${iconoLogo}
+                <Control xsi:type="Button" id="Romus.Ppt.Abrir">
+                  <Label resid="L.Abrir"/>
+                  <Supertip><Title resid="L.Abrir"/><Description resid="T.PptAbrir"/></Supertip>
+                  ${iconoLogo}
+                  <Action xsi:type="ShowTaskpane"><TaskpaneId>RomusPpt</TaskpaneId><SourceLocation resid="Ppt.Url"/></Action>
+                </Control>
+                ${PPT.map(([fn, et, tipo, ico]) => `<Control xsi:type="Button" id="Romus.${fn}"><Label resid="${etiqueta(fn, et)}"/><Supertip><Title resid="L.${fn}"/><Description resid="${tip(fn, tipo)}"/></Supertip>${icono(ico)}<Action xsi:type="ExecuteFunction"><FunctionName>${fn}</FunctionName></Action></Control>`).join("\n                ")}
+              </Group>
+              <Label resid="Tab.Label"/>
+            </CustomTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
     </Hosts>
     <Resources>
       <bt:Images>
@@ -135,6 +165,7 @@ ${[...imgs.entries()].map(([ico, id]) => [16, 32, 80].map(s => `        <bt:Imag
       </bt:Images>
       <bt:Urls>
         <bt:Url id="Taskpane.Url" DefaultValue="${BASE}/taskpane.html"/>
+        <bt:Url id="Ppt.Url" DefaultValue="${BASE}/ppt.html"/>
         <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="${BASE}/tutorial.html"/>
       </bt:Urls>
       <bt:ShortStrings>
@@ -142,10 +173,13 @@ ${[...imgs.entries()].map(([ico, id]) => [16, 32, 80].map(s => `        <bt:Imag
         <bt:String id="Group.Label" DefaultValue="Romus"/>
         <bt:String id="Button.Label" DefaultValue="Romus"/>
         <bt:String id="Tab.Label" DefaultValue="Romus"/>
+        <bt:String id="L.G.Sust" DefaultValue="Sustentación"/>
 ${[...cortas.entries()].map(([id, t]) => `        <bt:String id="${id}" DefaultValue="${x(t)}"/>`).join("\n")}
       </bt:ShortStrings>
       <bt:LongStrings>
         <bt:String id="GetStarted.Description" DefaultValue="Usa la pestaña «Romus» de la cinta o di «Ok Romus» seguido de tu orden."/>
+        <bt:String id="GetStarted.DescPpt" DefaultValue="Abre la pestaña «Romus» para ensayar tu sustentación, revisar tus diapositivas y hacer el simulacro de jurado."/>
+        <bt:String id="T.PptAbrir" DefaultValue="Abre Romus en PowerPoint: ensayo con cronómetro, revisión de diapositivas y simulacro de jurado."/>
         <bt:String id="Button.Tooltip" DefaultValue="Abre Romus: voz, corrección con IA, asesor de investigación y normas APA 7."/>
 ${[...largas.entries()].map(([id, t]) => `        <bt:String id="${id}" DefaultValue="${x(t)}"/>`).join("\n")}
       </bt:LongStrings>

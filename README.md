@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-3.0-185abd" alt="versión 3.0">
+  <img src="https://img.shields.io/badge/versión-3.1-185abd" alt="versión 3.1">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -134,6 +134,7 @@ Desde la versión 3.0, Romus tiene **su propia pestaña en la cinta de opciones 
 | **Investigación** | Asesor · Mi proyecto · Crear proyecto ★ · Planear y fundamentar ▾ · Diseñar y analizar ▾ · Escribir y entregar ▾ |
 | **APA 7** | Asesor APA · Revisor · Formato · Referencia |
 | **Ayuda** | Aprender ▾ (Guía, Teoría, Tutorial, Qué puedo decir) · Modo director |
+| **PowerPoint · Sustentación** | Abrir Romus · Ensayo · Revisar diapositivas · Simulacro de jurado |
 
 Los botones que actúan directamente funcionan en Microsoft 365 (Word 2205 o posterior), Word 2024, Word para la web y Word para Mac 16.61 o posterior. En versiones anteriores, el botón deja la acción lista y se ejecuta al abrir el panel. Si ya tenías Romus, **vuelve a ejecutar el instalador** para ver la pestaña nueva. Con el panel cerrado, Romus deja de escuchar, salvo que la burbuja esté abierta.
 
@@ -170,6 +171,26 @@ Los botones que actúan directamente funcionan en Microsoft 365 (Word 2205 o pos
 - **Acta de asesoría** en Word, con temas, avances, compromisos con fecha y firmas, a partir de las sesiones de Romus.
 - **Modo director**: el docente abre el trabajo de un estudiante y obtiene un **informe de revisión** (rúbrica, APA 7, avance, fortalezas, aspectos por mejorar y concepto) y el seguimiento de todos sus estudiantes.
 - **Script de R y jamovi**, además de la sintaxis de SPSS.
+
+## Sustentación en PowerPoint
+
+El contenido y las preguntas del jurado salen de tu documento; el ensayo ocurre en PowerPoint. Romus acompaña las dos partes.
+
+**1. Desde Word: tu presentación real (.pptx).** Pestaña Romus → *Escribir y entregar → Presentación* (o «haz las diapositivas de la sustentación»). Romus arma la presentación con diseño propio, **notas del orador con el tiempo sugerido para cada diapositiva** y **gráficos nativos de PowerPoint solo cuando sus datos aparecen en tu documento**; si un número no está en tu tesis, el gráfico se descarta y queda una sugerencia de visual.
+
+<p align="center"><img src="assets/capturas/presentacion.png" width="900" alt="Diapositivas generadas por Romus: portada, contenido, sección, gráfico con datos verificados y cierre"></p>
+
+**2. En PowerPoint: Romus · Sustentación.** El mismo complemento aparece en PowerPoint con su pestaña **Romus**:
+
+| Botón | Qué hace |
+|---|---|
+| **Ensayo** | Cronómetro por diapositiva y total, con el tiempo de cada una tomado de tus notas. Avanza con las flechas o con PowerPoint (el ensayo te sigue). Lee tus notas en voz alta si quieres. Al terminar: tiempo planeado frente a real por diapositiva, dónde te extendiste y comparación con el ensayo anterior. |
+| **Revisar diapositivas** | Con reglas fijas, sin IA: demasiado texto, demasiadas viñetas, frases largas, letra menor de 18 pt, diapositivas sin notas, varias seguidas solo con texto y número de diapositivas para tu tiempo. Si conectaste una IA, propone una versión corta para copiar. |
+| **Simulacro de jurado** | Preguntas de jurado sobre tus diapositivas y notas, en voz alta. Respondes hablando (o escribiendo) y recibes nota en claridad, fundamento y precisión, lo que faltó y una respuesta más sólida. Al final, qué repasar. |
+
+<p align="center"><img src="assets/capturas/powerpoint.png" width="900" alt="Romus en PowerPoint: ensayo con cronómetro, simulacro de jurado y revisión de diapositivas"></p>
+
+Romus lee la presentación completa (texto, letra, imágenes y notas) con la API común de Office, así que el ensayo y la revisión funcionan en PowerPoint de escritorio, en la web y en Mac. La voz del simulacro usa la IA que conectaste (Gemini sirve).
 
 ## Lo que hace a Romus insustituible
 
@@ -332,6 +353,8 @@ romus/
 │   ├── escritura.js      discusión, conclusiones, resumen/abstract, artículo, revistas y diapositivas
 │   ├── revision.js       respuesta a observaciones, acta de asesoría y modo director
 │   ├── herramientas.js   catálogo único de herramientas (panel, etapas y cinta de Word)
+│   ├── presentacion.js   presentación .pptx de sustentación (diseño, notas, gráficos verificados)
+│   ├── ppt.js            Romus para PowerPoint: ensayo, revisión de diapositivas y simulacro de jurado
 │   ├── guia.js           guía metodológica: 32 temas, buscador y rutas del tutorial
 │   ├── teoria.js         biblioteca «Teoría: conocimiento científico» (Suárez, 2025): 39 temas
 │   ├── romus.js          la esfera holográfica de Romus
@@ -349,6 +372,10 @@ Todo es HTML, CSS y JavaScript puro: no hace falta compilar nada. Para publicar 
 Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canvas 2D · APIs de Anthropic, OpenAI y Gemini, más cualquier API compatible con OpenAI · GitHub Pages.
 
 ## Novedades
+
+### v3.1 · Sustentación en PowerPoint
+- **Presentación .pptx real desde Word**: diseño Romus, notas del orador con tiempos y gráficos nativos solo con datos verificados en tu documento.
+- **Romus en PowerPoint** (mismo complemento e instalador): ensayo con cronómetro por diapositiva, revisión de diapositivas y simulacro de jurado por voz.
 
 ### v3.0 · Romus en la cinta de Word, APA 7 y la tesis completa
 - **Pestaña «Romus» en la cinta de Word** con 5 grupos y 48 acciones directas (runtime compartido); respaldo para versiones anteriores.
@@ -435,4 +462,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word · v3.0</sub></p>
+<p align="center"><sub>Romus para Word y PowerPoint · v3.1</sub></p>

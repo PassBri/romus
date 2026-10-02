@@ -298,7 +298,7 @@ ${doc.texto}`, signal);
     if (/(convierte|pasa|transforma|haz|hazme)( mi| la)? (tesis|trabajo) (en|a)( un)? articulo|^articulo (cientifico )?(de|desde) (mi |la )?tesis$/.test(n)) return tarea(articulo);
     const m = original.match(/d[oó]nde\s+(?:puedo\s+)?publico(?:\s+sobre)?\s*(.*)$|revistas\s+(?:para|sobre|de)\s+(.+)$/i);
     if (m && /(publico|revistas)/.test(n)) return tarea(() => revistas((m[1] || m[2] || "").replace(/[?.!]+$/, "")));
-    if (/(diapositivas|presentacion|powerpoint)/.test(n) && /(sustentacion|haz|hazme|crea|genera|prepara)/.test(n)) return tarea(diapositivas);
+    if (/(diapositivas|presentacion|powerpoint)/.test(n) && /(sustentacion|haz|hazme|crea|genera|prepara)/.test(n)) return tarea(() => window.Presentacion ? Presentacion.crear() : diapositivas());
     return null;
   }
 

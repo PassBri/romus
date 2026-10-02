@@ -1,0 +1,32 @@
+/* Romus para PowerPoint */
+.marca-txt small { font-weight: 400; color: var(--texto-2); font-size: 12px; }
+.ppt .seccion { border-top: none; }
+.ensayo-config { margin-bottom: 10px; }
+.cronos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.crono { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--linea); background: var(--superficie); transition: border-color .2s, background .2s; }
+.crono small { font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--texto-2); }
+.crono b { font-size: 30px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.crono span { font-size: 11.5px; color: var(--texto-2); font-variant-numeric: tabular-nums; }
+.crono.excedido { border-color: var(--error); background: color-mix(in srgb, var(--error) 8%, var(--superficie)); }
+.barra-crono { display: block; height: 4px; border-radius: 99px; background: var(--linea); overflow: hidden; margin-top: 6px; }
+.barra-crono i { display: block; height: 100%; width: 0; background: var(--ok); transition: width .25s linear; }
+.barra-crono i.medio { background: var(--oro); } .barra-crono i.mal { background: var(--error); }
+.diapo-actual { display: flex; align-items: baseline; gap: 8px; margin: 12px 0 8px; }
+.num-diapo { font-size: 11px; font-weight: 700; color: var(--acento); background: var(--acento-suave); padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+.diapo-actual b { font-size: 14px; line-height: 1.35; }
+.ensayo-botones { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 6px 0 12px; }
+.ensayo-botones .play { min-width: 140px; height: 38px; font-size: 13px; }
+.grande-borde { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--linea-2); }
+.notas-cab { display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--texto-2); margin-bottom: 4px; }
+.notas-orador { font-size: 15px; line-height: 1.6; padding: 12px 14px; border-radius: 10px; background: var(--superficie); border: 1px solid var(--linea); max-height: 38vh; overflow-y: auto; white-space: pre-wrap; }
+#resEnsayo, #resRevision, #juradoResumen { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; font-size: 12.5px; }
+#juradoInicio, #juradoPregunta { display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; }
+.pregunta-jurado { font-size: 17px; font-weight: 600; line-height: 1.45; margin: 2px 0 4px; }
+.eval-jurado { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--linea); background: var(--superficie); }
+.notas-jurado { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.notas-jurado span { display: flex; flex-direction: column; align-items: center; padding: 6px; border-radius: 8px; background: var(--superficie-2); }
+.notas-jurado b { font-size: 18px; } .notas-jurado small { font-size: 10.5px; color: var(--texto-2); }
+.notas-jurado .ok b { color: var(--ok); } .notas-jurado .medio b { color: var(--oro); } .notas-jurado .mal b { color: var(--error); }
+.ppt textarea.ajuste { width: 100%; font: inherit; font-size: 13px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--linea-2); background: var(--superficie); color: var(--texto); box-sizing: border-box; resize: vertical; }
+.ppt .prioridad strong { font-weight: 600; }
+.ppt .guia-caja small, .ppt .guia-caja span { text-transform: none; letter-spacing: 0; font-size: 12px; color: var(--texto-2); }

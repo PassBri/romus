@@ -59,6 +59,7 @@ window.Herramientas = (function () {
     formal: '<path d="M3 9l9-5 9 5-9 5zM7 11.5V16c3 2 7 2 10 0v-4.5"/>',
     dictar: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 20h14"/>',
     mas: '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
+    cronometro: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5M18.5 6.5l1.5-1.5"/>',
     ayuda: '<circle cx="12" cy="12" r="9.5"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.2-2.5 3.9"/><circle cx="12" cy="17.2" r=".6"/>'
   };
 
@@ -90,7 +91,7 @@ window.Herramientas = (function () {
     ["entregar", "observaciones", "Observaciones", "Matriz de respuesta al jurado o asesor", "observaciones", run(() => Revision.observaciones())],
     ["entregar", "acta", "Acta de asesoría", "Con compromisos y firmas", "acta", () => Revision.acta()],
     ["entregar", "sustentacion", "Simulacro de sustentación", "Romus hace de jurado por voz", "sustentacion", cmd("simulacro de sustentación")],
-    ["entregar", "diapositivas", "Diapositivas", "Esquema para PowerPoint y guion", "diapositivas", run(() => Escritura.diapositivas())],
+    ["entregar", "diapositivas", "Presentación", "PowerPoint con notas del orador y gráficos", "diapositivas", run(() => Presentacion.crear())],
     ["entregar", "articulo", "Tesis → artículo", "Borrador IMRyD y revistas", "articulo", run(() => Escritura.articulo())],
     ["entregar", "usoia", "Uso de IA", "Declaración para tu universidad", "usoia", cmd("declaración de uso de IA")],
     ["aprender", "guia", "Guía", "Dudas de metodología", "guia", cmd("abre la guía")],
