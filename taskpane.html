@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Romus</title>
   <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
-  <link rel="stylesheet" href="css/taskpane.css?v=3.4">
+  <link rel="stylesheet" href="css/taskpane.css?v=3.5">
 </head>
 <body>
   <div id="app">
@@ -66,13 +66,31 @@
       </div>
 
       <div id="avisoClave" class="bienvenida oculto">
-        <div class="bv-cab"><b>Bienvenido a Romus</b><span>3 pasos y listo</span></div>
-        <ol class="bv-pasos">
+        <div class="bv-cab"><b>Bienvenido a Romus</b><span>Conecta tu IA</span></div>
+        <div class="bv-opciones" role="tablist" aria-label="Formas de conectar la IA">
+          <button class="bv-op" data-op="clic" role="tab"><b>⚡ Un clic</b><small>Con tu cuenta, sin copiar claves</small></button>
+          <button class="bv-op activa" data-op="gemini" role="tab"><b>Gemini gratis</b><small>Copias y pegas una clave</small></button>
+          <button class="bv-op" data-op="respaldo" role="tab"><b>Tengo un respaldo</b><small>De otro equipo o de antes</small></button>
+        </div>
+        <div class="bv-panel oculto" data-op="clic">
+          <p>Inicia sesión en <b>OpenRouter</b> (puedes usar tu cuenta de Google) y Romus recibe la conexión solo. Desde ahí puedes usar modelos gratuitos o, si recargas saldo, Claude, GPT o Gemini.</p>
+          <button id="btnUnClic" class="boton primario">Conectar con un clic</button>
+          <small class="bv-nota-suave">Los modelos gratuitos tienen un límite diario de consultas. Para corregir y consultar alcanza; para proyectos largos conviene Gemini o recargar saldo.</small>
+        </div>
+        <div class="bv-panel oculto" data-op="respaldo">
+          <p>Pega el código de respaldo (empieza por <b>ROMUS1-</b>) o carga el archivo que guardaste. Se suman tus IA, tu nivel, tu enfoque y los datos de tu proyecto.</p>
+          <textarea id="inpRespaldoBv" class="ajuste" rows="2" placeholder="ROMUS1-…" spellcheck="false"></textarea>
+          <div class="bv-fila"><button id="btnImportarBv" class="boton primario">Restaurar</button><label class="boton secundario archivo">Cargar archivo<input id="filRespaldoBv" type="file" accept=".txt,text/plain" hidden></label></div>
+        </div>
+        <ol class="bv-pasos bv-panel" data-op="gemini">
           <li><span>Consigue tu clave <b>gratis</b> de Google Gemini (con tu cuenta de Google).</span>
             <button id="btnClaveGemini" class="boton secundario">Abrir aistudio.google.com ↗</button></li>
           <li><span>Pégala aquí:</span>
-            <div class="bv-fila"><input id="inpClaveRapida" type="password" placeholder="AIza…" autocomplete="off" spellcheck="false"><button id="btnConectarRapido" class="boton primario">Conectar</button></div>
-            <small id="bvNota"></small></li>
+            <button id="btnPegarCopiada" class="chip-pegar oculto" type="button"></button>
+            <div class="bv-fila"><input id="inpClaveRapida" type="password" placeholder="AIza… (o una clave de Claude, OpenAI, Groq…)" autocomplete="off" spellcheck="false"><button id="btnConectarRapido" class="boton primario">Conectar</button></div>
+            <small id="bvNota"></small>
+            <button id="btnVerGuia" class="enlace-sutil" type="button">Ver cómo se hace (animación)</button>
+            <div id="guiaGemini"></div></li>
           <li><span>Activa <b>Siempre atento</b> y di <b>«Ok Romus, lee el documento»</b>. ¿Vas a investigar? Abre la pestaña <b>Investigar</b>.</span></li>
         </ol>
         <div class="bv-pie"><button id="btnIrAjustes" class="enlace-sutil">Usar otra IA (Claude, ChatGPT…)</button><a class="enlace-sutil" href="https://passbri.github.io/romus/tutorial.html" target="_blank" rel="noopener">Ver tutorial</a></div>
@@ -282,7 +300,16 @@
         <button id="btnCerrarAjustes" class="icono" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       </div>
       <div class="hoja-cuerpo">
-        <h3>Inteligencia artificial</h3>
+        <h3>Conexión rápida</h3>
+        <div class="conexion-rapida">
+          <button id="btnUnClicAj" class="boton secundario" type="button">⚡ Conectar con un clic (OpenRouter)</button>
+          <label class="campo">Pegar cualquier clave (Romus reconoce de qué IA es)
+            <div class="con-boton"><input type="password" id="inpClaveAuto" placeholder="AIza…, sk-ant-…, sk-…, gsk_…" autocomplete="off" spellcheck="false"><button id="btnClaveAuto" class="boton secundario" type="button">Conectar</button></div>
+          </label>
+          <div id="modelosGratis" class="campo oculto"><span>Modelo gratuito de OpenRouter</span><select id="selModeloGratis"></select><small>Solo se muestran modelos gratuitos que manejan las herramientas de Romus.</small></div>
+          <p id="notaConexion" class="nota"></p>
+        </div>
+        <h3>Inteligencia artificial (todas tus IA)</h3>
         <label class="campo">IA en uso
           <div class="con-boton">
             <select id="selPerfil"></select>
@@ -324,6 +351,18 @@
           </div>
           <p id="resultadoPrueba" class="nota"></p>
         </div>
+
+        <h3>Respaldo de la configuración</h3>
+        <p class="nota">Guarda tus IA, claves, nivel, enfoque y datos del proyecto para no volver a configurarlos (otro computador, caché de Word limpiada…). <b>El respaldo incluye tus claves: guárdalo en privado.</b></p>
+        <div class="fila">
+          <button id="btnCopiarRespaldo" class="boton secundario" type="button">Copiar código</button>
+          <button id="btnDescargarRespaldo" class="boton secundario" type="button">Descargar archivo</button>
+        </div>
+        <label class="campo">Restaurar un respaldo
+          <div class="con-boton"><input type="text" id="inpRespaldo" placeholder="ROMUS1-…" autocomplete="off" spellcheck="false"><button id="btnImportarRespaldo" class="boton secundario" type="button">Restaurar</button></div>
+          <label class="enlace-sutil archivo">o cargar el archivo<input id="filRespaldo" type="file" accept=".txt,text/plain" hidden></label>
+        </label>
+        <p id="notaRespaldo" class="nota"></p>
 
         <h3>Asesor de investigación</h3>
         <label class="campo">Cómo te ayuda Romus en tu proyecto
@@ -479,29 +518,30 @@
     </div>
   </div>
 
-  <script src="js/config.js?v=3.4"></script>
-  <script src="js/voz.js?v=3.4"></script>
-  <script src="js/escucha.js?v=3.4"></script>
-  <script src="js/orbe.js?v=3.4"></script>
-  <script src="js/romus.js?v=3.4"></script>
-  <script src="js/ia.js?v=3.4"></script>
-  <script src="js/documento.js?v=3.4"></script>
-  <script src="js/panel.js?v=3.4"></script>
-  <script src="js/guia.js?v=3.4"></script>
-  <script src="js/teoria.js?v=3.4"></script>
-  <script src="js/investigacion.js?v=3.4"></script>
-  <script src="js/jurado.js?v=3.4"></script>
-  <script src="js/asesor.js?v=3.4"></script>
-  <script src="js/datos.js?v=3.4"></script>
-  <script src="js/docx.js?v=3.4"></script>
-  <script src="js/formato.js?v=3.4"></script>
-  <script src="js/apa.js?v=3.4"></script>
-  <script src="js/instrumentos.js?v=3.4"></script>
-  <script src="js/biblioteca.js?v=3.4"></script>
-  <script src="js/escritura.js?v=3.4"></script>
-  <script src="js/revision.js?v=3.4"></script>
-  <script src="js/presentacion.js?v=3.4"></script>
-  <script src="js/herramientas.js?v=3.4"></script>
-  <script src="js/app.js?v=3.4"></script>
+  <script src="js/config.js?v=3.5"></script>
+  <script src="js/voz.js?v=3.5"></script>
+  <script src="js/escucha.js?v=3.5"></script>
+  <script src="js/orbe.js?v=3.5"></script>
+  <script src="js/romus.js?v=3.5"></script>
+  <script src="js/ia.js?v=3.5"></script>
+  <script src="js/conexion.js?v=3.5"></script>
+  <script src="js/documento.js?v=3.5"></script>
+  <script src="js/panel.js?v=3.5"></script>
+  <script src="js/guia.js?v=3.5"></script>
+  <script src="js/teoria.js?v=3.5"></script>
+  <script src="js/investigacion.js?v=3.5"></script>
+  <script src="js/jurado.js?v=3.5"></script>
+  <script src="js/asesor.js?v=3.5"></script>
+  <script src="js/datos.js?v=3.5"></script>
+  <script src="js/docx.js?v=3.5"></script>
+  <script src="js/formato.js?v=3.5"></script>
+  <script src="js/apa.js?v=3.5"></script>
+  <script src="js/instrumentos.js?v=3.5"></script>
+  <script src="js/biblioteca.js?v=3.5"></script>
+  <script src="js/escritura.js?v=3.5"></script>
+  <script src="js/revision.js?v=3.5"></script>
+  <script src="js/presentacion.js?v=3.5"></script>
+  <script src="js/herramientas.js?v=3.5"></script>
+  <script src="js/app.js?v=3.5"></script>
 </body>
 </html>

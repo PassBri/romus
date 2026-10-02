@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Romus · Conectar la IA</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <style>
+    :root { color-scheme: light dark; --fondo: #f6f8fc; --texto: #1d2433; --suave: #5b6478; --acento: #2563eb; }
+    @media (prefers-color-scheme: dark) { :root { --fondo: #0f1626; --texto: #e7ecf6; --suave: #9aa6bd; --acento: #6ea0ff; } }
+    body { margin: 0; font: 15px/1.5 "Segoe UI", system-ui, sans-serif; background: var(--fondo); color: var(--texto); display: grid; place-items: center; min-height: 100vh; text-align: center; padding: 16px; box-sizing: border-box; }
+    .caja { max-width: 360px; }
+    .orbe { width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 14px; background: radial-gradient(circle at 35% 35%, #8fb4ff, #2a4ea8 60%, #0f1f4a); box-shadow: 0 0 24px #4b7bff66; animation: latir 1.6s ease-in-out infinite; }
+    @keyframes latir { 50% { transform: scale(1.08); } }
+    p { color: var(--suave); margin: 6px 0; }
+    b { color: var(--texto); }
+    button { margin-top: 12px; font: inherit; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--acento); background: var(--acento); color: #fff; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="caja">
+    <div class="orbe" aria-hidden="true"></div>
+    <b id="titulo">Conectando Romus con OpenRouter…</b>
+    <p id="detalle">Un momento.</p>
+    <div id="acciones"></div>
+  </div>
+  <script>
+    /* Página puente del inicio de sesión con OpenRouter (OAuth PKCE).
+       1) ?ir=openrouter&reto=… → lleva a OpenRouter.  2) OpenRouter vuelve aquí con ?code=… → se lo entrega a Romus. */
+    (function () {
+      const q = new URLSearchParams(location.search);
+      const callback = location.origin + location.pathname;
+      const $ = (id) => document.getElementById(id);
+      function enviar(datos) {
+        const msg = JSON.stringify(Object.assign({ tipo: "romus-openrouter" }, datos));
+        const porOffice = () => { try { Office.context.ui.messageParent(msg); return true; } catch (e) { return false; } };
+        const porVentana = () => { try { if (window.opener) { window.opener.postMessage(msg, location.origin); setTimeout(() => window.close(), 300); return true; } } catch (e) { /* sin ventana madre */ } return false; };
+        if (window.Office && Office.onReady) Office.onReady(() => { if (!porOffice() && !porVentana()) listo(datos); });
+        else if (!porVentana()) listo(datos);
+      }
+      function listo(datos) {
+        $("titulo").textContent = datos.codigo ? "¡Listo!" : "No se completó la conexión";
+        $("detalle").textContent = datos.codigo ? "Ya puedes cerrar esta ventana y volver a Romus." : "Cierra esta ventana y vuelve a intentarlo desde Romus.";
+      }
+      if (q.get("ir") === "openrouter" && q.get("reto")) {
+        $("detalle").innerHTML = "Te llevo a OpenRouter. Inicia sesión (puedes usar tu cuenta de <b>Google</b>) y pulsa <b>Authorize</b>.";
+        const url = "https://openrouter.ai/auth?callback_url=" + encodeURIComponent(callback) + "&code_challenge=" + encodeURIComponent(q.get("reto")) + "&code_challenge_method=S256";
+        setTimeout(() => location.replace(url), 700);
+      } else if (q.get("code")) {
+        $("titulo").textContent = "Autorización recibida";
+        $("detalle").textContent = "Entregando la conexión a Romus…";
+        enviar({ codigo: q.get("code") });
+      } else {
+        enviar({ error: q.get("error") ? "cancelado" : "sin-codigo" });
+      }
+    })();
+  </script>
+</body>
+</html>

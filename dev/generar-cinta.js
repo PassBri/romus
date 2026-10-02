@@ -21,7 +21,7 @@ const EXTRA = {
   Simplificar: ["Simplificar", "Reescribe la selección con un lenguaje más sencillo.", "simplificar"], Formal: ["Más formal", "Reescribe la selección con tono académico.", "formal"],
   Dictar: ["Dictar", "Lo que digas se escribe en el documento.", "dictar"], Ayuda: ["Qué puedo decir", "Comandos de voz y colores de Romus.", "ayuda"],
   Asesor: ["Asesor", "Tu asesor de investigación: te guía según dónde estés.", "asesor"], MiProyecto: ["Mi proyecto", "Avance, etapa, cronograma y sesiones de asesoría.", "proyecto"],
-  ConectarIA: ["Conectar IA", "Configura tu inteligencia artificial: proveedor, clave y modelo (Gemini gratis, Claude, OpenAI…).", "conectar"],
+  ConectarIA: ["Conectar IA", "Conecta tu IA con un clic (OpenRouter), pegando cualquier clave (Gemini gratis, Claude, OpenAI…) o restaurando un respaldo.", "conectar"],
   NivelPregrado: ["Pregrado", "Trabajo de grado de pregrado.", "nivel"], NivelEspecializacion: ["Especialización", "Trabajo aplicado o de intervención.", "nivel"],
   NivelMaestria: ["Maestría", "Tesis de investigación o de profundización.", "nivel"], NivelDoctorado: ["Doctorado", "Proyecto de tesis doctoral.", "nivel"],
   NivelPosdoctorado: ["Posdoctorado", "Proyecto posdoctoral financiable.", "nivel"],

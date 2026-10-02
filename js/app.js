@@ -1330,6 +1330,7 @@
     Config.set({ perfilActivo: id });
     estado.historial = []; // cada IA empieza su propia conversación
     pintarPerfiles();
+    if (typeof pintarModelosGratis === "function") pintarModelosGratis();
     actualizarAvisoClave();
   }
 
@@ -1354,6 +1355,93 @@
 
   }
 
+  /* ---------- Conexión fácil de la IA (un clic, Gemini guiado y respaldo) ---------- */
+  function iniciarConexion(conectarRapido) {
+    if (!window.Conexion) return;
+    Conexion.alConectar = (perfil, res) => {
+      pintarPerfiles(); activarPerfil(Config.get().perfilActivo); actualizarChipIA(); pintarModelosGratis();
+      if (res && res.mensaje) { $("notaConexion").textContent = res.mensaje; }
+    };
+    // Pestañas de la bienvenida
+    document.querySelectorAll(".bv-op").forEach(b => b.addEventListener("click", () => {
+      document.querySelectorAll(".bv-op").forEach(x => x.classList.toggle("activa", x === b));
+      document.querySelectorAll(".bv-panel").forEach(x => x.classList.toggle("oculto", x.dataset.op !== b.dataset.op));
+      if (b.dataset.op === "gemini") ofrecerPegar();
+    }));
+    // 1. Un clic con OpenRouter
+    const unClic = async (nota) => {
+      const escribir = (t, cls) => { nota.textContent = t; nota.className = cls || "nota"; };
+      try {
+        const res = await Conexion.openRouter((t) => escribir(t));
+        escribir(res.mensaje, res.ok ? (res.aviso ? "aviso-nota" : "ok-nota") : "error-nota");
+        if (res.ok) { agregarMensaje("sistema", `OpenRouter conectado con el modelo ${res.perfil.modelo}. Puedes cambiarlo en Ajustes.`); hablar("Listo, ya estoy conectado."); }
+      } catch (e) { escribir(e.message, "error-nota"); }
+    };
+    $("btnUnClic").addEventListener("click", () => unClic($("bvNota")));
+    $("btnUnClicAj").addEventListener("click", () => unClic($("notaConexion")));
+    // 2. Gemini guiado: guía animada, portapapeles y validación al pegar
+    $("btnVerGuia").addEventListener("click", () => {
+      const g = $("guiaGemini");
+      if (g.firstChild) { g.innerHTML = ""; $("btnVerGuia").textContent = "Ver cómo se hace (animación)"; return; }
+      Conexion.guiaGemini(g); $("btnVerGuia").textContent = "Ocultar la animación";
+    });
+    async function ofrecerPegar() {
+      if ($("avisoClave").classList.contains("oculto") || $("inpClaveRapida").value) return;
+      const r = await Conexion.claveEnPortapapeles();
+      const chip = $("btnPegarCopiada");
+      if (!r) { chip.classList.add("oculto"); return; }
+      chip.textContent = `Pegar la clave de ${r.nombre} que copiaste (…${r.clave.slice(-4)})`;
+      $("bvNota").textContent = ""; $("bvNota").className = "";
+      chip.classList.remove("oculto");
+      chip.onclick = () => { $("inpClaveRapida").value = r.clave; chip.classList.add("oculto"); conectarRapido(); };
+    }
+    window.addEventListener("focus", ofrecerPegar);
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) ofrecerPegar(); });
+    $("inpClaveRapida").addEventListener("paste", () => setTimeout(() => { if (Conexion.reconocer($("inpClaveRapida").value)) conectarRapido(); else $("bvNota").textContent = Conexion.diagnostico($("inpClaveRapida").value); }, 30));
+    // Ajustes: pegar cualquier clave
+    const auto = async () => {
+      const v = $("inpClaveAuto").value.trim(), r = Conexion.reconocer(v);
+      if (!r) { $("notaConexion").textContent = Conexion.diagnostico(v); return; }
+      $("notaConexion").textContent = `Probando la clave de ${r.nombre}…`;
+      const res = await Conexion.conectarClave(v);
+      $("notaConexion").textContent = res.mensaje; if (res.ok) $("inpClaveAuto").value = "";
+    };
+    $("btnClaveAuto").addEventListener("click", auto);
+    $("inpClaveAuto").addEventListener("paste", () => setTimeout(auto, 30));
+    // Modelos gratuitos de OpenRouter
+    $("selModeloGratis").addEventListener("change", () => {
+      const p = Config.perfil(); if (p.proveedor !== "openrouter") return;
+      p.modelo = $("selModeloGratis").value; Config.guardar(); pintarPerfiles();
+      $("notaConexion").textContent = `Modelo: ${p.modelo}.`;
+    });
+    // 3. Respaldo
+    const nota = (t) => { $("notaRespaldo").textContent = t; };
+    $("btnCopiarRespaldo").addEventListener("click", async () => {
+      const cod = Conexion.exportar();
+      try { await navigator.clipboard.writeText(cod); nota("Copié el código de respaldo. Pégalo en un lugar privado (por ejemplo, una nota personal)."); }
+      catch (e) { $("inpRespaldo").value = cod; $("inpRespaldo").select(); nota("Selecciona y copia el código que puse en la casilla (Ctrl + C)."); }
+    });
+    $("btnDescargarRespaldo").addEventListener("click", () => { Conexion.descargarRespaldo(); nota("Descargué el archivo de respaldo. Guárdalo en un lugar privado."); });
+    const restaurar = (codigo, donde) => { try { const r = Conexion.importar(codigo); donde(`Listo: restauré ${r.ias} ${r.ias === 1 ? "IA" : "IA guardadas"} y tus datos.`); } catch (e) { donde(e.message); } };
+    $("btnImportarRespaldo").addEventListener("click", () => restaurar($("inpRespaldo").value, nota));
+    $("btnImportarBv").addEventListener("click", () => restaurar($("inpRespaldoBv").value, (t) => { $("bvNota").textContent = t; }));
+    const archivo = (inp, donde) => inp.addEventListener("change", () => { const f = inp.files[0]; if (!f) return; Conexion.leerArchivo(f).then(r => donde(`Listo: restauré ${r.ias} ${r.ias === 1 ? "IA" : "IA guardadas"} y tus datos.`)).catch(e => donde(e.message)); inp.value = ""; });
+    archivo($("filRespaldo"), nota); archivo($("filRespaldoBv"), (t) => { $("bvNota").textContent = t; });
+    pintarModelosGratis();
+    setTimeout(ofrecerPegar, 800);
+  }
+  async function pintarModelosGratis() {
+    const caja = $("modelosGratis"); if (!caja || !window.Conexion) return;
+    const p = Config.perfil();
+    if (p.proveedor !== "openrouter") { caja.classList.add("oculto"); return; }
+    caja.classList.remove("oculto");
+    try {
+      const l = await Conexion.modelosGratis();
+      $("selModeloGratis").innerHTML = (l.some(m => m.id === p.modelo) ? "" : `<option value="${escaparHTML(p.modelo)}">${escaparHTML(p.modelo)} (actual)</option>`) + l.map(m => `<option value="${escaparHTML(m.id)}">${escaparHTML(m.nombre)}</option>`).join("");
+      $("selModeloGratis").value = p.modelo;
+    } catch (e) { caja.classList.add("oculto"); }
+  }
+
   /* ---------- Pestaña «Romus» de la cinta de Word ---------- */
   const CINTA = {
     Hablar: () => alternarMic(),
@@ -1363,7 +1451,7 @@
     Resumir: "resume el documento en pocas frases", Explicar: "explícame lo que tengo seleccionado con palabras sencillas",
     Simplificar: "reescribe la selección con un lenguaje más sencillo", Formal: "reescribe la selección con un tono más formal y académico",
     Dictar: "modo dictado", Ayuda: () => abrirHoja("panelAyuda"),
-    ConectarIA: () => { abrirHoja("panelAjustes"); setTimeout(() => { const i = $("inpClave"); if (i) i.focus(); }, 150); },
+    ConectarIA: () => { abrirHoja("panelAjustes"); setTimeout(() => { const c = document.querySelector(".conexion-rapida"); if (c) { c.scrollIntoView({ block: "start" }); $("inpClaveAuto").focus(); } }, 150); },
     NivelPregrado: () => fijarDesdeCinta("nivel", "pregrado"), NivelEspecializacion: () => fijarDesdeCinta("nivel", "especializacion"),
     NivelMaestria: () => fijarDesdeCinta("nivel", "maestria"), NivelDoctorado: () => fijarDesdeCinta("nivel", "doctorado"), NivelPosdoctorado: () => fijarDesdeCinta("nivel", "posdoctorado"),
     EnfoqueCuantitativo: () => fijarDesdeCinta("enfoque", "cuantitativo"), EnfoqueCualitativo: () => fijarDesdeCinta("enfoque", "cualitativo"),
@@ -1492,9 +1580,24 @@
       try { if (window.Office && Office.context.ui.openBrowserWindow) { Office.context.ui.openBrowserWindow(url); return; } } catch (e) { /* sin API */ }
       window.open(url, "_blank", "noopener");
     });
-    const conectarRapido = () => {
+    const conectarRapido = async () => {
       const clave = $("inpClaveRapida").value.trim();
       if (clave.length < 20) { $("bvNota").textContent = "Pega la clave completa (empieza por AIza…)."; $("inpClaveRapida").focus(); return; }
+      // Si es una clave de otra IA (Claude, OpenAI, Groq…), Romus la reconoce y la conecta; luego verifica que funcione.
+      if (window.Conexion) {
+        const r = Conexion.reconocer(clave);
+        if (!r) { $("bvNota").textContent = Conexion.diagnostico(clave); $("inpClaveRapida").focus(); return; }
+        $("bvNota").textContent = `Probando la clave de ${r.nombre}…`;
+        const res = await Conexion.conectarClave(clave);
+        $("bvNota").textContent = res.mensaje;
+        $("bvNota").className = res.ok ? (res.aviso ? "aviso-nota" : "ok-nota") : "error-nota";
+        if (!res.ok) return;
+        $("inpClaveRapida").value = "";
+        agregarMensaje("sistema", `${res.perfil.nombre} conectado. Activa «Siempre atento» y di «Ok Romus, lee el documento».`);
+        hablar("Listo, ya estoy conectado. Dime Ok Romus y lo que necesitas.");
+        if (!estado.escuchandoInicial && Config.get().manosLibres && !Voz.escuchando) empezarEscucha();
+        return;
+      }
       const c = Config.get();
       let p = c.perfiles.find(x => x.proveedor === "gemini");
       if (!p) { p = Config.nuevoPerfil("gemini"); c.perfiles.push(p); }
@@ -1506,6 +1609,7 @@
       if (!estado.escuchandoInicial && Config.get().manosLibres && !Voz.escuchando) empezarEscucha();
     };
     $("btnConectarRapido").addEventListener("click", conectarRapido);
+    iniciarConexion(conectarRapido);
     $("inpClaveRapida").addEventListener("keydown", (e) => { if (e.key === "Enter") conectarRapido(); });
     $("btnCerrarAjustes").addEventListener("click", () => { cerrarHoja("panelAjustes"); actualizarAvisoClave(); });
     $("btnAyuda").addEventListener("click", () => abrirHoja("panelAyuda"));

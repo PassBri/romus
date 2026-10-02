@@ -609,3 +609,43 @@ main > .lector, main > .progreso { position: sticky; top: 0; z-index: 3; box-sha
 .ruta-tesis li button { font-weight: 600; padding: 0; text-align: left; }
 .ruta-tesis li small, .ruta-apartados small { display: block; color: var(--texto-2); font-size: 11.5px; }
 .ruta-apartados li.ok { color: var(--ok); }
+
+/* Formas de conectar la IA */
+.bv-opciones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 4px 0 10px; }
+.bv-op { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; text-align: left; font: inherit; padding: 6px 7px; border-radius: 8px; border: 1px solid var(--linea-2); background: var(--superficie); color: var(--texto); cursor: pointer; min-width: 0; }
+.bv-op b { font-size: 12px; }
+.bv-op small { color: var(--texto-2); font-size: 10.5px; line-height: 1.25; }
+.bv-op.activa { border-color: var(--acento); box-shadow: inset 0 0 0 1px var(--acento); }
+.bv-panel p { margin: 0 0 8px; }
+.bv-panel textarea { width: 100%; box-sizing: border-box; margin-bottom: 6px; }
+.bv-nota-suave { display: block; margin-top: 6px; color: var(--texto-2); font-size: 11px; }
+.boton.archivo, .enlace-sutil.archivo { cursor: pointer; }
+.chip-pegar { font: inherit; font-size: 12px; padding: 5px 9px; border-radius: 999px; border: 1px dashed var(--acento); background: var(--superficie); color: var(--acento); cursor: pointer; }
+.ok-nota { color: var(--ok); } .error-nota { color: var(--error); } .aviso-nota { color: var(--oro); }
+.conexion-rapida { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+@media (max-width: 300px) { .bv-opciones { grid-template-columns: 1fr; } }
+
+/* Guía animada de Gemini */
+.guia-anim { margin-top: 6px; width: 100%; }
+.ga-pantalla { border: 1px solid var(--linea-2); border-radius: 8px; overflow: hidden; background: var(--superficie); }
+.ga-barra { display: flex; align-items: center; gap: 4px; padding: 4px 6px; background: var(--superficie-2); font-size: 10px; color: var(--texto-2); }
+.ga-barra i { width: 6px; height: 6px; border-radius: 50%; background: var(--linea-2); }
+.ga-barra span { margin-left: 6px; }
+.ga-cuerpo { position: relative; height: 92px; padding: 8px; }
+.ga-boton, .ga-clave, .ga-word { position: absolute; left: 10px; right: 10px; transition: opacity .4s, transform .4s; opacity: .25; font-size: 11.5px; }
+.ga-boton { top: 8px; width: max-content; padding: 5px 10px; border-radius: 6px; background: #1a73e8; color: #fff; }
+.ga-clave { top: 40px; display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; border: 1px solid var(--linea-2); border-radius: 6px; }
+.ga-word { top: 8px; opacity: 0; display: flex; flex-direction: column; gap: 4px; }
+.ga-word span { font-weight: 600; color: var(--acento); }
+.ga-input { padding: 4px 8px; border: 1px solid var(--acento); border-radius: 6px; }
+.ga-word em { color: var(--ok); font-style: normal; }
+.ga-cursor { position: absolute; width: 0; height: 0; border-left: 7px solid var(--texto); border-top: 4px solid transparent; border-bottom: 9px solid transparent; transform: rotate(-25deg); transition: left .6s, top .6s; left: 80%; top: 70px; }
+.guia-anim[data-paso="abrir"] .ga-cursor { left: 60%; top: 2px; }
+.guia-anim[data-paso="crear"] .ga-boton { opacity: 1; transform: scale(1.05); } .guia-anim[data-paso="crear"] .ga-cursor { left: 70px; top: 18px; }
+.guia-anim[data-paso="copiar"] .ga-boton { opacity: .4; } .guia-anim[data-paso="copiar"] .ga-clave { opacity: 1; } .guia-anim[data-paso="copiar"] .ga-cursor { left: calc(100% - 26px); top: 50px; }
+.guia-anim[data-paso="pegar"] .ga-boton, .guia-anim[data-paso="pegar"] .ga-clave { opacity: 0; } .guia-anim[data-paso="pegar"] .ga-word { opacity: 1; } .guia-anim[data-paso="pegar"] .ga-cursor { left: 50%; top: 38px; }
+.ga-pasos { margin: 6px 0 0; padding-left: 18px; font-size: 11.5px; }
+.ga-pasos li { cursor: pointer; color: var(--texto-2); }
+.ga-pasos li b { color: var(--texto); margin-right: 4px; }
+.ga-pasos li.activo { color: var(--texto); } .ga-pasos li.activo b { color: var(--acento); }
+@media (prefers-reduced-motion: reduce) { .ga-boton, .ga-clave, .ga-word, .ga-cursor { transition: none; } }

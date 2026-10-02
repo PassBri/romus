@@ -10,7 +10,7 @@
            xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
            xsi:type="TaskPaneApp">
   <Id>5f564e3f-5a46-472e-8454-27f2c1cdfc22</Id>
-  <Version>3.4.0.0</Version>
+  <Version>3.5.0.0</Version>
   <ProviderName>Brian Suárez</ProviderName>
   <DefaultLocale>es-ES</DefaultLocale>
   <DisplayName DefaultValue="Romus"/>
@@ -452,7 +452,7 @@
         <bt:String id="T.Burbuja" DefaultValue="Romus en una ventanita flotante, sin el panel lateral."/>
         <bt:String id="T.Dictar" DefaultValue="Lo que digas se escribe en el documento."/>
         <bt:String id="T.Leer" DefaultValue="Lee el documento en voz alta."/>
-        <bt:String id="T.ConectarIA" DefaultValue="Configura tu inteligencia artificial: proveedor, clave y modelo (Gemini gratis, Claude, OpenAI…)."/>
+        <bt:String id="T.ConectarIA" DefaultValue="Conecta tu IA con un clic (OpenRouter), pegando cualquier clave (Gemini gratis, Claude, OpenAI…) o restaurando un respaldo."/>
         <bt:String id="T.ruta" DefaultValue="La ruta según tu nivel y enfoque"/>
         <bt:String id="T.M.Nivel" DefaultValue="Nivel: Pregrado, Especialización, Maestría, Doctorado, Posdoctorado."/>
         <bt:String id="T.NivelPregrado" DefaultValue="Trabajo de grado de pregrado."/>

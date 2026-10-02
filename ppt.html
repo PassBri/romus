@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Romus · Sustentación</title>
   <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
-  <link rel="stylesheet" href="css/taskpane.css?v=3.4">
-  <link rel="stylesheet" href="css/ppt.css?v=3.4">
+  <link rel="stylesheet" href="css/taskpane.css?v=3.5">
+  <link rel="stylesheet" href="css/ppt.css?v=3.5">
 </head>
 <body class="ppt">
   <div id="app">
@@ -103,19 +103,22 @@
   <div id="hojaIA" class="hoja oculto" role="dialog" aria-label="Conectar la IA">
     <div class="hoja-cabecera"><h2>Conectar la IA</h2><button id="btnCerrarIA" class="icono" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div class="hoja-cuerpo">
-      <p class="inv-nota">El ensayo y la revisión funcionan sin IA. El simulacro de jurado y la escucha de tu voz usan la IA que conectaste en Romus para Word. Si aquí no aparece, pega tu clave de Google Gemini (gratis en aistudio.google.com).</p>
-      <label class="campo-pro"><span>Clave de Google Gemini</span><input id="inpClavePpt" class="ajuste" type="password" placeholder="AIza…" autocomplete="off"></label>
-      <button id="btnGuardarClave" class="boton primario">Conectar</button>
+      <p class="inv-nota">El ensayo y la revisión funcionan sin IA. El simulacro de jurado y la escucha de tu voz usan la IA que conectaste en Romus para Word. Si aquí no aparece, conéctala de una de estas formas:</p>
+      <button id="btnUnClicPpt" class="boton primario">⚡ Conectar con un clic (OpenRouter)</button>
+      <label class="campo-pro"><span>O pega una clave (Gemini gratis en aistudio.google.com, o Claude, OpenAI, Groq…)</span><input id="inpClavePpt" class="ajuste" type="password" placeholder="AIza…" autocomplete="off"></label>
+      <button id="btnGuardarClave" class="boton secundario">Conectar</button>
+      <button id="btnRespaldoPpt" class="enlace-sutil">Restaurar con un código de respaldo (pégalo arriba)</button>
       <p id="notaClave" class="inv-nota"></p>
     </div>
   </div>
 
-  <script src="js/config.js?v=3.4"></script>
-  <script src="js/voz.js?v=3.4"></script>
-  <script src="js/escucha.js?v=3.4"></script>
-  <script src="js/romus.js?v=3.4"></script>
-  <script src="js/ia.js?v=3.4"></script>
-  <script src="vendor/jszip.min.js?v=3.4"></script>
-  <script src="js/ppt.js?v=3.4"></script>
+  <script src="js/config.js?v=3.5"></script>
+  <script src="js/voz.js?v=3.5"></script>
+  <script src="js/escucha.js?v=3.5"></script>
+  <script src="js/romus.js?v=3.5"></script>
+  <script src="js/ia.js?v=3.5"></script>
+  <script src="js/conexion.js?v=3.5"></script>
+  <script src="vendor/jszip.min.js?v=3.5"></script>
+  <script src="js/ppt.js?v=3.5"></script>
 </body>
 </html>

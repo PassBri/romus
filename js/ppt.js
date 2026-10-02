@@ -395,9 +395,17 @@ Respuesta del estudiante (transcrita de su voz, puede tener errores de transcrip
   }
   function chipIA() { const p = Config.perfil(); $("iaPpt").textContent = Config.faltaClave() ? "Sin IA (el jurado necesita una)" : `${p.nombre} · ${p.modelo}`; $("iaPpt").classList.toggle("sin-clave", Config.faltaClave()); }
   function abrirIA() { $("hojaIA").classList.remove("oculto"); $("inpClavePpt").focus(); }
-  function conectar() {
+  async function conectar() {
     const clave = $("inpClavePpt").value.trim();
     if (clave.length < 20) { $("notaClave").textContent = "Pega la clave completa (empieza por AIza…)."; return; }
+    if (window.Conexion) { // reconoce Gemini, Claude, OpenAI, Groq… y verifica que funcione
+      if (!Conexion.reconocer(clave)) { $("notaClave").textContent = Conexion.diagnostico(clave); return; }
+      $("notaClave").textContent = "Probando la clave…";
+      const r = await Conexion.conectarClave(clave);
+      $("notaClave").textContent = r.mensaje;
+      if (r.ok) { chipIA(); setTimeout(() => $("hojaIA").classList.add("oculto"), 900); hablar("Listo, ya estoy conectado."); }
+      return;
+    }
     const c = Config.get();
     let p = c.perfiles.find(x => x.proveedor === "gemini");
     if (!p) { p = Config.nuevoPerfil("gemini"); c.perfiles.push(p); }
@@ -428,7 +436,12 @@ Respuesta del estudiante (transcrita de su voz, puede tener errores de transcrip
     $("btnRecargar").onclick = () => cargar();
     $("btnTema").onclick = () => { const o = document.documentElement.dataset.tema === "oscuro" ? "claro" : "oscuro"; Config.set({ tema: o }); aplicarTema(); };
     $("btnAjustesPpt").onclick = abrirIA; $("btnCerrarIA").onclick = () => $("hojaIA").classList.add("oculto");
-    $("btnGuardarClave").onclick = conectar; $("btnJurado").onclick = iniciarJurado;
+    $("btnGuardarClave").onclick = conectar;
+    if (window.Conexion) {
+      Conexion.alConectar = () => chipIA();
+      $("btnUnClicPpt").onclick = async () => { try { const r = await Conexion.openRouter(t => { $("notaClave").textContent = t; }); $("notaClave").textContent = r.mensaje; if (r.ok) { chipIA(); hablar("Listo, ya estoy conectado."); } } catch (e) { $("notaClave").textContent = e.message; } };
+      $("btnRespaldoPpt").onclick = () => { try { const r = Conexion.importar($("inpClavePpt").value); $("notaClave").textContent = `Restauré ${r.ias} IA.`; chipIA(); } catch (e) { $("notaClave").textContent = e.message; } };
+    } $("btnJurado").onclick = iniciarJurado;
     document.addEventListener("keydown", (e) => {
       if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
       if (e.key === "ArrowRight" || e.key === "PageDown") { e.preventDefault(); cambiar(E.idx + 1); }

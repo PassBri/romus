@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-3.4-185abd" alt="versión 3.4">
+  <img src="https://img.shields.io/badge/versión-3.5-185abd" alt="versión 3.5">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -373,6 +373,13 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 
 ## Novedades
 
+### v3.5 · Conectar la IA es más fácil
+Se suman tres formas nuevas a las que ya había (la configuración manual sigue igual) y puedes cambiar entre ellas cuando quieras:
+- **⚡ Un clic con OpenRouter**: inicias sesión (también con Google), autorizas y la clave llega sola a Romus. Romus elige un modelo gratuito que maneja sus herramientas y puedes cambiarlo en Ajustes.
+- **Gemini guiado**: guía animada de los 4 pasos, Romus detecta la clave que copiaste y ofrece pegarla, y la verifica al instante con mensajes claros (incompleta, con espacios, no válida, límite alcanzado). También reconoce claves de Claude, OpenAI, Groq, DeepSeek y OpenRouter.
+- **Respaldo de la configuración**: copia un código o descarga un archivo con tus IA, nivel, enfoque y datos del proyecto, y restáuralo en otro equipo o después de limpiar la caché de Word.
+- Si una clave nueva no funciona, la IA que ya tenías sigue activa.
+
 ### v3.4 · Mi tesis en la cinta
 - **Conectar IA** desde la cinta (grupo Romus): abre la configuración del proveedor, la clave y el modelo.
 - Nuevo grupo **Mi tesis**: menús **Nivel** (pregrado a posdoctorado) y **Enfoque** (cuantitativo, cualitativo, mixto o teórico-documental), y **Etapas** de la tesis.
@@ -484,4 +491,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word y PowerPoint · v3.4</sub></p>
+<p align="center"><sub>Romus para Word y PowerPoint · v3.5</sub></p>
