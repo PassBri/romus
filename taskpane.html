@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Romus</title>
   <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
-  <link rel="stylesheet" href="css/taskpane.css?v=2.9.1">
+  <link rel="stylesheet" href="css/taskpane.css?v=3.0">
 </head>
 <body>
   <div id="app">
@@ -171,22 +171,12 @@
         <div class="rapidas">
           <button class="chip" data-prefijo="Ayúdame a idear un proyecto sobre " title="Di: «ayúdame a idear un proyecto sobre…»"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg><span>Idear</span></button>
           <button class="chip" data-cmd="revisa la coherencia" title="Di: «revisa la coherencia»"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="12" cy="18" r="2"/><path d="M6.5 10.5l4-3M13.5 7.5l4 3M17.5 13.5l-4 3M10.5 16.5l-4-3"/></svg><span>Coherencia</span></button>
-          <button class="chip" data-cmd="verifica las referencias" title="Di: «verifica las referencias»: cruza citas y lista, revisa APA 7 y comprueba que cada fuente exista"><svg viewBox="0 0 24 24"><path d="M5 4h10l4 4v12H5z"/><path d="M14 4v5h5M8.5 14.5l2 2 4.5-4.5"/></svg><span>Referencias</span></button>
+          <button class="chip" data-cmd="asesor apa" title="Asesor y revisor de normas APA 7: citas, referencias, formato. Di: «asesor APA»"><svg viewBox="0 0 24 24"><path d="M4 20L9.5 5h1L16 20M6.2 14.5h7.6"/><path d="M17 5h3.5l-2.5 5"/></svg><span>APA 7</span></button>
           <button class="chip" data-cmd="simulacro de sustentación" title="Di: «simulacro de sustentación»: Romus hace de jurado y evalúa tus respuestas orales"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3"/><path d="M6 21v-2a6 6 0 0 1 12 0v2M3 11h3M18 11h3M4.5 7.5l2 1M19.5 7.5l-2 1"/></svg><span>Sustentación</span></button>
         </div>
-        <details class="inv-mas">
-          <summary>Más herramientas</summary>
-          <div class="rapidas">
-            <button class="chip" data-cmd="inserta la estructura" title="Di: «inserta la estructura de la tesis»"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h10M8 15h12M8 20h8"/></svg><span>Estructura</span></button>
-            <button class="chip" data-prefijo="Busca literatura sobre " title="Di: «busca literatura sobre…»"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M9 7h6M9 11h4"/></svg><span>Literatura</span></button>
-            <button class="chip" data-cmd="evalúa con la rúbrica" title="Di: «evalúa mi proyecto»"><svg viewBox="0 0 24 24"><path d="M5 20V10M10 20V4M15 20v-7M20 20V8"/></svg><span>Rúbrica</span></button>
-            <button class="chip" data-cmd="spss" title="SPSS o PSPP: sintaxis desde tu proyecto y resultados redactados en APA. Di: «genera la sintaxis de SPSS» o «redacta los resultados en APA»"><svg viewBox="0 0 24 24"><path d="M4 4v16h16"/><path d="M8 16v-4M12 16V8M16 16v-6"/></svg><span>SPSS</span></button>
-            <button class="chip" data-cmd="atlas ti" title="ATLAS.ti: libro de códigos (Excel o QDC) y resultados cualitativos con citas verificadas. Di: «libro de códigos» o «redacta los resultados cualitativos»"><svg viewBox="0 0 24 24"><path d="M4 7l4-3h12v12l-3 4H4z"/><path d="M8 4v12h12M8 16l-4 4"/></svg><span>ATLAS.ti</span></button>
-            <button class="chip" data-cmd="abre la guía" title="Di: «¿qué es la saturación?» o «abre la guía»"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.2-2.5 3.9M12 17.2v.3"/></svg><span>Guía</span></button>
-            <button class="chip" data-cmd="abre la teoría" title="Libro «Teoría: conocimiento científico» de Brian Suárez. Di: «¿qué es un postulado?» o «ayúdame a construir un axioma»"><svg viewBox="0 0 24 24"><path d="M12 22V12M12 12C9 12 6 10 6 6c3 0 6 2 6 6zM12 12c3 0 6-2 6-6-3 0-6 2-6 6zM12 15c-2.5 0-4.5-1.5-5-4M12 15c2.5 0 4.5-1.5 5-4"/></svg><span>Teoría</span></button>
-            <button class="chip" data-cmd="modo tutorial" title="Di: «modo tutorial»"><svg viewBox="0 0 24 24"><path d="M3 8l9-4 9 4-9 4z"/><path d="M7 10v5c3 2 7 2 10 0v-5M21 8v6"/></svg><span>Tutorial</span></button>
-            <button class="chip" data-cmd="declaración de uso de IA" title="Di: «declaración de uso de IA»"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Uso de IA</span></button>
-          </div>
+        <details class="inv-mas" id="detHerramientas">
+          <summary>Todas las herramientas (32)</summary>
+          <div id="invHerramientas" class="inv-herramientas"></div>
         </details>
       </section>
 
@@ -397,7 +387,7 @@
         <div class="fila">
           <button id="btnBorrarHistorial" class="boton secundario">Borrar conversación</button>
         </div>
-        <p class="nota">Romus para Word v2.9.1 · Los textos se envían a la IA que elijas solo cuando das un comando que la usa.</p>
+        <p class="nota">Romus para Word v3.0 · Los textos se envían a la IA que elijas solo cuando das un comando que la usa.</p>
       </div>
     </div>
 
@@ -420,6 +410,15 @@
           <li>«Lee el documento» · «lee la selección» · «lee desde aquí»</li>
           <li>«Para» / «detente» · «pausa» · «continúa»</li>
           <li>«Siguiente» · «anterior» · «más rápido» · «más lento»</li>
+        </ul>
+        <h3>Normas APA 7 y tesis</h3>
+        <ul>
+          <li>«Asesor APA» · «revisa mi documento con normas APA» · «aplica el formato APA» · «genera una referencia de libro»</li>
+          <li>«Calcula el tamaño de la muestra» · «diseña el cuestionario» · «calcula la V de Aiken» · «prepara los consentimientos»</li>
+          <li>«Abre mi biblioteca» · «busca literatura en español sobre…» · «busca afirmaciones sin cita»</li>
+          <li>«Ayúdame con la discusión» · «revisa las conclusiones frente a los objetivos» · «hazme el resumen y abstract»</li>
+          <li>«Responde a las observaciones del jurado» · «acta de asesoría» · «haz las diapositivas de la sustentación» · «modo director»</li>
+          <li>Todo esto también está en la pestaña <b>Romus</b> de la cinta de Word.</li>
         </ul>
         <h3>Investigación (método Kuetz)</h3>
         <ul>
@@ -477,20 +476,28 @@
     </div>
   </div>
 
-  <script src="js/config.js?v=2.9.1"></script>
-  <script src="js/voz.js?v=2.9.1"></script>
-  <script src="js/escucha.js?v=2.9.1"></script>
-  <script src="js/orbe.js?v=2.9.1"></script>
-  <script src="js/romus.js?v=2.9.1"></script>
-  <script src="js/ia.js?v=2.9.1"></script>
-  <script src="js/documento.js?v=2.9.1"></script>
-  <script src="js/panel.js?v=2.9.1"></script>
-  <script src="js/guia.js?v=2.9.1"></script>
-  <script src="js/teoria.js?v=2.9.1"></script>
-  <script src="js/investigacion.js?v=2.9.1"></script>
-  <script src="js/jurado.js?v=2.9.1"></script>
-  <script src="js/asesor.js?v=2.9.1"></script>
-  <script src="js/datos.js?v=2.9.1"></script>
-  <script src="js/app.js?v=2.9.1"></script>
+  <script src="js/config.js?v=3.0"></script>
+  <script src="js/voz.js?v=3.0"></script>
+  <script src="js/escucha.js?v=3.0"></script>
+  <script src="js/orbe.js?v=3.0"></script>
+  <script src="js/romus.js?v=3.0"></script>
+  <script src="js/ia.js?v=3.0"></script>
+  <script src="js/documento.js?v=3.0"></script>
+  <script src="js/panel.js?v=3.0"></script>
+  <script src="js/guia.js?v=3.0"></script>
+  <script src="js/teoria.js?v=3.0"></script>
+  <script src="js/investigacion.js?v=3.0"></script>
+  <script src="js/jurado.js?v=3.0"></script>
+  <script src="js/asesor.js?v=3.0"></script>
+  <script src="js/datos.js?v=3.0"></script>
+  <script src="js/docx.js?v=3.0"></script>
+  <script src="js/formato.js?v=3.0"></script>
+  <script src="js/apa.js?v=3.0"></script>
+  <script src="js/instrumentos.js?v=3.0"></script>
+  <script src="js/biblioteca.js?v=3.0"></script>
+  <script src="js/escritura.js?v=3.0"></script>
+  <script src="js/revision.js?v=3.0"></script>
+  <script src="js/herramientas.js?v=3.0"></script>
+  <script src="js/app.js?v=3.0"></script>
 </body>
 </html>

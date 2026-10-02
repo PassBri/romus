@@ -168,7 +168,9 @@ window.Inv = (function () {
     modelo: { txt: "Inferencia de la IA · verifícala", cls: "modelo" },
     plantilla: { txt: "Plantilla del nivel", cls: "rubrica" },
     guia: { txt: "Guía Romus", cls: "guia" },
-    teoria: { txt: "Teoría · Suárez (2025)", cls: "teoria" }
+    teoria: { txt: "Teoría · Suárez (2025)", cls: "teoria" },
+    reglas: { txt: "Reglas fijas · sin IA", cls: "rubrica" },
+    calculo: { txt: "Cálculo exacto · sin IA", cls: "rubrica" }
   };
   function etiqueta(origen, extra) {
     const o = ORIGENES[origen] || ORIGENES.modelo;
@@ -181,7 +183,8 @@ window.Inv = (function () {
       rubrica: "Calculado con criterios fijos, no por la opinión de la IA.",
       modelo: "Propuesta generada por la IA. No está comprobada en tu documento ni en fuentes: revísala.",
       teoria: "Contenido del libro «Teoría: conocimiento científico» de Brian Gonzalo Suárez Acevedo (2025).",
-      guia: "Guía metodológica de Romus (método Kuetz), escrita para Romus. Al final de cada tema se indican lecturas para profundizar."
+      guia: "Guía metodológica de Romus (método Kuetz), escrita para Romus. Al final de cada tema se indican lecturas para profundizar.",
+      reglas: "Revisado con reglas fijas (por ejemplo, las normas APA 7), sin usar la IA."
     }[o.cls] || "";
     return s;
   }
@@ -510,12 +513,19 @@ Reglas:
     return { texto, cita, fuente, titulo, anio, doi: w.doi || "", citas: w.cited_by_count || 0, abierto: !!(w.open_access && w.open_access.is_oa), autores: autores.map(a => a.apellido) };
   }
 
-  async function buscarOpenAlex(consulta, recientes) {
+  /** OpenAlex guarda el resumen como índice invertido: lo reconstruye. */
+  function resumenDe(ii) {
+    if (!ii) return "";
+    const pal = [];
+    Object.keys(ii).forEach(w => ii[w].forEach(i => { pal[i] = w; }));
+    return pal.filter(Boolean).join(" ");
+  }
+  async function buscarOpenAlex(consulta, recientes, espanol) {
     const params = new URLSearchParams({
       search: consulta, "per-page": "8",
-      select: "id,doi,display_name,publication_year,authorships,primary_location,biblio,cited_by_count,open_access,type"
+      select: "id,doi,display_name,publication_year,authorships,primary_location,biblio,cited_by_count,open_access,type,abstract_inverted_index,language"
     });
-    params.set("filter", "type:article|review|book-chapter|book|dissertation" + (recientes ? ",from_publication_date:" + (new Date().getFullYear() - 8) + "-01-01" : ""));
+    params.set("filter", "type:article|review|book-chapter|book|dissertation" + (recientes ? ",from_publication_date:" + (new Date().getFullYear() - 8) + "-01-01" : "") + (espanol ? ",language:es" : ""));
     const r = await fetch("https://api.openalex.org/works?" + params.toString());
     if (!r.ok) throw new Error("No pude consultar OpenAlex (" + r.status + "). Revisa tu conexión.");
     const j = await r.json();
@@ -526,20 +536,21 @@ Reglas:
     tema = String(tema || "").trim();
     if (!tema) throw new Error("Dime el tema: «busca literatura sobre…».");
     const recientes = !(opciones && opciones.todas);
-    let obras = await buscarOpenAlex(tema, recientes);
+    const espanol = !!(opciones && opciones.espanol);
+    let obras = await buscarOpenAlex(tema, recientes, espanol);
     // Si hay pocos resultados, la IA (si está conectada) propone palabras clave en inglés.
     if (obras.length < 4 && !Config.faltaClave()) {
       try {
         const d = await pedirHerramienta("palabras_clave", "Palabras clave en inglés para buscar literatura académica.",
           { type: "object", properties: { consulta: { type: "string" } }, required: ["consulta"] },
           `Tema: «${tema}». Devuelve 3 a 6 palabras clave en inglés, sin comillas ni operadores.`);
-        if (d.consulta) { const mas = await buscarOpenAlex(d.consulta, recientes); obras = obras.concat(mas.filter(m => !obras.some(o => o.id === m.id))); }
+        if (d.consulta && !espanol) { const mas = await buscarOpenAlex(d.consulta, recientes); obras = obras.concat(mas.filter(m => !obras.some(o => o.id === m.id))); }
       } catch (e) { /* seguir con lo que hay */ }
     }
-    ultimos = obras.slice(0, 6).map(apa);
+    ultimos = obras.slice(0, 6).map(w => Object.assign(apa(w), { resumen: resumenDe(w.abstract_inverted_index), openalex: w.id }));
     registrar("Búsqueda de literatura", tema, "fuente");
     const c = el("div", "inv-cuerpo");
-    c.appendChild(etiqueta("fuente", recientes ? "últimos 8 años" : ""));
+    c.appendChild(etiqueta("fuente", [recientes ? "últimos 8 años" : "", espanol ? "en español" : ""].filter(Boolean).join(" · ")));
     if (!ultimos.length) {
       c.appendChild(el("p", "inv-nota", "No encontré trabajos con esos términos. Prueba con palabras más generales o en inglés."));
       tarjeta("Literatura · " + tema, c);
@@ -555,6 +566,7 @@ Reglas:
       const bC = el("button", "boton secundario", "Citar " + (k + 1));
       bC.onclick = () => citar(k).catch(ui.mostrarError);
       acc.appendChild(bC);
+      if (window.Biblio) { const bG = el("button", "boton secundario", "Guardar"); bG.title = "Guardar en mi biblioteca para hacer su ficha de lectura"; bG.onclick = () => { Biblio.guardarObra(w); bG.textContent = "Guardada ✓"; bG.disabled = true; }; acc.appendChild(bG); }
       if (w.doi) { const a = el("a", "enlace-sutil", "Abrir"); a.href = w.doi; a.target = "_blank"; a.rel = "noopener"; acc.appendChild(a); }
       li.appendChild(acc);
       lista.appendChild(li);
@@ -718,6 +730,7 @@ Reglas:
     tarjeta("Autoevaluación con rúbrica", c);
     const peor = criterios.slice().sort((a, b) => a.nota - b.nota)[0];
     ui.hablar(`Tu proyecto obtiene ${puntaje} sobre 100 en la rúbrica de ${n.nombre}. Lo más débil es ${peor.nombre.toLowerCase()}.${d.fortaleza ? " Fortaleza: " + d.fortaleza : ""}`);
+    return { puntaje, criterios: criterios.map(c => ({ nombre: c.nombre, nota: c.nota, det: c.det })), fortaleza: d.fortaleza || "" };
   }
 
   /* ================= 6. Declaración de uso de IA ================= */
@@ -788,7 +801,7 @@ Reglas:
   function mostrarTema(t, ruta, paso, hablarlo) {
     const c = el("div", "inv-cuerpo guia");
     const esTeoria = /^Teoría/.test(t.cat);
-    c.appendChild(etiqueta(esTeoria ? "teoria" : "guia", esTeoria ? t.fuente.replace(/^.*?, (?=§|Cap|Ecos)/, "") : "método Kuetz"));
+    c.appendChild(etiqueta(esTeoria ? "teoria" : "guia", esTeoria ? t.fuente.replace(/^.*?, (?=§|Cap|Ecos)/, "") : t.cat === "APA 7" ? "normas APA 7" : "método Kuetz"));
     if (t.complejidad) c.appendChild(el("span", "guia-nivel", "Nivel de complejidad: " + t.complejidad));
     if (ruta) {
       const total = Guia.RUTAS[ruta].length;
@@ -1042,8 +1055,12 @@ Reglas:
       ["🧱", "Quiero empezar el documento", `Inserto la estructura de ${n.producto.toLowerCase()} con una guía en cada apartado.`, () => ejecutar(insertarEstructura)],
       ["🔎", "Ya tengo un borrador y quiero revisarlo", "Coherencia, referencias y rúbrica, con comentarios en tu documento.", () => revisarBorrador()],
       ["📊", "Tengo datos: SPSS o ATLAS.ti", "Sintaxis de SPSS, libro de códigos para ATLAS.ti y resultados redactados en APA, con cada dato verificado.", () => { if (window.Datos) Datos.inicio(); }],
+      ["📐", "Normas APA 7", "Citar, referenciar, revisar y dar formato a tu documento con APA 7.", () => { if (window.APA) APA.asesor(); }],
+      ["📝", "Tengo observaciones del jurado o del asesor", "Leo sus comentarios en Word y armo la matriz de respuesta.", () => { if (window.Revision) ejecutar(() => Revision.observaciones()); }],
       ["🎓", "Voy a sustentar", "Hago de jurado: te pregunto en voz alta y evalúo tus respuestas.", () => { if (window.Jurado) ejecutar(() => Jurado.iniciar(5)); }],
       ["🌳", "Quiero construir teoría (maestría o doctorado)", "Axiomas, supuestos, constructos y modelos con el libro de Brian Suárez.", () => indiceGuia(true)],
+      ["👩‍🏫", "Soy director o jurado", "Informe de revisión del trabajo de un estudiante y seguimiento.", () => { if (window.Revision) ejecutar(() => Revision.director()); }],
+      ["🧰", "Ver todas las herramientas", "Organizadas por etapa: planear, fundamentar, diseñar, analizar, escribir y entregar.", () => { const d = document.getElementById("detHerramientas"); if (d) { d.open = true; d.scrollIntoView({ block: "start", behavior: "smooth" }); } }],
       ["❓", "Tengo una duda concreta", "Pregúntame: «¿qué es la saturación?», «¿cómo calculo la muestra?»…", () => indiceGuia()]
     ];
     opciones.forEach(([ico, t, d, fn]) => {
@@ -1080,7 +1097,7 @@ Reglas:
 
   /** Devuelve una función si el comando es del modo investigación; si no, null. n = texto normalizado; original = texto con tildes. */
   function comando(n, original, signal) {
-    const extra = (window.Jurado && Jurado.comando(n, original)) || (window.Asesor && Asesor.comando(n, original)) || (window.Datos && Datos.comando(n, original));
+    const extra = ["Jurado", "Asesor", "APA", "Formato", "Datos", "Instrumentos", "Biblio", "Escritura", "Revision"].reduce((f, m) => f || (window[m] && window[m].comando ? window[m].comando(n, original) : null), null);
     if (extra) return extra;
     const tarea = (fn) => async () => {
       ui.ocupar(true, "Investigación…");
@@ -1098,7 +1115,9 @@ Reglas:
     if (/^(revisa|analiza|evalua|haz|dame|verifica)( la| una| mi)? (coherencia|matriz de coherencia)( del (proyecto|documento))?$|^matriz de coherencia$|^(es|esta) coherente (mi|el) proyecto$/.test(n)) return tarea(() => coherencia(signal));
     if (/^(evalua|califica|revisa)( mi| el| la)? (proyecto|propuesta|tesis|documento)? ?(con|segun) (la )?rubrica$|^(evalua|califica)( mi| el| la)? (proyecto|propuesta|tesis)$|^(autoevaluacion|rubrica)$/.test(n)) return tarea(() => evaluarRubrica(signal));
     m = original.match(/^\s*(?:busca(?:me)?|encuentra|dame)\s+(?:literatura|autores|art[ií]culos|referencias|fuentes|antecedentes|estudios|investigaciones)\s+(?:sobre|de|acerca de|del|para)\s+(.{3,})$/i);
-    if (m) { const todas = /\b(todas las [ée]pocas|cl[aá]sic[oa]s|sin l[ií]mite)\b/i.test(m[1]); return tarea(() => literatura(m[1].replace(/[.?!]+$/, ""), { todas })); }
+    if (m) { const todas = /\b(todas las [ée]pocas|cl[aá]sic[oa]s|sin l[ií]mite)\b/i.test(m[1]); const espanol = /\ben espa[ñn]ol\b|\blatinoam/i.test(original); return tarea(() => literatura(m[1].replace(/[.?!]+$/, "").replace(/\s*en espa[ñn]ol\s*/i, " ").trim(), { todas, espanol })); }
+    m = original.match(/^\s*(?:busca(?:me)?|encuentra|dame)\s+(?:literatura|art[ií]culos|fuentes|antecedentes|estudios)\s+en\s+espa[ñn]ol\s+(?:sobre|de|acerca de)\s+(.{3,})$/i);
+    if (m) return tarea(() => literatura(m[1].replace(/[.?!]+$/, ""), { espanol: true }));
     m = n.match(/^cita (el |la )?(articulo |trabajo |numero |referencia )?(uno|una|primero|primera|dos|segundo|segunda|tres|tercero|tercera|cuatro|cuarto|cuarta|cinco|quinto|quinta|seis|sexto|sexta|[1-6])$/);
     if (m) return tarea(() => citar(NUM[m[3]]));
     m = n.match(/^(ayudame a |quiero |puedes )?(construir|formular|crear|redactar|plantear|elaborar|proponer|hacer|disenar)(me)? (un |una |el |la |mi |mis |unos |unas |los |las )?(axioma|postulado|definicion|corolario|simulacion|paradoja|teorema|tesis|hipotesis|constructo|modelo|teoria|ley|metateoria|paradigma|supuesto|inferencia|principio|proposicion|concepto|problema cientifico|enunciado empirico|enunciado teorico|argumento|premisa|variable|indicador)(e?s)?( cientific[oa]s?| teoric[oa]s?)?\b ?(para|sobre|de|acerca de|con)? ?(.*)$/);
@@ -1132,6 +1151,7 @@ Reglas:
     preguntar, indiceGuia, mostrarTema, construir, asesor, iniciarTutorial, pasoTutorial, salirTutorial,
     _apa: apa, _verificar: verificar, _partirNombre: partirNombre,
     // Utilidades compartidas con otros módulos (jurado.js)
+    _resumenDe: resumenDe,
     _h: { tarjeta, el, etiqueta, registrar, documentoNumerado, pedirHerramienta, verificar, norm, ejecutar, irA, buscarOpenAlex, apa, claveDoc, get ui() { return ui; } }
   };
 })();

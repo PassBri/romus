@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-2.9.1-185abd" alt="versión 2.9.1">
+  <img src="https://img.shields.io/badge/versión-3.0-185abd" alt="versión 3.0">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -50,7 +50,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 
 **Word para la web o Mac:** descarga tu manifiesto en [passbri.github.io/romus](https://passbri.github.io/romus/) y cárgalo como explica el **[tutorial](https://passbri.github.io/romus/tutorial.html#instalar)**.
 
-Después, en Word: **Inicio → Romus → Ajustes → + Agregar → Google Gemini** (clave gratis en [aistudio.google.com/apikey](https://aistudio.google.com/apikey)). Todo esto, con imágenes, está en el **[📘 tutorial paso a paso](https://passbri.github.io/romus/tutorial.html)**.
+Después, en Word: **pestaña Romus → Abrir Romus → Ajustes → + Agregar → Google Gemini** (clave gratis en [aistudio.google.com/apikey](https://aistudio.google.com/apikey)). Todo esto, con imágenes, está en el **[📘 tutorial paso a paso](https://passbri.github.io/romus/tutorial.html)**.
 
 ## ¿Qué es Romus?
 
@@ -120,6 +120,56 @@ Donde más se atascan los tesistas es entre los datos y el capítulo de resultad
 Toca **SPSS** o **ATLAS.ti** en *Investigar → Más herramientas*, o di «Ok Romus, genera la sintaxis de SPSS», «redacta los resultados en APA» o «libro de códigos para ATLAS.ti». ¿No tienes SPSS? La sintaxis funciona igual en **PSPP**, que es gratuito. Puedes elegir decimales con coma o con punto. Romus no sube tus bases de datos: trabaja con tu documento y con lo que pegas.
 
 <p align="center"><img src="assets/capturas/datos.png" width="760" alt="Resultados en APA desde SPSS con números verificados y hallazgos cualitativos desde ATLAS.ti con citas verificadas"></p>
+
+## La pestaña «Romus» en Word
+
+Desde la versión 3.0, Romus tiene **su propia pestaña en la cinta de opciones de Word**. Cada botón hace su trabajo directamente: el panel lateral se abre solo cuando hay un resultado que mostrar, y con **Burbuja** puedes trabajar sin panel.
+
+<p align="center"><img src="assets/capturas/cinta.png" width="900" alt="Pestaña Romus en la cinta de Word: grupos Romus, Documento, Investigación, APA 7 y Ayuda"></p>
+
+| Grupo | Botones |
+|---|---|
+| **Romus** | Abrir Romus · Hablar · Modo voz · Burbuja |
+| **Documento** | Leer · Corregir · Revisar · Resumir · Más (Explicar, Leer selección, Simplificar, Más formal, Dictar) |
+| **Investigación** | Asesor · Mi proyecto · Crear proyecto ★ · Planear y fundamentar ▾ · Diseñar y analizar ▾ · Escribir y entregar ▾ |
+| **APA 7** | Asesor APA · Revisor · Formato · Referencia |
+| **Ayuda** | Aprender ▾ (Guía, Teoría, Tutorial, Qué puedo decir) · Modo director |
+
+Los botones que actúan directamente funcionan en Microsoft 365 (Word 2205 o posterior), Word 2024, Word para la web y Word para Mac 16.61 o posterior. En versiones anteriores, el botón deja la acción lista y se ejecuta al abrir el panel. Si ya tenías Romus, **vuelve a ejecutar el instalador** para ver la pestaña nueva. Con el panel cerrado, Romus deja de escuchar, salvo que la burbuja esté abierta.
+
+## Normas APA 7
+
+| Herramienta | Qué hace |
+|---|---|
+| **Asesor APA 7** | Responde dudas («¿cómo cito una ley?», «¿cómo cito a ChatGPT?», «¿qué pasa con tres autores?») con 19 temas escritos para Romus. |
+| **Generador de referencias** | Artículo, libro, capítulo, tesis, página web, informe, ley colombiana, video, ponencia, periódico o IA: llenas los datos y obtienes la referencia y la cita (parentética y narrativa). La inserta en orden alfabético, con sangría francesa y cursivas. |
+| **Revisor APA 7** | Revisa todo el documento con reglas fijas: citas («&», «et al.», tres o más autores, coma, página en citas textuales, citas de 40 palabras), referencias (DOI, «Recuperado de», «Vol.», mayúsculas, orden alfabético), cruce citas ↔ referencias, títulos, tablas y figuras («Nota.» en vez de «Fuente:»), estadísticos (p = .000), siglas sin definir y lenguaje sin sesgos. **Corrige lo seguro en un clic** y deja comentarios para lo demás. |
+| **Corregir referencias con IA** | Propone la versión APA 7 de cada referencia y Romus **comprueba que no cambie autores, años ni agregue datos inventados** antes de dejarte aplicarla. |
+| **Formato APA 7 en un clic** | Fuente, interlineado doble, sangría de 1,27 cm, los 5 niveles de título, referencias con sangría francesa, rótulos de tablas y figuras, notas, portada de estudiante, número de página y tabla de contenido. |
+
+## Del proyecto al trabajo de campo
+
+- **Tamaño de muestra**: poblaciones finitas e infinitas, comparación de dos grupos y correlación (con potencia), pérdida esperada y orientación para estudios cualitativos. Te deja el párrafo para la metodología.
+- **Instrumentos**: cuestionario Likert desde la operacionalización (ítems numerados p1, p2… que coinciden con la sintaxis de SPSS) o guion de entrevista desde las categorías, más la matriz de operacionalización o de categorías.
+- **Validación por jueces**: formato para los expertos en Word, **V de Aiken** con intervalo de confianza (Penfield y Giacobbi, 2004) y **razón de Lawshe** con el valor crítico exacto (Ayre y Scally, 2014). Tabla y párrafo listos.
+- **Ética**: consentimiento informado, consentimiento de acudientes y **asentimiento para menores** en lenguaje sencillo, carta a la institución y autorización de tratamiento de datos (Ley 1581 de 2012), con la clasificación del riesgo de la Resolución 8430 de 1993.
+
+## Literatura y escritura
+
+- **Mi biblioteca**: guarda fuentes de OpenAlex (también **solo en español**), del generador APA o importadas de **Zotero y Mendeley** (RIS o BibTeX).
+- **Fichas de lectura** de cada fuente (objetivo, contexto, método, hallazgos, limitaciones, aporte) y **matriz de antecedentes** en Word.
+- **Estado del arte** organizado por temas, citando solo las fuentes de tu biblioteca.
+- **Frases sin cita**: lo que el jurado preguntaría «¿según quién?», y **cita–fuente**: ¿la fuente dice lo que le atribuyes?
+- **Discusión triangulada**: cada resultado frente a los antecedentes que ya citas.
+- **Conclusiones frente a objetivos**: qué objetivo quedó sin conclusión y qué conclusión no responde a ningún objetivo.
+- **Resumen y abstract** con palabras clave, **tesis → artículo** (IMRyD) con las revistas que más publican tu tema, y **diapositivas de sustentación** (esquema que PowerPoint convierte en presentación, más el guion del orador).
+
+## Revisión y acompañamiento
+
+- **Respuesta a observaciones**: Romus lee los comentarios del jurado o del asesor en tu documento, revisa si ya los atendiste y arma la **matriz de respuesta**. Puede responder dentro de cada comentario y marcar como resueltos los atendidos.
+- **Acta de asesoría** en Word, con temas, avances, compromisos con fecha y firmas, a partir de las sesiones de Romus.
+- **Modo director**: el docente abre el trabajo de un estudiante y obtiene un **informe de revisión** (rúbrica, APA 7, avance, fortalezas, aspectos por mejorar y concepto) y el seguimiento de todos sus estudiantes.
+- **Script de R y jamovi**, además de la sintaxis de SPSS.
 
 ## Lo que hace a Romus insustituible
 
@@ -202,6 +252,11 @@ Con **Siempre atento** activado, empieza cada orden con «Ok Romus». Después d
 | Quieres… | Di… |
 |---|---|
 | Que lea | «lee el documento», «lee desde aquí», «léeme la conclusión» |
+| Normas APA 7 | «asesor APA», «revisa mi documento con normas APA», «aplica el formato APA», «genera una referencia de libro», «corrige las referencias con IA» |
+| Trabajo de campo | «calcula el tamaño de la muestra», «diseña el cuestionario», «hazme el guion de entrevista», «calcula la V de Aiken», «prepara los consentimientos» |
+| Literatura | «abre mi biblioteca», «busca literatura en español sobre…», «matriz de antecedentes», «busca afirmaciones sin cita» |
+| Escribir y entregar | «ayúdame con la discusión», «revisa las conclusiones frente a los objetivos», «hazme el resumen y abstract», «convierte mi tesis en artículo», «haz las diapositivas de la sustentación», «responde a las observaciones del jurado», «acta de asesoría», «modo director» |
+| Cambiar de pestaña | «ve a investigar», «abre documento», «ve a inicio» |
 | Analizar datos | «genera la sintaxis de SPSS», «redacta los resultados en APA», «libro de códigos para ATLAS.ti», «redacta los resultados cualitativos» |
 | Controlar la lectura | «pausa», «sigue», «más rápido», «más lento», «para» |
 | Corregir | «corrige el documento», «corrige esto», «corrige la ortografía» |
@@ -268,7 +323,15 @@ romus/
 │   ├── investigacion.js  modo investigación: niveles, coherencia, literatura, rúbrica, Trust Label, tutorial
 │   ├── jurado.js         simulacro de sustentación y verificador de citas y referencias
 │   ├── asesor.js         asesor: mi proyecto, cronograma, sesiones, bitácora y Romus Pro (método Kuetz)
-│   ├── datos.js          puente con SPSS/PSPP y ATLAS.ti: sintaxis, libro de códigos y resultados en APA verificados
+│   ├── datos.js          puente con SPSS/PSPP, R/jamovi y ATLAS.ti: sintaxis, libro de códigos y resultados en APA verificados
+│   ├── docx.js           generador de documentos de Word (.docx) y datos del proyecto
+│   ├── apa.js            asesor APA 7, generador de referencias y revisor de normas
+│   ├── formato.js        formato APA 7 en un clic (portada, títulos, sangrías, índice)
+│   ├── instrumentos.js   muestra, cuestionarios, guiones, V de Aiken, Lawshe y documentos de ética
+│   ├── biblioteca.js     biblioteca, Zotero/Mendeley, fichas, matriz de antecedentes, frases sin cita
+│   ├── escritura.js      discusión, conclusiones, resumen/abstract, artículo, revistas y diapositivas
+│   ├── revision.js       respuesta a observaciones, acta de asesoría y modo director
+│   ├── herramientas.js   catálogo único de herramientas (panel, etapas y cinta de Word)
 │   ├── guia.js           guía metodológica: 32 temas, buscador y rutas del tutorial
 │   ├── teoria.js         biblioteca «Teoría: conocimiento científico» (Suárez, 2025): 39 temas
 │   ├── romus.js          la esfera holográfica de Romus
@@ -286,6 +349,16 @@ Todo es HTML, CSS y JavaScript puro: no hace falta compilar nada. Para publicar 
 Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canvas 2D · APIs de Anthropic, OpenAI y Gemini, más cualquier API compatible con OpenAI · GitHub Pages.
 
 ## Novedades
+
+### v3.0 · Romus en la cinta de Word, APA 7 y la tesis completa
+- **Pestaña «Romus» en la cinta de Word** con 5 grupos y 48 acciones directas (runtime compartido); respaldo para versiones anteriores.
+- **Asesor APA 7, generador de referencias (11 tipos), revisor de normas y formato APA 7 en un clic.**
+- **Trabajo de campo:** tamaño de muestra, cuestionario o guion desde la operacionalización, formato para jueces, V de Aiken y Lawshe, y documentos de ética.
+- **Literatura:** biblioteca del proyecto, importación de Zotero y Mendeley, fichas de lectura, matriz de antecedentes, estado del arte, búsqueda en español, frases sin cita y cita–fuente.
+- **Escritura:** discusión triangulada, conclusiones frente a objetivos, resumen y abstract, tesis → artículo, revistas sugeridas y diapositivas de sustentación.
+- **Revisión:** matriz de respuesta a observaciones (lee los comentarios de Word), acta de asesoría y modo director.
+- **Script de R y jamovi** junto a la sintaxis de SPSS.
+- Caja de herramientas organizada por etapa y herramientas sugeridas en «Mi proyecto».
 
 ### v2.9.1 · Romus permanente y estados de un vistazo
 - **Instalación permanente** en Word de escritorio: el instalador registra Romus con el mismo formato que usa Microsoft y pide a Word que lo recargue al abrir. Nuevo acceso **Reparar Romus** en el menú Inicio.
@@ -362,4 +435,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word · v2.9.1</sub></p>
+<p align="center"><sub>Romus para Word · v3.0</sub></p>

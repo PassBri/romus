@@ -1354,6 +1354,64 @@
 
   }
 
+  /* ---------- Pestaña «Romus» de la cinta de Word ---------- */
+  const CINTA = {
+    Hablar: () => alternarMic(),
+    ModoVoz: () => abrirModoVoz(),
+    Burbuja: () => abrirBurbuja(),
+    Leer: "lee el documento", LeerSel: "lee la selección", Corregir: "corrige la ortografía", Revisar: "revisa con comentarios",
+    Resumir: "resume el documento en pocas frases", Explicar: "explícame lo que tengo seleccionado con palabras sencillas",
+    Simplificar: "reescribe la selección con un lenguaje más sencillo", Formal: "reescribe la selección con un tono más formal y académico",
+    Dictar: "modo dictado", Ayuda: () => abrirHoja("panelAyuda"),
+    Asesor: () => Inv.asesor(), MiProyecto: () => { if (window.Asesor) Asesor.miProyecto(); }, Crear: () => { if (window.Asesor) Asesor.nuevoProyecto(); }
+  };
+  const SIN_PANEL = new Set(["Burbuja"]); // funciona sin abrir el panel (la burbuja es su propia ventana)
+  function accionCinta(clave) {
+    if (CINTA[clave]) return CINTA[clave];
+    const id = clave.charAt(0).toLowerCase() + clave.slice(1);
+    if (window.Herramientas && Herramientas.porId(id)) return () => Herramientas.ejecutar(id);
+    return null;
+  }
+  function correrCinta(clave) {
+    const a = accionCinta(clave); if (!a) return;
+    Promise.resolve().then(() => typeof a === "string" ? manejarComando(a, "boton") : a()).catch(mostrarError);
+  }
+  function registrarCinta() {
+    if (!(window.Office && Office.actions && Office.actions.associate)) return;
+    const claves = Object.keys(CINTA).concat(window.Herramientas ? Herramientas.TODAS.map(t => t.id.charAt(0).toUpperCase() + t.id.slice(1)) : []);
+    claves.forEach(clave => {
+      try {
+        Office.actions.associate("romus" + clave, async (ev) => {
+          const compartido = !!(Office.addin && Office.addin.showAsTaskpane);
+          if (!compartido) { // Word sin runtime compartido: la acción queda pendiente para cuando se abra el panel
+            window.__soyFuncion = true; // esta instancia oculta no debe consumir lo pendiente
+            try { localStorage.setItem("romus.cinta.pendiente", JSON.stringify({ clave, t: Date.now() })); } catch (e) { /* sin almacenamiento */ }
+            ev.completed(); return;
+          }
+          if (!(SIN_PANEL.has(clave) || (clave === "Hablar" && estado.burbuja))) { try { await Office.addin.showAsTaskpane(); } catch (e) { /* ya visible */ } }
+          ev.completed();
+          correrCinta(clave);
+        });
+      } catch (e) { /* función ya registrada */ }
+    });
+    // Con el panel oculto, Romus deja de escuchar (salvo que la burbuja esté abierta): privacidad del micrófono.
+    try {
+      Office.addin.onVisibilityModeChanged((a) => {
+        estado.panelVisible = a.visibilityMode !== "Hidden";
+        if (!estado.panelVisible && !estado.burbuja && Voz.escuchando) { estado.escuchaPausadaPorCinta = true; Voz.detenerEscucha(false); }
+        else if (estado.panelVisible && estado.escuchaPausadaPorCinta) { estado.escuchaPausadaPorCinta = false; if (Config.get().manosLibres) empezarEscucha(); }
+      });
+    } catch (e) { /* sin runtime compartido */ }
+  }
+  function ejecutarPendienteCinta() {
+    if (window.__soyFuncion) return;
+    try {
+      const p = JSON.parse(localStorage.getItem("romus.cinta.pendiente") || "null");
+      localStorage.removeItem("romus.cinta.pendiente");
+      if (p && Date.now() - p.t < 5 * 60000) setTimeout(() => correrCinta(p.clave), 600);
+    } catch (e) { /* nada pendiente */ }
+  }
+
   function conectarEventos() {
     document.querySelectorAll(".pestana").forEach(b => b.addEventListener("click", () => irPestana(b.dataset.ir)));
     if ($("btnLimpiarChat")) $("btnLimpiarChat").addEventListener("click", () => {
@@ -1607,6 +1665,14 @@
     actualizarAvisoClave();
     conectarEventos();
     irPestana(Config.get().pestana || "inicio", { sinScroll: true });
+    if (window.Herramientas) Herramientas.pintar($("invHerramientas"));
+    registrarCinta();
+    ejecutarPendienteCinta();
+    // Word sin runtime compartido: si el panel ya está abierto, recoge las acciones de la cinta
+    if (!(window.Office && Office.addin && Office.addin.showAsTaskpane)) {
+      window.addEventListener("storage", (e) => { if (e.key === "romus.cinta.pendiente" && e.newValue) ejecutarPendienteCinta(); });
+      setInterval(() => { if (document.visibilityState === "visible") { try { if (localStorage.getItem("romus.cinta.pendiente")) ejecutarPendienteCinta(); } catch (e) { /* sin almacenamiento */ } } }, 1500);
+    }
     Voz.cargarVoces().then(llenarVoces);
     ajustarAltura();
     if (!Voz.soportaReconocimiento()) {
@@ -1615,7 +1681,7 @@
     } else {
       $("pistaDictado").innerHTML = `<kbd>Ctrl</kbd> + <kbd>Espacio</kbd> para hablar`; $("pistaDictado").title = "Si el micrófono falla, usa el dictado del sistema en la caja";
     }
-    if (estado.enWord && Config.get().manosLibres) empezarEscucha();
+    if (estado.enWord && Config.get().manosLibres && document.visibilityState !== "hidden") empezarEscucha();
   }
 
   if (window.Office && Office.onReady) {

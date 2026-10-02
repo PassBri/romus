@@ -387,5 +387,5 @@ ${doc.texto}`);
     return null;
   }
 
-  return { activo, iniciar, recibir, salir, verificar, comando, _extraerCitas: extraerCitas, _extraerReferencias: extraerReferencias };
+  return { activo, iniciar, recibir, salir, verificar, comando, _extraerCitas: extraerCitas, _extraerReferencias: extraerReferencias, _formatoAPA: formatoAPA };
 })();

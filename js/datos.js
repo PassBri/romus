@@ -383,6 +383,84 @@ ${doc.texto}`, signal);
     return L.join("\r\n") + "\r\n";
   }
 
+  /** Script equivalente en R (funciona en RStudio y en jamovi con el módulo Rj). Determinista. */
+  function construirR(plan) {
+    const L = [], q = (t) => '"' + String(t || "").replace(/\\/g, "\\\\").replace(/"/g, '\\"') + '"';
+    const lab = {};
+    plan.variables.forEach(v => { if (v.valores.length) lab[v.nombre] = v.valores; });
+    const nivelesDe = (n, cods) => (lab[n] || []).filter(x => !cods || cods.includes(num(x.codigo))).map(x => q(x.etiqueta));
+    L.push("# ==================================================================",
+      "# Script de análisis generado por Romus" + (plan.titulo ? " para «" + plan.titulo + "»" : ""),
+      "# Funciona en R/RStudio y en jamovi (módulo «Rj Editor»). Revisa nombres y códigos.",
+      "# ==================================================================", "",
+      "# Paquetes (instálalos solo la primera vez):",
+      "# install.packages(c(\"readxl\", \"psych\"))",
+      "library(readxl)", "",
+      "# ---------- 1. Leer los datos ----------",
+      "# Elige tu archivo de Excel (.xlsx). Si es CSV, usa: datos <- read.csv(file.choose(), fileEncoding = \"UTF-8\")",
+      "datos <- as.data.frame(read_excel(file.choose()))", "");
+    const perd = plan.variables.filter(v => !v.calculada && v.perdido != null);
+    if (perd.length) { L.push("# ---------- 2. Datos perdidos ----------"); perd.forEach(v => L.push(`datos$${v.nombre}[datos$${v.nombre} == ${v.perdido}] <- NA`)); L.push(""); }
+    if (plan.escalas.length) {
+      L.push("# ---------- 3. Puntajes de las escalas y confiabilidad ----------");
+      plan.escalas.forEach(e => {
+        const it = "c(" + e.items.map(q).join(", ") + ")";
+        L.push(`# ${e.etiqueta}`, `datos$${e.nombre} <- ${e.calculo === "suma" ? "rowSums" : "rowMeans"}(datos[, ${it}], na.rm = TRUE)`);
+        L.push(`if (requireNamespace("psych", quietly = TRUE)) print(psych::alpha(datos[, ${it}])$total)`);
+      });
+      L.push("");
+    }
+    // Factores con etiquetas (se crean como columnas nuevas para conservar los códigos)
+    const cat = plan.variables.filter(v => v.nivel === "nominal" && lab[v.nombre]);
+    if (cat.length) {
+      L.push("# ---------- 4. Etiquetas de las variables categóricas ----------");
+      cat.forEach(v => L.push(`datos$${v.nombre}_f <- factor(datos$${v.nombre}, levels = c(${lab[v.nombre].map(x => num(x.codigo)).join(", ")}), labels = c(${nivelesDe(v.nombre).join(", ")}))`));
+      L.push("");
+    }
+    const fac = (n) => cat.some(v => v.nombre === n) ? n + "_f" : n;
+    L.push("# ---------- 5. Descripción de la muestra ----------",
+      "describir <- function(x) c(n = sum(!is.na(x)), M = mean(x, na.rm = TRUE), DE = sd(x, na.rm = TRUE), Min = min(x, na.rm = TRUE), Max = max(x, na.rm = TRUE))");
+    plan.variables.filter(v => v.nivel !== "escala").forEach(v => L.push(`print(table(datos$${fac(v.nombre)}, useNA = "ifany")); print(round(prop.table(table(datos$${fac(v.nombre)})) * 100, 1))`));
+    const esc = plan.variables.filter(v => v.nivel === "escala").map(v => v.nombre);
+    if (esc.length) L.push(`print(round(sapply(datos[, c(${esc.map(q).join(", ")}), drop = FALSE], describir), 2))`);
+    L.push("", "# Tamaños del efecto",
+      "d_cohen <- function(x, y) { nx <- sum(!is.na(x)); ny <- sum(!is.na(y)); sp <- sqrt(((nx - 1) * var(x, na.rm = TRUE) + (ny - 1) * var(y, na.rm = TRUE)) / (nx + ny - 2)); (mean(x, na.rm = TRUE) - mean(y, na.rm = TRUE)) / sp }",
+      "v_cramer <- function(tabla) { chi <- suppressWarnings(chisq.test(tabla, correct = FALSE)); sqrt(unname(chi$statistic) / (sum(tabla) * (min(dim(tabla)) - 1))) }", "");
+    L.push("# ---------- 6. Análisis por hipótesis u objetivo ----------");
+    plan.analisis.forEach((a, k) => {
+      const y = a.dependiente || a.variables[0], x = a.independiente || a.variables[1], vs = a.variables.length ? a.variables : [y, x].filter(Boolean);
+      L.push("", `# Análisis ${k + 1}: ${String(a.proposito).replace(/\n/g, " ")}`, `# Prueba: ${PRUEBAS[a.prueba].nombre}`);
+      const gr = a.grupos.length >= 2 ? a.grupos.slice(0, 2) : codigosDe(plan, x).slice(0, 2);
+      switch (a.prueba) {
+        case "descriptivos": vs.forEach(n => L.push((varDe(plan, n) || {}).nivel === "escala" ? `print(round(describir(datos$${n}), 2))` : `print(table(datos$${fac(n)}))`)); break;
+        case "t_independientes": case "mann_whitney": {
+          const g = gr.length === 2 ? gr : [1, 2];
+          L.push(`sub <- subset(datos, ${x} %in% c(${g.join(", ")}))`, `g1 <- sub$${y}[sub$${x} == ${g[0]}]; g2 <- sub$${y}[sub$${x} == ${g[1]}]`);
+          if (a.prueba === "t_independientes") L.push("print(shapiro.test(g1)); print(shapiro.test(g2))  # normalidad por grupo", "print(var.test(g1, g2))  # homogeneidad de varianzas", "print(t.test(g1, g2, var.equal = TRUE))  # si var.test da p < .05, usa var.equal = FALSE (Welch)", "cat(\"d de Cohen:\", round(d_cohen(g1, g2), 2), \"\\n\")", "# Alternativa no paramétrica:", "# print(wilcox.test(g1, g2))");
+          else L.push("print(wilcox.test(g1, g2))");
+          break;
+        }
+        case "t_relacionadas": case "wilcoxon": {
+          const [pre, post] = vs.length >= 2 ? vs : [y, x];
+          if (a.prueba === "t_relacionadas") L.push(`dif <- datos$${post} - datos$${pre}`, "print(shapiro.test(dif))", `print(t.test(datos$${post}, datos$${pre}, paired = TRUE))`, "cat(\"d de Cohen (dz):\", round(mean(dif, na.rm = TRUE) / sd(dif, na.rm = TRUE), 2), \"\\n\")", "# Alternativa no paramétrica:", `# print(wilcox.test(datos$${post}, datos$${pre}, paired = TRUE))`);
+          else L.push(`print(wilcox.test(datos$${post}, datos$${pre}, paired = TRUE))`);
+          break;
+        }
+        case "anova": case "kruskal_wallis":
+          if (a.prueba === "anova") L.push(`modelo <- aov(${y} ~ factor(${x}), data = datos)`, "print(summary(modelo))", "print(TukeyHSD(modelo))", "ss <- summary(modelo)[[1]][[\"Sum Sq\"]]; cat(\"eta cuadrado:\", round(ss[1] / sum(ss), 3), \"\\n\")", "# Alternativa no paramétrica:", `# print(kruskal.test(${y} ~ factor(${x}), data = datos))`);
+          else L.push(`print(kruskal.test(${y} ~ factor(${x}), data = datos))`);
+          break;
+        case "pearson": L.push(`print(cor.test(datos$${vs[0]}, datos$${vs[1]}, method = "pearson"))`, "# Alternativa no paramétrica:", `# print(cor.test(datos$${vs[0]}, datos$${vs[1]}, method = "spearman", exact = FALSE))`); break;
+        case "spearman": L.push(`print(cor.test(datos$${vs[0]}, datos$${vs[1]}, method = "spearman", exact = FALSE))`); break;
+        case "chi_cuadrado": L.push(`tabla <- table(datos$${fac(vs[0])}, datos$${fac(vs[1])})`, "print(tabla)", "prueba <- chisq.test(tabla, correct = FALSE); print(prueba)", "print(round(prueba$expected, 2))  # si más del 20 % es < 5, usa fisher.test(tabla)", "cat(\"V de Cramér:\", round(v_cramer(tabla), 3), \"\\n\")"); break;
+        case "regresion": { const preds = a.variables.filter(n => n !== y); L.push(`print(summary(lm(${y} ~ ${(preds.length ? preds : [x]).join(" + ")}, data = datos)))`); break; }
+        case "alfa": L.push(`if (requireNamespace("psych", quietly = TRUE)) print(psych::alpha(datos[, c(${vs.map(q).join(", ")})]))`); break;
+      }
+    });
+    L.push("", "# Cuando tengas los resultados, copia la salida y pídele a Romus: «redacta los resultados en APA».");
+    return L.join("\n") + "\n";
+  }
+
   /** Párrafos del plan de análisis para el documento. Determinista. */
   function textoPlan(plan) {
     const P = [];
@@ -454,7 +532,8 @@ ${doc.texto}`, signal);
     acc.append(
       boton("Copiar sintaxis", "primario", async (e) => { const ok = await copiar(sps); e.target.textContent = ok ? "¡Copiada!" : "Selecciónala y copia"; }),
       boton("Descargar .sps", "", () => descargar("romus-analisis.sps", "﻿" + sps, "text/plain;charset=utf-8")),
-      boton("Plantilla de datos (.xlsx)", "", () => descargar("romus-base-de-datos.xlsx", xlsx([plan.variables.filter(v => !v.calculada).map(v => v.nombre)], "datos")))
+      boton("Plantilla de datos (.xlsx)", "", () => descargar("romus-base-de-datos.xlsx", xlsx([plan.variables.filter(v => !v.calculada).map(v => v.nombre)], "datos"))),
+      boton("Script de R / jamovi", "", () => descargar("romus-analisis.R", construirR(plan), "text/plain;charset=utf-8"))
     );
     c.appendChild(acc);
     const acc2 = el("div", "inv-acciones");
@@ -800,6 +879,6 @@ ${fuente.slice(0, 30000)}`, signal);
   }
 
   return { inicio, sintaxis, resultadosAPA, redactarAPA, libroCodigos, resultadosCualitativos, redactarCualitativo, comando,
-    _construirSintaxis: construirSintaxis, _normalizarPlan: normalizarPlan, _verificarNumeros: verificarNumeros, _pulirAPA: pulirAPA, _aComa: aComa, _xlsx: xlsx, _qdc: qdc, _filasAtlas: filasAtlas, _citaLiteral: citaLiteral, _textoPlan: textoPlan,
+    _construirSintaxis: construirSintaxis, _construirR: construirR, _normalizarPlan: normalizarPlan, _verificarNumeros: verificarNumeros, _pulirAPA: pulirAPA, _aComa: aComa, _xlsx: xlsx, _qdc: qdc, _filasAtlas: filasAtlas, _citaLiteral: citaLiteral, _textoPlan: textoPlan,
     get ultimoPlan() { return ultimoPlan; }, get ultimoLibro() { return ultimoLibro; } };
 })();

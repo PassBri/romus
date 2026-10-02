@@ -1,0 +1,238 @@
+/* Romus · Formato APA 7 en un clic (sin IA: reglas fijas sobre el documento de Word).
+   Aplica: fuente y tamaño, interlineado doble, sangría de primera línea, alineación,
+   los 5 niveles de título de APA 7, referencias con sangría francesa, rótulos de tablas y figuras,
+   notas de tabla, portada de estudiante, número de página y tabla de contenido.
+   Al final informa lo que hizo y lo que el estudiante debe revisar a mano. */
+window.Formato = (function () {
+  const H = () => Inv._h;
+  const FUENTES = { tnr: ["Times New Roman", 12], calibri: ["Calibri", 11], arial: ["Arial", 11], georgia: ["Georgia", 11] };
+  const RE_REF = /^\s*(referencias|referencias bibliogr[aá]ficas|bibliograf[ií]a|lista de referencias)\s*$/i;
+  const RE_ANEXO = /^\s*(anexos?|ap[eé]ndices?)\b/i;
+  const RE_ROTULO = /^\s*(Tabla|Figura)\s+(\d+)\s*[.:]?\s*(.*)$/;
+  const nivelDe = (estilo) => { const m = String(estilo || "").match(/(heading|t[ií]tulo|titre|überschrift)\s*([1-9])/i); return m ? +m[2] : 0; };
+  const esTituloDoc = (estilo) => /^(title|t[ií]tulo|titre)$/i.test(String(estilo || "").trim());
+
+  function tarjetaOpciones() {
+    const { el, tarjeta } = H();
+    const cfg = Config.get().formatoAPA || {};
+    const c = el("div", "inv-cuerpo formato");
+    c.appendChild(el("p", "guia-resumen", "Dejo tu documento con el formato de APA 7 (estudiantes): fuente, interlineado doble, sangrías, niveles de título, referencias con sangría francesa, tablas y figuras. No cambio tu texto."));
+    const fila = (txt, ctrl) => { const l = el("label", "campo-pro"); l.appendChild(el("span", "", txt)); l.appendChild(ctrl); c.appendChild(l); return ctrl; };
+    const sel = (ops, v) => { const s = el("select", "ajuste"); ops.forEach(([k, t]) => { const o = el("option", "", t); o.value = k; s.appendChild(o); }); s.value = v; return s; };
+    const sF = fila("Fuente", sel([["tnr", "Times New Roman 12"], ["calibri", "Calibri 11"], ["arial", "Arial 11"], ["georgia", "Georgia 11"]], cfg.fuente || "tnr"));
+    const sA = fila("Alineación del texto", sel([["izquierda", "A la izquierda (lo que pide APA 7)"], ["justificado", "Justificado (si tu universidad lo exige)"]], cfg.alineacion || "izquierda"));
+    const chk = (txt, v) => { const l = el("label", "interruptor pequeno"); const i = el("input"); i.type = "checkbox"; i.checked = v; l.append(i, el("span", "riel"), el("span", "", txt)); c.appendChild(l); return i; };
+    const cP = chk("Agregar portada de estudiante", cfg.portada !== false);
+    const cN = chk("Número de página arriba a la derecha", cfg.numero !== false);
+    const cT = chk("Tabla de contenido", cfg.indice !== false);
+    c.appendChild(el("p", "inv-nota", "Consejo: guarda una copia antes. Si algo no te gusta, Ctrl+Z deshace los cambios."));
+    const b = el("button", "boton primario", "Aplicar formato APA 7");
+    b.onclick = () => {
+      const o = { fuente: sF.value, alineacion: sA.value, portada: cP.checked, numero: cN.checked, indice: cT.checked };
+      Config.set({ formatoAPA: o });
+      if (o.portada && Docx.faltan(["titulo", "estudiante", "institucion", "programa"]).length) {
+        const f = Docx.formulario(["titulo", "estudiante", "institucion", "facultad", "programa", "curso", "asesor"], () => H().ejecutar(() => aplicar(o)), "Para la portada necesito estos datos. Los guardo para la próxima vez.");
+        H().tarjeta("Datos para la portada", f);
+        return;
+      }
+      H().ejecutar(() => aplicar(o));
+    };
+    c.appendChild(b);
+    tarjeta("Formato APA 7", c);
+    H().ui.hablar("Elige la fuente y pulsa aplicar. Dejo tu documento en formato APA siete.");
+  }
+
+  async function aplicar(o) {
+    o = Object.assign({ fuente: "tnr", alineacion: "izquierda", portada: true, numero: true, indice: true }, o || {});
+    const [fuente, tam] = FUENTES[o.fuente] || FUENTES.tnr;
+    const alin = o.alineacion === "justificado" ? "Justified" : "Left";
+    const hecho = [], revisar = [];
+    const cuenta = { cuerpo: 0, titulos: [0, 0, 0, 0, 0, 0], refs: 0, tablas: 0, figuras: 0, notas: 0, separados: 0 };
+    const numeros = { Tabla: [], Figura: [] };
+    let refsTexto = [];
+
+    await Word.run(async (ctx) => {
+      const ps = ctx.document.body.paragraphs;
+      ps.load("items/text,items/style,items/tableNestingLevel");
+      await ctx.sync();
+      const items = ps.items;
+      let enRefs = false, siguienteTituloRotulo = false;
+      const nuevos = [];
+      items.forEach((p, i) => {
+        const t = (p.text || "").replace(/\r/g, "").trim();
+        const nivel = nivelDe(p.style);
+        const enTabla = (p.tableNestingLevel || 0) > 0;
+        p.font.name = fuente; p.font.size = tam;
+        if (enTabla) return;
+        if (nivel || RE_REF.test(t) || RE_ANEXO.test(t) && t.length < 40) {
+          enRefs = RE_REF.test(t);
+          const n = nivel || 1;
+          if (!nivel) p.styleBuiltIn = "Heading1";
+          cuenta.titulos[n]++;
+          p.font.name = fuente; p.font.size = tam; p.font.color = "#000000";
+          p.font.bold = true; p.font.italic = n === 3 || n === 5;
+          p.alignment = n === 1 ? "Centered" : "Left";
+          p.firstLineIndent = n >= 4 ? 36 : 0; p.leftIndent = 0;
+          p.lineSpacing = tam * 2; p.spaceBefore = 0; p.spaceAfter = 0;
+          return;
+        }
+        if (esTituloDoc(p.style)) { p.font.bold = true; p.font.color = "#000000"; p.alignment = "Centered"; p.firstLineIndent = 0; return; }
+        if (!t) { siguienteTituloRotulo = false; return; }
+        const rot = t.match(RE_ROTULO);
+        if (rot && t.length < 160) {
+          const tipo = rot[1]; numeros[tipo].push(+rot[2]);
+          cuenta[tipo === "Tabla" ? "tablas" : "figuras"]++;
+          p.firstLineIndent = 0; p.leftIndent = 0; p.alignment = "Left"; p.lineSpacing = tam * 2; p.spaceAfter = 0; p.spaceBefore = 0;
+          if (rot[3]) { // «Tabla 1. Título» → número en negrita y título en cursiva en la línea siguiente
+            p.insertText(`${tipo} ${rot[2]}`, "Replace");
+            const q = p.insertParagraph(rot[3].replace(/^[.:\s]+/, ""), "After");
+            q.font.name = fuente; q.font.size = tam; q.font.bold = false; q.font.italic = true; q.firstLineIndent = 0; q.leftIndent = 0; q.alignment = "Left"; q.lineSpacing = tam * 2; q.spaceAfter = 0;
+            cuenta.separados++;
+          }
+          p.font.bold = true; p.font.italic = false;
+          siguienteTituloRotulo = !rot[3];
+          return;
+        }
+        if (siguienteTituloRotulo) { // título de la tabla o figura
+          p.font.italic = true; p.font.bold = false; p.firstLineIndent = 0; p.leftIndent = 0; p.alignment = "Left"; p.lineSpacing = tam * 2; p.spaceAfter = 0;
+          siguienteTituloRotulo = false; return;
+        }
+        if (/^Nota\.\s/.test(t)) {
+          p.firstLineIndent = 0; p.leftIndent = 0; p.alignment = "Left"; p.lineSpacing = tam * 2; p.spaceAfter = 0;
+          const r = p.search("Nota.", { matchCase: true }); r.load("items"); nuevos.push(r); cuenta.notas++;
+          return;
+        }
+        p.lineSpacing = tam * 2; p.spaceBefore = 0; p.spaceAfter = 0; p.font.color = "#000000";
+        if (enRefs) {
+          p.leftIndent = 36; p.firstLineIndent = -36; p.alignment = "Left";
+          cuenta.refs++; refsTexto.push(t);
+        } else {
+          p.leftIndent = 0; p.firstLineIndent = 36; p.alignment = alin;
+          cuenta.cuerpo++;
+        }
+      });
+      await ctx.sync();
+      nuevos.forEach(r => { if (r.items && r.items[0]) r.items[0].font.italic = true; });
+      await ctx.sync();
+    });
+    hecho.push(`Fuente ${fuente} ${tam} e interlineado doble en todo el texto.`);
+    if (cuenta.cuerpo) hecho.push(`${cuenta.cuerpo} párrafos con sangría de primera línea de 1,27 cm, ${o.alineacion === "justificado" ? "justificados" : "alineados a la izquierda"} y sin espacio extra entre párrafos.`);
+    const niv = cuenta.titulos.map((n, k) => n && k ? `nivel ${k}: ${n}` : "").filter(Boolean);
+    if (niv.length) hecho.push(`Títulos con los niveles de APA 7 (${niv.join(", ")}): nivel 1 centrado en negrita, nivel 2 a la izquierda en negrita, nivel 3 en negrita y cursiva.`);
+    else revisar.push("No encontré títulos con estilo. Aplica los estilos «Título 1», «Título 2»… a tus títulos (pestaña Inicio de Word) y vuelve a aplicar el formato.");
+    if (cuenta.refs) hecho.push(`${cuenta.refs} referencias con sangría francesa.`);
+    if (cuenta.tablas || cuenta.figuras) hecho.push(`${cuenta.tablas} tablas y ${cuenta.figuras} figuras: número en negrita y título en cursiva${cuenta.separados ? ` (separé ${cuenta.separados} rótulos que tenían el título en la misma línea)` : ""}.`);
+    if (cuenta.notas) hecho.push(`${cuenta.notas} notas de tabla con «Nota.» en cursiva.`);
+    // Revisión de numeración de tablas y figuras
+    ["Tabla", "Figura"].forEach(tipo => {
+      const ns = numeros[tipo]; const malos = ns.filter((n, k) => n !== k + 1);
+      if (malos.length) revisar.push(`La numeración de ${tipo === "Tabla" ? "las tablas" : "las figuras"} no es consecutiva (${ns.join(", ")}). Debe ir 1, 2, 3… en el orden en que aparecen.`);
+    });
+    // Orden alfabético de referencias
+    const orden = refsTexto.slice().sort((a, b) => a.localeCompare(b, "es", { sensitivity: "base" }));
+    const fuera = refsTexto.findIndex((r, k) => r !== orden[k]);
+    if (fuera >= 0) revisar.push(`Las referencias no están en orden alfabético (revisa desde «${refsTexto[fuera].slice(0, 40)}…»).`);
+    if (!cuenta.refs) revisar.push("No encontré la sección «Referencias». Agrégala al final con un título.");
+
+    // Portada, número de página y tabla de contenido
+    if (o.portada) { const r = await portada(fuente, tam); if (r === "hecha") hecho.push("Portada de estudiante con título, autor, institución, programa, curso, docente y fecha."); else if (r === "existe") hecho.push("Ya tenías portada: la dejé como estaba."); }
+    if (o.numero) { if (await numeroPagina()) hecho.push("Número de página arriba a la derecha."); else revisar.push("Agrega el número de página: Insertar → Número de página → Principio de página → Número sin formato 3."); }
+    if (o.indice) { const r = await indice(); if (r === "hecha") hecho.push("Tabla de contenido después de la portada (clic derecho → Actualizar campos cuando termines)."); else if (r !== "existe") revisar.push("Agrega la tabla de contenido: Referencias → Tabla de contenido → Tabla automática 1."); }
+    revisar.push("Márgenes de 2,54 cm en los cuatro lados: Disposición → Márgenes → Normal.");
+    revisar.push("Las citas de 40 palabras o más van en bloque aparte, con sangría de 1,27 cm y sin comillas.");
+
+    H().registrar("Formato APA 7", `${cuenta.cuerpo} párrafos, ${cuenta.refs} referencias`, "rubrica");
+    const { el, tarjeta, etiqueta } = H();
+    const c = el("div", "inv-cuerpo formato");
+    c.appendChild(etiqueta("reglas", "APA 7"));
+    c.appendChild(el("div", "inv-sub", "Lo que hice"));
+    const ul = el("ul", "guia-puntos lista-ok"); hecho.forEach(x => ul.appendChild(el("li", "", x))); c.appendChild(ul);
+    c.appendChild(el("div", "inv-sub", "Revisa tú"));
+    const ul2 = el("ul", "guia-puntos lista-revisar"); revisar.forEach(x => ul2.appendChild(el("li", "", x))); c.appendChild(ul2);
+    const acc = el("div", "inv-acciones");
+    const bV = el("button", "boton secundario", "Verificar referencias"); bV.onclick = () => { if (window.Jurado) H().ejecutar(Jurado.verificar); };
+    const bS = el("button", "boton secundario", "Frases sin cita"); bS.onclick = () => { if (window.Biblio) H().ejecutar(() => Biblio.sinRespaldo()); };
+    acc.append(bV, bS); c.appendChild(acc);
+    tarjeta("Formato APA 7 aplicado", c);
+    H().ui.hablar(`Listo. Apliqué el formato APA siete. ${revisar.length ? "Te dejé " + revisar.length + " cosas para revisar." : ""}`);
+    return { hecho, revisar, cuenta };
+  }
+
+  /** Portada de estudiante (APA 7). Devuelve "hecha", "existe" o "no". */
+  async function portada(fuente, tam) {
+    const d = Docx.datos();
+    if (!d.titulo) return "no";
+    return Word.run(async (ctx) => {
+      const ps = ctx.document.body.paragraphs; ps.load("items/text"); await ctx.sync();
+      const primeros = ps.items.slice(0, 12).map(p => H().norm(p.text));
+      if (primeros.some(t => t && t === H().norm(d.titulo))) return "existe";
+      const body = ctx.document.body;
+      const lineas = [
+        ["", false], ["", false], ["", false],
+        [d.titulo, true], ["", false],
+        [d.estudiante, false],
+        [[d.facultad, d.institucion].filter(Boolean).join(", ") || d.institucion, false],
+        [d.programa, false],
+        [d.curso, false],
+        [d.asesor ? (d.asesor.match(/^(dr|dra|mg|lic|esp|prof)\b/i) ? d.asesor : d.asesor) : "", false],
+        [Docx.fechaLarga(), false]
+      ].filter(([t], k) => k < 5 || t);
+      // Insertar al inicio en orden inverso
+      let primero = null;
+      for (let k = lineas.length - 1; k >= 0; k--) {
+        const [t, negrita] = lineas[k];
+        const p = body.insertParagraph(t, "Start");
+        p.styleBuiltIn = "Normal";
+        p.alignment = "Centered"; p.firstLineIndent = 0; p.leftIndent = 0; p.lineSpacing = tam * 2; p.spaceAfter = 0;
+        p.font.name = fuente; p.font.size = tam; p.font.bold = negrita; p.font.italic = false;
+        if (k === lineas.length - 1) primero = p;
+      }
+      try { primero.insertBreak("Page", "After"); } catch (e) { /* sin salto: el estudiante lo agrega */ }
+      await ctx.sync();
+      return "hecha";
+    });
+  }
+
+  async function numeroPagina() {
+    try {
+      return await Word.run(async (ctx) => {
+        const sec = ctx.document.sections.getFirst();
+        const enc = sec.getHeader("Primary");
+        enc.load("text"); await ctx.sync();
+        if (/\d/.test(enc.text || "")) return true;
+        const p = enc.insertParagraph("", "Start");
+        p.alignment = "Right";
+        p.getRange("Start").insertField("Start", "Page");
+        await ctx.sync();
+        return true;
+      });
+    } catch (e) { return false; }
+  }
+
+  async function indice() {
+    try {
+      return await Word.run(async (ctx) => {
+        const ps = ctx.document.body.paragraphs; ps.load("items/text,items/style"); await ctx.sync();
+        if (ps.items.some(p => /^(tabla de contenido|contenido|[ií]ndice)$/i.test(p.text.trim()))) return "existe";
+        const primerTitulo = ps.items.find(p => nivelDe(p.style) === 1);
+        if (!primerTitulo) return "no";
+        const h = primerTitulo.insertParagraph("Tabla de contenido", "Before");
+        h.alignment = "Centered"; h.font.bold = true; h.firstLineIndent = 0;
+        const q = primerTitulo.insertParagraph("", "Before");
+        q.getRange("Start").insertField("Start", "TOC", '\\o "1-3" \\h \\z \\u', true);
+        try { q.insertBreak("Page", "After"); } catch (e) { /* opcional */ }
+        await ctx.sync();
+        return "hecha";
+      });
+    } catch (e) { return "no"; }
+  }
+
+  function comando(n) {
+    if (/(formato|normas?) apa|^(aplica|pon|dale|ponle|dame)( el)? formato( apa)?( 7| siete)?( al documento| a mi (tesis|documento|trabajo))?$|^formatea( el| mi)? (documento|trabajo|tesis)( en apa)?$/.test(n) && !/(referencia|cita)/.test(n)) return () => tarjetaOpciones();
+    if (/^(pon|agrega|inserta|crea|haz)( me)?( la| una)? portada( apa)?$/.test(n)) return () => tarjetaOpciones();
+    if (/^(datos del proyecto|mis datos|cambia mis datos)$/.test(n)) return () => H().tarjeta("Datos del proyecto", Docx.formulario(null, () => H().ui.confirmar("Guardé los datos del proyecto.")));
+    return null;
+  }
+
+  return { tarjetaOpciones, aplicar, portada, comando, _nivelDe: nivelDe };
+})();

@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Romus para Word — Manifiesto del complemento para Microsoft Word.
+  Romus para Word — Manifiesto del complemento.
   No lo edites a mano: abre la página de Romus publicada (index.html) y pulsa «Descargar mi manifest.xml».
-  Si prefieres hacerlo a mano, reemplaza TODAS las apariciones de "TU-USUARIO" por tu usuario de GitHub
-  (o por la dirección donde alojes los archivos). Deben ser direcciones https://
+  Generado por dev/generar-cinta.js a partir de js/herramientas.js.
 -->
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -11,11 +10,11 @@
            xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
            xsi:type="TaskPaneApp">
   <Id>5f564e3f-5a46-472e-8454-27f2c1cdfc22</Id>
-  <Version>2.2.0.0</Version>
+  <Version>3.0.0.0</Version>
   <ProviderName>Brian Suárez</ProviderName>
   <DefaultLocale>es-ES</DefaultLocale>
   <DisplayName DefaultValue="Romus"/>
-  <Description DefaultValue="Romus: asistente de voz con inteligencia artificial para leer, corregir y editar documentos de Word. Se activa diciendo «Ok Romus»."/>
+  <Description DefaultValue="Romus: asistente de voz con IA y asesor de investigación para Word. Lee, corrige, aplica normas APA 7 y te acompaña desde la idea hasta la sustentación."/>
   <IconUrl DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/icon-32.png"/>
   <HighResolutionIconUrl DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/icon-64.png"/>
   <SupportUrl DefaultValue="https://TU-USUARIO.github.io/romus/"/>
@@ -37,40 +36,37 @@
   <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
     <Hosts>
       <Host xsi:type="Document">
+        <Runtimes>
+          <Runtime resid="Taskpane.Url" lifetime="long"/>
+        </Runtimes>
         <DesktopFormFactor>
           <GetStarted>
             <Title resid="GetStarted.Title"/>
             <Description resid="GetStarted.Description"/>
             <LearnMoreUrl resid="GetStarted.LearnMoreUrl"/>
           </GetStarted>
-          <FunctionFile resid="Commands.Url"/>
+          <FunctionFile resid="Taskpane.Url"/>
           <ExtensionPoint xsi:type="PrimaryCommandSurface">
             <OfficeTab id="TabHome">
               <Group id="VozDoc.Group">
                 <Label resid="Group.Label"/>
-                <Icon>
-                  <bt:Image size="16" resid="Icon.16x16"/>
-                  <bt:Image size="32" resid="Icon.32x32"/>
-                  <bt:Image size="80" resid="Icon.80x80"/>
-                </Icon>
+                <Icon><bt:Image size="16" resid="Icon.16x16"/><bt:Image size="32" resid="Icon.32x32"/><bt:Image size="80" resid="Icon.80x80"/></Icon>
                 <Control xsi:type="Button" id="VozDoc.AbrirPanel">
                   <Label resid="Button.Label"/>
-                  <Supertip>
-                    <Title resid="Button.Label"/>
-                    <Description resid="Button.Tooltip"/>
-                  </Supertip>
-                  <Icon>
-                    <bt:Image size="16" resid="Icon.16x16"/>
-                    <bt:Image size="32" resid="Icon.32x32"/>
-                    <bt:Image size="80" resid="Icon.80x80"/>
-                  </Icon>
-                  <Action xsi:type="ShowTaskpane">
-                    <TaskpaneId>VozDocPanel</TaskpaneId>
-                    <SourceLocation resid="Taskpane.Url"/>
-                  </Action>
+                  <Supertip><Title resid="Button.Label"/><Description resid="Button.Tooltip"/></Supertip>
+                  <Icon><bt:Image size="16" resid="Icon.16x16"/><bt:Image size="32" resid="Icon.32x32"/><bt:Image size="80" resid="Icon.80x80"/></Icon>
+                  <Action xsi:type="ShowTaskpane"><TaskpaneId>VozDocPanel</TaskpaneId><SourceLocation resid="Taskpane.Url"/></Action>
                 </Control>
               </Group>
             </OfficeTab>
+            <CustomTab id="Romus.Tab">
+              <Group id="Romus.G.Voz"><Label resid="L.G.Voz"/><Icon><bt:Image size="16" resid="Icon.16x16"/><bt:Image size="32" resid="Icon.32x32"/><bt:Image size="80" resid="Icon.80x80"/></Icon><Control xsi:type="Button" id="Romus.Abrir"><Label resid="L.Abrir"/><Supertip><Title resid="L.Abrir"/><Description resid="T.Abrir"/></Supertip><Icon><bt:Image size="16" resid="Icon.16x16"/><bt:Image size="32" resid="Icon.32x32"/><bt:Image size="80" resid="Icon.80x80"/></Icon><Action xsi:type="ShowTaskpane"><TaskpaneId>VozDocPanel</TaskpaneId><SourceLocation resid="Taskpane.Url"/></Action></Control><Control xsi:type="Button" id="Romus.romusHablar"><Label resid="L.Hablar"/><Supertip><Title resid="L.Hablar.t"/><Description resid="T.Hablar"/></Supertip><Icon><bt:Image size="16" resid="I.hablar.16"/><bt:Image size="32" resid="I.hablar.32"/><bt:Image size="80" resid="I.hablar.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusHablar</FunctionName></Action></Control><Control xsi:type="Button" id="Romus.romusModoVoz"><Label resid="L.ModoVoz"/><Supertip><Title resid="L.ModoVoz.t"/><Description resid="T.ModoVoz"/></Supertip><Icon><bt:Image size="16" resid="I.modovoz.16"/><bt:Image size="32" resid="I.modovoz.32"/><bt:Image size="80" resid="I.modovoz.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusModoVoz</FunctionName></Action></Control><Control xsi:type="Button" id="Romus.romusBurbuja"><Label resid="L.Burbuja"/><Supertip><Title resid="L.Burbuja.t"/><Description resid="T.Burbuja"/></Supertip><Icon><bt:Image size="16" resid="I.burbuja.16"/><bt:Image size="32" resid="I.burbuja.32"/><bt:Image size="80" resid="I.burbuja.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusBurbuja</FunctionName></Action></Control></Group>
+              <Group id="Romus.G.Doc"><Label resid="L.G.Doc"/><Icon><bt:Image size="16" resid="I.leer.16"/><bt:Image size="32" resid="I.leer.32"/><bt:Image size="80" resid="I.leer.80"/></Icon><Control xsi:type="Button" id="Romus.romusLeer"><Label resid="L.Leer"/><Supertip><Title resid="L.Leer.t"/><Description resid="T.Leer"/></Supertip><Icon><bt:Image size="16" resid="I.leer.16"/><bt:Image size="32" resid="I.leer.32"/><bt:Image size="80" resid="I.leer.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusLeer</FunctionName></Action></Control><Control xsi:type="Button" id="Romus.romusCorregir"><Label resid="L.Corregir"/><Supertip><Title resid="L.Corregir.t"/><Description resid="T.Corregir"/></Supertip><Icon><bt:Image size="16" resid="I.corregir.16"/><bt:Image size="32" resid="I.corregir.32"/><bt:Image size="80" resid="I.corregir.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusCorregir</FunctionName></Action></Control><Control xsi:type="Button" id="Romus.romusRevisar"><Label resid="L.Revisar"/><Supertip><Title resid="L.Revisar.t"/><Description resid="T.Revisar"/></Supertip><Icon><bt:Image size="16" resid="I.revisar.16"/><bt:Image size="32" resid="I.revisar.32"/><bt:Image size="80" resid="I.revisar.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusRevisar</FunctionName></Action></Control><Control xsi:type="Button" id="Romus.romusResumir"><Label resid="L.Resumir"/><Supertip><Title resid="L.Resumir.t"/><Description resid="T.Resumir"/></Supertip><Icon><bt:Image size="16" resid="I.resumir.16"/><bt:Image size="32" resid="I.resumir.32"/><bt:Image size="80" resid="I.resumir.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusResumir</FunctionName></Action></Control><Control xsi:type="Menu" id="Romus.Menu.Mas"><Label resid="L.M.Mas"/><Supertip><Title resid="L.M.Mas"/><Description resid="T.M.Mas"/></Supertip><Icon><bt:Image size="16" resid="I.mas.16"/><bt:Image size="32" resid="I.mas.32"/><bt:Image size="80" resid="I.mas.80"/></Icon><Items><Item id="Romus.romusExplicar"><Label resid="L.Explicar"/><Supertip><Title resid="L.Explicar.t"/><Description resid="T.Explicar"/></Supertip><Icon><bt:Image size="16" resid="I.explicar.16"/><bt:Image size="32" resid="I.explicar.32"/><bt:Image size="80" resid="I.explicar.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusExplicar</FunctionName></Action></Item><Item id="Romus.romusLeerSel"><Label resid="L.LeerSel"/><Supertip><Title resid="L.LeerSel.t"/><Description resid="T.LeerSel"/></Supertip><Icon><bt:Image size="16" resid="I.leersel.16"/><bt:Image size="32" resid="I.leersel.32"/><bt:Image size="80" resid="I.leersel.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusLeerSel</FunctionName></Action></Item><Item id="Romus.romusSimplificar"><Label resid="L.Simplificar"/><Supertip><Title resid="L.Simplificar.t"/><Description resid="T.Simplificar"/></Supertip><Icon><bt:Image size="16" resid="I.simplificar.16"/><bt:Image size="32" resid="I.simplificar.32"/><bt:Image size="80" resid="I.simplificar.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusSimplificar</FunctionName></Action></Item><Item id="Romus.romusFormal"><Label resid="L.Formal"/><Supertip><Title resid="L.Formal.t"/><Description resid="T.Formal"/></Supertip><Icon><bt:Image size="16" resid="I.formal.16"/><bt:Image size="32" resid="I.formal.32"/><bt:Image size="80" resid="I.formal.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusFormal</FunctionName></Action></Item><Item id="Romus.romusDictar"><Label resid="L.Dictar"/><Supertip><Title resid="L.Dictar.t"/><Description resid="T.Dictar"/></Supertip><Icon><bt:Image size="16" resid="I.dictar.16"/><bt:Image size="32" resid="I.dictar.32"/><bt:Image size="80" resid="I.dictar.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusDictar</FunctionName></Action></Item></Items></Control></Group>
+              <Group id="Romus.G.Inv"><Label resid="L.G.Inv"/><Icon><bt:Image size="16" resid="I.asesor.16"/><bt:Image size="32" resid="I.asesor.32"/><bt:Image size="80" resid="I.asesor.80"/></Icon><Control xsi:type="Button" id="Romus.romusAsesor"><Label resid="L.Asesor"/><Supertip><Title resid="L.Asesor.t"/><Description resid="T.Asesor"/></Supertip><Icon><bt:Image size="16" resid="I.asesor.16"/><bt:Image size="32" resid="I.asesor.32"/><bt:Image size="80" resid="I.asesor.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusAsesor</FunctionName></Action></Control><Control xsi:type="Button" id="Romus.romusMiProyecto"><Label resid="L.MiProyecto"/><Supertip><Title resid="L.MiProyecto.t"/><Description resid="T.MiProyecto"/></Supertip><Icon><bt:Image size="16" resid="I.proyecto.16"/><bt:Image size="32" resid="I.proyecto.32"/><bt:Image size="80" resid="I.proyecto.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusMiProyecto</FunctionName></Action></Control><Control xsi:type="Button" id="Romus.romusCrear"><Label resid="L.Crear"/><Supertip><Title resid="L.Crear.t"/><Description resid="T.Crear"/></Supertip><Icon><bt:Image size="16" resid="I.crear.16"/><bt:Image size="32" resid="I.crear.32"/><bt:Image size="80" resid="I.crear.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusCrear</FunctionName></Action></Control><Control xsi:type="Menu" id="Romus.Menu.Planear"><Label resid="L.M.Planear"/><Supertip><Title resid="L.M.Planear"/><Description resid="T.M.Planear"/></Supertip><Icon><bt:Image size="16" resid="I.bombillo.16"/><bt:Image size="32" resid="I.bombillo.32"/><bt:Image size="80" resid="I.bombillo.80"/></Icon><Items><Item id="Romus.romusIdear"><Label resid="L.idear"/><Supertip><Title resid="L.idear.t"/><Description resid="T.idear"/></Supertip><Icon><bt:Image size="16" resid="I.bombillo.16"/><bt:Image size="32" resid="I.bombillo.32"/><bt:Image size="80" resid="I.bombillo.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusIdear</FunctionName></Action></Item><Item id="Romus.romusEstructura"><Label resid="L.estructura"/><Supertip><Title resid="L.estructura.t"/><Description resid="T.estructura"/></Supertip><Icon><bt:Image size="16" resid="I.estructura.16"/><bt:Image size="32" resid="I.estructura.32"/><bt:Image size="80" resid="I.estructura.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusEstructura</FunctionName></Action></Item><Item id="Romus.romusCoherencia"><Label resid="L.coherencia"/><Supertip><Title resid="L.coherencia.t"/><Description resid="T.coherencia"/></Supertip><Icon><bt:Image size="16" resid="I.coherencia.16"/><bt:Image size="32" resid="I.coherencia.32"/><bt:Image size="80" resid="I.coherencia.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusCoherencia</FunctionName></Action></Item><Item id="Romus.romusRubrica"><Label resid="L.rubrica"/><Supertip><Title resid="L.rubrica.t"/><Description resid="T.rubrica"/></Supertip><Icon><bt:Image size="16" resid="I.rubrica.16"/><bt:Image size="32" resid="I.rubrica.32"/><bt:Image size="80" resid="I.rubrica.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusRubrica</FunctionName></Action></Item><Item id="Romus.romusLiteratura"><Label resid="L.literatura"/><Supertip><Title resid="L.literatura.t"/><Description resid="T.literatura"/></Supertip><Icon><bt:Image size="16" resid="I.libro.16"/><bt:Image size="32" resid="I.libro.32"/><bt:Image size="80" resid="I.libro.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusLiteratura</FunctionName></Action></Item><Item id="Romus.romusBiblioteca"><Label resid="L.biblioteca"/><Supertip><Title resid="L.biblioteca.t"/><Description resid="T.biblioteca"/></Supertip><Icon><bt:Image size="16" resid="I.biblioteca.16"/><bt:Image size="32" resid="I.biblioteca.32"/><bt:Image size="80" resid="I.biblioteca.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusBiblioteca</FunctionName></Action></Item><Item id="Romus.romusMatriz"><Label resid="L.matriz"/><Supertip><Title resid="L.matriz.t"/><Description resid="T.matriz"/></Supertip><Icon><bt:Image size="16" resid="I.matriz.16"/><bt:Image size="32" resid="I.matriz.32"/><bt:Image size="80" resid="I.matriz.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusMatriz</FunctionName></Action></Item><Item id="Romus.romusSincita"><Label resid="L.sincita"/><Supertip><Title resid="L.sincita.t"/><Description resid="T.sincita"/></Supertip><Icon><bt:Image size="16" resid="I.sincita.16"/><bt:Image size="32" resid="I.sincita.32"/><bt:Image size="80" resid="I.sincita.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusSincita</FunctionName></Action></Item></Items></Control><Control xsi:type="Menu" id="Romus.Menu.Disenar"><Label resid="L.M.Disenar"/><Supertip><Title resid="L.M.Disenar"/><Description resid="T.M.Disenar"/></Supertip><Icon><bt:Image size="16" resid="I.instrumento.16"/><bt:Image size="32" resid="I.instrumento.32"/><bt:Image size="80" resid="I.instrumento.80"/></Icon><Items><Item id="Romus.romusMuestra"><Label resid="L.muestra"/><Supertip><Title resid="L.muestra.t"/><Description resid="T.muestra"/></Supertip><Icon><bt:Image size="16" resid="I.muestra.16"/><bt:Image size="32" resid="I.muestra.32"/><bt:Image size="80" resid="I.muestra.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusMuestra</FunctionName></Action></Item><Item id="Romus.romusInstrumento"><Label resid="L.instrumento"/><Supertip><Title resid="L.instrumento.t"/><Description resid="T.instrumento"/></Supertip><Icon><bt:Image size="16" resid="I.instrumento.16"/><bt:Image size="32" resid="I.instrumento.32"/><bt:Image size="80" resid="I.instrumento.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusInstrumento</FunctionName></Action></Item><Item id="Romus.romusValidacion"><Label resid="L.validacion"/><Supertip><Title resid="L.validacion.t"/><Description resid="T.validacion"/></Supertip><Icon><bt:Image size="16" resid="I.validacion.16"/><bt:Image size="32" resid="I.validacion.32"/><bt:Image size="80" resid="I.validacion.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusValidacion</FunctionName></Action></Item><Item id="Romus.romusEtica"><Label resid="L.etica"/><Supertip><Title resid="L.etica.t"/><Description resid="T.etica"/></Supertip><Icon><bt:Image size="16" resid="I.etica.16"/><bt:Image size="32" resid="I.etica.32"/><bt:Image size="80" resid="I.etica.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusEtica</FunctionName></Action></Item><Item id="Romus.romusSpss"><Label resid="L.spss"/><Supertip><Title resid="L.spss.t"/><Description resid="T.spss"/></Supertip><Icon><bt:Image size="16" resid="I.spss.16"/><bt:Image size="32" resid="I.spss.32"/><bt:Image size="80" resid="I.spss.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusSpss</FunctionName></Action></Item><Item id="Romus.romusAtlas"><Label resid="L.atlas"/><Supertip><Title resid="L.atlas.t"/><Description resid="T.atlas"/></Supertip><Icon><bt:Image size="16" resid="I.atlas.16"/><bt:Image size="32" resid="I.atlas.32"/><bt:Image size="80" resid="I.atlas.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusAtlas</FunctionName></Action></Item></Items></Control><Control xsi:type="Menu" id="Romus.Menu.Entregar"><Label resid="L.M.Entregar"/><Supertip><Title resid="L.M.Entregar"/><Description resid="T.M.Entregar"/></Supertip><Icon><bt:Image size="16" resid="I.sustentacion.16"/><bt:Image size="32" resid="I.sustentacion.32"/><bt:Image size="80" resid="I.sustentacion.80"/></Icon><Items><Item id="Romus.romusDiscusion"><Label resid="L.discusion"/><Supertip><Title resid="L.discusion.t"/><Description resid="T.discusion"/></Supertip><Icon><bt:Image size="16" resid="I.discusion.16"/><bt:Image size="32" resid="I.discusion.32"/><bt:Image size="80" resid="I.discusion.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusDiscusion</FunctionName></Action></Item><Item id="Romus.romusConclusiones"><Label resid="L.conclusiones"/><Supertip><Title resid="L.conclusiones.t"/><Description resid="T.conclusiones"/></Supertip><Icon><bt:Image size="16" resid="I.conclusiones.16"/><bt:Image size="32" resid="I.conclusiones.32"/><bt:Image size="80" resid="I.conclusiones.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusConclusiones</FunctionName></Action></Item><Item id="Romus.romusResumen"><Label resid="L.resumen"/><Supertip><Title resid="L.resumen.t"/><Description resid="T.resumen"/></Supertip><Icon><bt:Image size="16" resid="I.resumen.16"/><bt:Image size="32" resid="I.resumen.32"/><bt:Image size="80" resid="I.resumen.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusResumen</FunctionName></Action></Item><Item id="Romus.romusExisten"><Label resid="L.existen"/><Supertip><Title resid="L.existen.t"/><Description resid="T.existen"/></Supertip><Icon><bt:Image size="16" resid="I.existen.16"/><bt:Image size="32" resid="I.existen.32"/><bt:Image size="80" resid="I.existen.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusExisten</FunctionName></Action></Item><Item id="Romus.romusObservaciones"><Label resid="L.observaciones"/><Supertip><Title resid="L.observaciones.t"/><Description resid="T.observaciones"/></Supertip><Icon><bt:Image size="16" resid="I.observaciones.16"/><bt:Image size="32" resid="I.observaciones.32"/><bt:Image size="80" resid="I.observaciones.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusObservaciones</FunctionName></Action></Item><Item id="Romus.romusActa"><Label resid="L.acta"/><Supertip><Title resid="L.acta.t"/><Description resid="T.acta"/></Supertip><Icon><bt:Image size="16" resid="I.acta.16"/><bt:Image size="32" resid="I.acta.32"/><bt:Image size="80" resid="I.acta.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusActa</FunctionName></Action></Item><Item id="Romus.romusSustentacion"><Label resid="L.sustentacion"/><Supertip><Title resid="L.sustentacion.t"/><Description resid="T.sustentacion"/></Supertip><Icon><bt:Image size="16" resid="I.sustentacion.16"/><bt:Image size="32" resid="I.sustentacion.32"/><bt:Image size="80" resid="I.sustentacion.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusSustentacion</FunctionName></Action></Item><Item id="Romus.romusDiapositivas"><Label resid="L.diapositivas"/><Supertip><Title resid="L.diapositivas.t"/><Description resid="T.diapositivas"/></Supertip><Icon><bt:Image size="16" resid="I.diapositivas.16"/><bt:Image size="32" resid="I.diapositivas.32"/><bt:Image size="80" resid="I.diapositivas.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusDiapositivas</FunctionName></Action></Item><Item id="Romus.romusArticulo"><Label resid="L.articulo"/><Supertip><Title resid="L.articulo.t"/><Description resid="T.articulo"/></Supertip><Icon><bt:Image size="16" resid="I.articulo.16"/><bt:Image size="32" resid="I.articulo.32"/><bt:Image size="80" resid="I.articulo.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusArticulo</FunctionName></Action></Item><Item id="Romus.romusUsoia"><Label resid="L.usoia"/><Supertip><Title resid="L.usoia.t"/><Description resid="T.usoia"/></Supertip><Icon><bt:Image size="16" resid="I.usoia.16"/><bt:Image size="32" resid="I.usoia.32"/><bt:Image size="80" resid="I.usoia.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusUsoia</FunctionName></Action></Item></Items></Control></Group>
+              <Group id="Romus.G.Apa"><Label resid="L.G.Apa"/><Icon><bt:Image size="16" resid="I.apa.16"/><bt:Image size="32" resid="I.apa.32"/><bt:Image size="80" resid="I.apa.80"/></Icon><Control xsi:type="Button" id="Romus.romusApaasesor"><Label resid="L.apaasesor"/><Supertip><Title resid="L.apaasesor.t"/><Description resid="T.apaasesor"/></Supertip><Icon><bt:Image size="16" resid="I.apa.16"/><bt:Image size="32" resid="I.apa.32"/><bt:Image size="80" resid="I.apa.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusApaasesor</FunctionName></Action></Control><Control xsi:type="Button" id="Romus.romusAparevisor"><Label resid="L.aparevisor"/><Supertip><Title resid="L.aparevisor.t"/><Description resid="T.aparevisor"/></Supertip><Icon><bt:Image size="16" resid="I.revisor.16"/><bt:Image size="32" resid="I.revisor.32"/><bt:Image size="80" resid="I.revisor.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusAparevisor</FunctionName></Action></Control><Control xsi:type="Button" id="Romus.romusApaformato"><Label resid="L.apaformato"/><Supertip><Title resid="L.apaformato.t"/><Description resid="T.apaformato"/></Supertip><Icon><bt:Image size="16" resid="I.formato.16"/><bt:Image size="32" resid="I.formato.32"/><bt:Image size="80" resid="I.formato.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusApaformato</FunctionName></Action></Control><Control xsi:type="Button" id="Romus.romusApareferencia"><Label resid="L.apareferencia"/><Supertip><Title resid="L.apareferencia.t"/><Description resid="T.apareferencia"/></Supertip><Icon><bt:Image size="16" resid="I.referencia.16"/><bt:Image size="32" resid="I.referencia.32"/><bt:Image size="80" resid="I.referencia.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusApareferencia</FunctionName></Action></Control></Group>
+              <Group id="Romus.G.Ayuda"><Label resid="L.G.Ayuda"/><Icon><bt:Image size="16" resid="I.guia.16"/><bt:Image size="32" resid="I.guia.32"/><bt:Image size="80" resid="I.guia.80"/></Icon><Control xsi:type="Menu" id="Romus.Menu.Aprender"><Label resid="L.M.Aprender"/><Supertip><Title resid="L.M.Aprender"/><Description resid="T.M.Aprender"/></Supertip><Icon><bt:Image size="16" resid="I.tutorial.16"/><bt:Image size="32" resid="I.tutorial.32"/><bt:Image size="80" resid="I.tutorial.80"/></Icon><Items><Item id="Romus.romusGuia"><Label resid="L.guia"/><Supertip><Title resid="L.guia.t"/><Description resid="T.guia"/></Supertip><Icon><bt:Image size="16" resid="I.guia.16"/><bt:Image size="32" resid="I.guia.32"/><bt:Image size="80" resid="I.guia.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusGuia</FunctionName></Action></Item><Item id="Romus.romusTeoria"><Label resid="L.teoria"/><Supertip><Title resid="L.teoria.t"/><Description resid="T.teoria"/></Supertip><Icon><bt:Image size="16" resid="I.teoria.16"/><bt:Image size="32" resid="I.teoria.32"/><bt:Image size="80" resid="I.teoria.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusTeoria</FunctionName></Action></Item><Item id="Romus.romusTutorial"><Label resid="L.tutorial"/><Supertip><Title resid="L.tutorial.t"/><Description resid="T.tutorial"/></Supertip><Icon><bt:Image size="16" resid="I.tutorial.16"/><bt:Image size="32" resid="I.tutorial.32"/><bt:Image size="80" resid="I.tutorial.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusTutorial</FunctionName></Action></Item><Item id="Romus.romusAyuda"><Label resid="L.Ayuda"/><Supertip><Title resid="L.Ayuda.t"/><Description resid="T.Ayuda"/></Supertip><Icon><bt:Image size="16" resid="I.ayuda.16"/><bt:Image size="32" resid="I.ayuda.32"/><bt:Image size="80" resid="I.ayuda.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusAyuda</FunctionName></Action></Item></Items></Control><Control xsi:type="Button" id="Romus.romusDirector"><Label resid="L.director"/><Supertip><Title resid="L.director.t"/><Description resid="T.director"/></Supertip><Icon><bt:Image size="16" resid="I.director.16"/><bt:Image size="32" resid="I.director.32"/><bt:Image size="80" resid="I.director.80"/></Icon><Action xsi:type="ExecuteFunction"><FunctionName>romusDirector</FunctionName></Action></Control></Group>
+              <Label resid="Tab.Label"/>
+            </CustomTab>
           </ExtensionPoint>
         </DesktopFormFactor>
       </Host>
@@ -80,20 +76,328 @@
         <bt:Image id="Icon.16x16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/icon-16.png"/>
         <bt:Image id="Icon.32x32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/icon-32.png"/>
         <bt:Image id="Icon.80x80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/icon-80.png"/>
+        <bt:Image id="I.hablar.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/hablar-16.png"/>
+        <bt:Image id="I.hablar.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/hablar-32.png"/>
+        <bt:Image id="I.hablar.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/hablar-80.png"/>
+        <bt:Image id="I.modovoz.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/modovoz-16.png"/>
+        <bt:Image id="I.modovoz.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/modovoz-32.png"/>
+        <bt:Image id="I.modovoz.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/modovoz-80.png"/>
+        <bt:Image id="I.burbuja.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/burbuja-16.png"/>
+        <bt:Image id="I.burbuja.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/burbuja-32.png"/>
+        <bt:Image id="I.burbuja.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/burbuja-80.png"/>
+        <bt:Image id="I.leer.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/leer-16.png"/>
+        <bt:Image id="I.leer.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/leer-32.png"/>
+        <bt:Image id="I.leer.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/leer-80.png"/>
+        <bt:Image id="I.corregir.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/corregir-16.png"/>
+        <bt:Image id="I.corregir.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/corregir-32.png"/>
+        <bt:Image id="I.corregir.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/corregir-80.png"/>
+        <bt:Image id="I.revisar.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/revisar-16.png"/>
+        <bt:Image id="I.revisar.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/revisar-32.png"/>
+        <bt:Image id="I.revisar.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/revisar-80.png"/>
+        <bt:Image id="I.resumir.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/resumir-16.png"/>
+        <bt:Image id="I.resumir.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/resumir-32.png"/>
+        <bt:Image id="I.resumir.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/resumir-80.png"/>
+        <bt:Image id="I.mas.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/mas-16.png"/>
+        <bt:Image id="I.mas.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/mas-32.png"/>
+        <bt:Image id="I.mas.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/mas-80.png"/>
+        <bt:Image id="I.explicar.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/explicar-16.png"/>
+        <bt:Image id="I.explicar.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/explicar-32.png"/>
+        <bt:Image id="I.explicar.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/explicar-80.png"/>
+        <bt:Image id="I.leersel.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/leersel-16.png"/>
+        <bt:Image id="I.leersel.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/leersel-32.png"/>
+        <bt:Image id="I.leersel.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/leersel-80.png"/>
+        <bt:Image id="I.simplificar.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/simplificar-16.png"/>
+        <bt:Image id="I.simplificar.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/simplificar-32.png"/>
+        <bt:Image id="I.simplificar.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/simplificar-80.png"/>
+        <bt:Image id="I.formal.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/formal-16.png"/>
+        <bt:Image id="I.formal.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/formal-32.png"/>
+        <bt:Image id="I.formal.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/formal-80.png"/>
+        <bt:Image id="I.dictar.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/dictar-16.png"/>
+        <bt:Image id="I.dictar.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/dictar-32.png"/>
+        <bt:Image id="I.dictar.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/dictar-80.png"/>
+        <bt:Image id="I.asesor.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/asesor-16.png"/>
+        <bt:Image id="I.asesor.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/asesor-32.png"/>
+        <bt:Image id="I.asesor.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/asesor-80.png"/>
+        <bt:Image id="I.proyecto.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/proyecto-16.png"/>
+        <bt:Image id="I.proyecto.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/proyecto-32.png"/>
+        <bt:Image id="I.proyecto.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/proyecto-80.png"/>
+        <bt:Image id="I.crear.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/crear-16.png"/>
+        <bt:Image id="I.crear.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/crear-32.png"/>
+        <bt:Image id="I.crear.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/crear-80.png"/>
+        <bt:Image id="I.bombillo.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/bombillo-16.png"/>
+        <bt:Image id="I.bombillo.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/bombillo-32.png"/>
+        <bt:Image id="I.bombillo.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/bombillo-80.png"/>
+        <bt:Image id="I.estructura.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/estructura-16.png"/>
+        <bt:Image id="I.estructura.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/estructura-32.png"/>
+        <bt:Image id="I.estructura.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/estructura-80.png"/>
+        <bt:Image id="I.coherencia.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/coherencia-16.png"/>
+        <bt:Image id="I.coherencia.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/coherencia-32.png"/>
+        <bt:Image id="I.coherencia.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/coherencia-80.png"/>
+        <bt:Image id="I.rubrica.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/rubrica-16.png"/>
+        <bt:Image id="I.rubrica.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/rubrica-32.png"/>
+        <bt:Image id="I.rubrica.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/rubrica-80.png"/>
+        <bt:Image id="I.libro.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/libro-16.png"/>
+        <bt:Image id="I.libro.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/libro-32.png"/>
+        <bt:Image id="I.libro.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/libro-80.png"/>
+        <bt:Image id="I.biblioteca.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/biblioteca-16.png"/>
+        <bt:Image id="I.biblioteca.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/biblioteca-32.png"/>
+        <bt:Image id="I.biblioteca.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/biblioteca-80.png"/>
+        <bt:Image id="I.matriz.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/matriz-16.png"/>
+        <bt:Image id="I.matriz.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/matriz-32.png"/>
+        <bt:Image id="I.matriz.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/matriz-80.png"/>
+        <bt:Image id="I.sincita.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/sincita-16.png"/>
+        <bt:Image id="I.sincita.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/sincita-32.png"/>
+        <bt:Image id="I.sincita.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/sincita-80.png"/>
+        <bt:Image id="I.instrumento.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/instrumento-16.png"/>
+        <bt:Image id="I.instrumento.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/instrumento-32.png"/>
+        <bt:Image id="I.instrumento.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/instrumento-80.png"/>
+        <bt:Image id="I.muestra.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/muestra-16.png"/>
+        <bt:Image id="I.muestra.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/muestra-32.png"/>
+        <bt:Image id="I.muestra.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/muestra-80.png"/>
+        <bt:Image id="I.validacion.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/validacion-16.png"/>
+        <bt:Image id="I.validacion.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/validacion-32.png"/>
+        <bt:Image id="I.validacion.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/validacion-80.png"/>
+        <bt:Image id="I.etica.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/etica-16.png"/>
+        <bt:Image id="I.etica.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/etica-32.png"/>
+        <bt:Image id="I.etica.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/etica-80.png"/>
+        <bt:Image id="I.spss.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/spss-16.png"/>
+        <bt:Image id="I.spss.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/spss-32.png"/>
+        <bt:Image id="I.spss.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/spss-80.png"/>
+        <bt:Image id="I.atlas.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/atlas-16.png"/>
+        <bt:Image id="I.atlas.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/atlas-32.png"/>
+        <bt:Image id="I.atlas.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/atlas-80.png"/>
+        <bt:Image id="I.sustentacion.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/sustentacion-16.png"/>
+        <bt:Image id="I.sustentacion.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/sustentacion-32.png"/>
+        <bt:Image id="I.sustentacion.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/sustentacion-80.png"/>
+        <bt:Image id="I.discusion.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/discusion-16.png"/>
+        <bt:Image id="I.discusion.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/discusion-32.png"/>
+        <bt:Image id="I.discusion.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/discusion-80.png"/>
+        <bt:Image id="I.conclusiones.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/conclusiones-16.png"/>
+        <bt:Image id="I.conclusiones.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/conclusiones-32.png"/>
+        <bt:Image id="I.conclusiones.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/conclusiones-80.png"/>
+        <bt:Image id="I.resumen.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/resumen-16.png"/>
+        <bt:Image id="I.resumen.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/resumen-32.png"/>
+        <bt:Image id="I.resumen.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/resumen-80.png"/>
+        <bt:Image id="I.existen.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/existen-16.png"/>
+        <bt:Image id="I.existen.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/existen-32.png"/>
+        <bt:Image id="I.existen.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/existen-80.png"/>
+        <bt:Image id="I.observaciones.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/observaciones-16.png"/>
+        <bt:Image id="I.observaciones.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/observaciones-32.png"/>
+        <bt:Image id="I.observaciones.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/observaciones-80.png"/>
+        <bt:Image id="I.acta.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/acta-16.png"/>
+        <bt:Image id="I.acta.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/acta-32.png"/>
+        <bt:Image id="I.acta.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/acta-80.png"/>
+        <bt:Image id="I.diapositivas.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/diapositivas-16.png"/>
+        <bt:Image id="I.diapositivas.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/diapositivas-32.png"/>
+        <bt:Image id="I.diapositivas.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/diapositivas-80.png"/>
+        <bt:Image id="I.articulo.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/articulo-16.png"/>
+        <bt:Image id="I.articulo.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/articulo-32.png"/>
+        <bt:Image id="I.articulo.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/articulo-80.png"/>
+        <bt:Image id="I.usoia.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/usoia-16.png"/>
+        <bt:Image id="I.usoia.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/usoia-32.png"/>
+        <bt:Image id="I.usoia.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/usoia-80.png"/>
+        <bt:Image id="I.apa.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/apa-16.png"/>
+        <bt:Image id="I.apa.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/apa-32.png"/>
+        <bt:Image id="I.apa.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/apa-80.png"/>
+        <bt:Image id="I.revisor.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/revisor-16.png"/>
+        <bt:Image id="I.revisor.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/revisor-32.png"/>
+        <bt:Image id="I.revisor.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/revisor-80.png"/>
+        <bt:Image id="I.formato.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/formato-16.png"/>
+        <bt:Image id="I.formato.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/formato-32.png"/>
+        <bt:Image id="I.formato.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/formato-80.png"/>
+        <bt:Image id="I.referencia.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/referencia-16.png"/>
+        <bt:Image id="I.referencia.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/referencia-32.png"/>
+        <bt:Image id="I.referencia.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/referencia-80.png"/>
+        <bt:Image id="I.guia.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/guia-16.png"/>
+        <bt:Image id="I.guia.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/guia-32.png"/>
+        <bt:Image id="I.guia.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/guia-80.png"/>
+        <bt:Image id="I.tutorial.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/tutorial-16.png"/>
+        <bt:Image id="I.tutorial.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/tutorial-32.png"/>
+        <bt:Image id="I.tutorial.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/tutorial-80.png"/>
+        <bt:Image id="I.teoria.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/teoria-16.png"/>
+        <bt:Image id="I.teoria.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/teoria-32.png"/>
+        <bt:Image id="I.teoria.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/teoria-80.png"/>
+        <bt:Image id="I.ayuda.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/ayuda-16.png"/>
+        <bt:Image id="I.ayuda.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/ayuda-32.png"/>
+        <bt:Image id="I.ayuda.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/ayuda-80.png"/>
+        <bt:Image id="I.director.16" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/director-16.png"/>
+        <bt:Image id="I.director.32" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/director-32.png"/>
+        <bt:Image id="I.director.80" DefaultValue="https://TU-USUARIO.github.io/romus/assets/iconos/cinta/director-80.png"/>
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="Commands.Url" DefaultValue="https://TU-USUARIO.github.io/romus/commands.html"/>
         <bt:Url id="Taskpane.Url" DefaultValue="https://TU-USUARIO.github.io/romus/taskpane.html"/>
-        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://TU-USUARIO.github.io/romus/"/>
+        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://TU-USUARIO.github.io/romus/tutorial.html"/>
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="GetStarted.Title" DefaultValue="Romus está listo"/>
         <bt:String id="Group.Label" DefaultValue="Romus"/>
         <bt:String id="Button.Label" DefaultValue="Romus"/>
+        <bt:String id="Tab.Label" DefaultValue="Romus"/>
+        <bt:String id="L.G.Voz" DefaultValue="Romus"/>
+        <bt:String id="L.Abrir" DefaultValue="Abrir Romus"/>
+        <bt:String id="L.Hablar" DefaultValue="Hablar"/>
+        <bt:String id="L.Hablar.t" DefaultValue="Hablar"/>
+        <bt:String id="L.ModoVoz" DefaultValue="Modo voz"/>
+        <bt:String id="L.ModoVoz.t" DefaultValue="Modo voz"/>
+        <bt:String id="L.Burbuja" DefaultValue="Burbuja"/>
+        <bt:String id="L.Burbuja.t" DefaultValue="Burbuja"/>
+        <bt:String id="L.G.Doc" DefaultValue="Documento"/>
+        <bt:String id="L.Leer" DefaultValue="Leer"/>
+        <bt:String id="L.Leer.t" DefaultValue="Leer"/>
+        <bt:String id="L.Corregir" DefaultValue="Corregir"/>
+        <bt:String id="L.Corregir.t" DefaultValue="Corregir"/>
+        <bt:String id="L.Revisar" DefaultValue="Revisar"/>
+        <bt:String id="L.Revisar.t" DefaultValue="Revisar"/>
+        <bt:String id="L.Resumir" DefaultValue="Resumir"/>
+        <bt:String id="L.Resumir.t" DefaultValue="Resumir"/>
+        <bt:String id="L.M.Mas" DefaultValue="Más"/>
+        <bt:String id="L.Explicar" DefaultValue="Explicar"/>
+        <bt:String id="L.Explicar.t" DefaultValue="Explicar"/>
+        <bt:String id="L.LeerSel" DefaultValue="Leer selección"/>
+        <bt:String id="L.LeerSel.t" DefaultValue="Leer selección"/>
+        <bt:String id="L.Simplificar" DefaultValue="Simplificar"/>
+        <bt:String id="L.Simplificar.t" DefaultValue="Simplificar"/>
+        <bt:String id="L.Formal" DefaultValue="Más formal"/>
+        <bt:String id="L.Formal.t" DefaultValue="Más formal"/>
+        <bt:String id="L.Dictar" DefaultValue="Dictar"/>
+        <bt:String id="L.Dictar.t" DefaultValue="Dictar"/>
+        <bt:String id="L.G.Inv" DefaultValue="Investigación"/>
+        <bt:String id="L.Asesor" DefaultValue="Asesor"/>
+        <bt:String id="L.Asesor.t" DefaultValue="Asesor"/>
+        <bt:String id="L.MiProyecto" DefaultValue="Mi proyecto"/>
+        <bt:String id="L.MiProyecto.t" DefaultValue="Mi proyecto"/>
+        <bt:String id="L.Crear" DefaultValue="Crear proyecto ★"/>
+        <bt:String id="L.Crear.t" DefaultValue="Crear proyecto ★"/>
+        <bt:String id="L.M.Planear" DefaultValue="Planear y fundamentar"/>
+        <bt:String id="L.idear" DefaultValue="Idear"/>
+        <bt:String id="L.idear.t" DefaultValue="Idear"/>
+        <bt:String id="L.estructura" DefaultValue="Estructura"/>
+        <bt:String id="L.estructura.t" DefaultValue="Estructura"/>
+        <bt:String id="L.coherencia" DefaultValue="Coherencia"/>
+        <bt:String id="L.coherencia.t" DefaultValue="Coherencia"/>
+        <bt:String id="L.rubrica" DefaultValue="Rúbrica"/>
+        <bt:String id="L.rubrica.t" DefaultValue="Rúbrica"/>
+        <bt:String id="L.literatura" DefaultValue="Buscar literatura"/>
+        <bt:String id="L.literatura.t" DefaultValue="Buscar literatura"/>
+        <bt:String id="L.biblioteca" DefaultValue="Mi biblioteca"/>
+        <bt:String id="L.biblioteca.t" DefaultValue="Mi biblioteca"/>
+        <bt:String id="L.matriz" DefaultValue="Matriz de antecedentes"/>
+        <bt:String id="L.matriz.t" DefaultValue="Matriz de antecedentes"/>
+        <bt:String id="L.sincita" DefaultValue="Frases sin cita"/>
+        <bt:String id="L.sincita.t" DefaultValue="Frases sin cita"/>
+        <bt:String id="L.M.Disenar" DefaultValue="Diseñar y analizar"/>
+        <bt:String id="L.muestra" DefaultValue="Tamaño de muestra"/>
+        <bt:String id="L.muestra.t" DefaultValue="Tamaño de muestra"/>
+        <bt:String id="L.instrumento" DefaultValue="Instrumento"/>
+        <bt:String id="L.instrumento.t" DefaultValue="Instrumento"/>
+        <bt:String id="L.validacion" DefaultValue="Validación por jueces"/>
+        <bt:String id="L.validacion.t" DefaultValue="Validación por jueces"/>
+        <bt:String id="L.etica" DefaultValue="Ética"/>
+        <bt:String id="L.etica.t" DefaultValue="Ética"/>
+        <bt:String id="L.spss" DefaultValue="SPSS o R"/>
+        <bt:String id="L.spss.t" DefaultValue="SPSS o R"/>
+        <bt:String id="L.atlas" DefaultValue="ATLAS.ti"/>
+        <bt:String id="L.atlas.t" DefaultValue="ATLAS.ti"/>
+        <bt:String id="L.M.Entregar" DefaultValue="Escribir y entregar"/>
+        <bt:String id="L.discusion" DefaultValue="Discusión"/>
+        <bt:String id="L.discusion.t" DefaultValue="Discusión"/>
+        <bt:String id="L.conclusiones" DefaultValue="Conclusiones"/>
+        <bt:String id="L.conclusiones.t" DefaultValue="Conclusiones"/>
+        <bt:String id="L.resumen" DefaultValue="Resumen y abstract"/>
+        <bt:String id="L.resumen.t" DefaultValue="Resumen y abstract"/>
+        <bt:String id="L.existen" DefaultValue="¿Mis fuentes existen?"/>
+        <bt:String id="L.existen.t" DefaultValue="¿Mis fuentes existen?"/>
+        <bt:String id="L.observaciones" DefaultValue="Observaciones"/>
+        <bt:String id="L.observaciones.t" DefaultValue="Observaciones"/>
+        <bt:String id="L.acta" DefaultValue="Acta de asesoría"/>
+        <bt:String id="L.acta.t" DefaultValue="Acta de asesoría"/>
+        <bt:String id="L.sustentacion" DefaultValue="Simulacro de sustentación"/>
+        <bt:String id="L.sustentacion.t" DefaultValue="Simulacro de sustentación"/>
+        <bt:String id="L.diapositivas" DefaultValue="Diapositivas"/>
+        <bt:String id="L.diapositivas.t" DefaultValue="Diapositivas"/>
+        <bt:String id="L.articulo" DefaultValue="Tesis → artículo"/>
+        <bt:String id="L.articulo.t" DefaultValue="Tesis → artículo"/>
+        <bt:String id="L.usoia" DefaultValue="Uso de IA"/>
+        <bt:String id="L.usoia.t" DefaultValue="Uso de IA"/>
+        <bt:String id="L.G.Apa" DefaultValue="APA 7"/>
+        <bt:String id="L.apaasesor" DefaultValue="Asesor APA"/>
+        <bt:String id="L.apaasesor.t" DefaultValue="Asesor APA 7"/>
+        <bt:String id="L.aparevisor" DefaultValue="Revisor"/>
+        <bt:String id="L.aparevisor.t" DefaultValue="Revisor APA 7"/>
+        <bt:String id="L.apaformato" DefaultValue="Formato"/>
+        <bt:String id="L.apaformato.t" DefaultValue="Formato APA 7"/>
+        <bt:String id="L.apareferencia" DefaultValue="Referencia"/>
+        <bt:String id="L.apareferencia.t" DefaultValue="Generar referencia"/>
+        <bt:String id="L.G.Ayuda" DefaultValue="Ayuda"/>
+        <bt:String id="L.M.Aprender" DefaultValue="Aprender"/>
+        <bt:String id="L.guia" DefaultValue="Guía"/>
+        <bt:String id="L.guia.t" DefaultValue="Guía"/>
+        <bt:String id="L.teoria" DefaultValue="Teoría"/>
+        <bt:String id="L.teoria.t" DefaultValue="Teoría"/>
+        <bt:String id="L.tutorial" DefaultValue="Tutorial"/>
+        <bt:String id="L.tutorial.t" DefaultValue="Tutorial"/>
+        <bt:String id="L.Ayuda" DefaultValue="Qué puedo decir"/>
+        <bt:String id="L.Ayuda.t" DefaultValue="Qué puedo decir"/>
+        <bt:String id="L.director" DefaultValue="Modo director"/>
+        <bt:String id="L.director.t" DefaultValue="Modo director"/>
       </bt:ShortStrings>
       <bt:LongStrings>
-        <bt:String id="GetStarted.Description" DefaultValue="Abre Romus desde Inicio &gt; Romus y di «Ok Romus» seguido de tu orden para leer, corregir o editar tu documento."/>
-        <bt:String id="Button.Tooltip" DefaultValue="Abre Romus: lectura en voz alta, corrección con IA y edición por voz. Actívalo diciendo «Ok Romus»."/>
+        <bt:String id="GetStarted.Description" DefaultValue="Usa la pestaña «Romus» de la cinta o di «Ok Romus» seguido de tu orden."/>
+        <bt:String id="Button.Tooltip" DefaultValue="Abre Romus: voz, corrección con IA, asesor de investigación y normas APA 7."/>
+        <bt:String id="T.Abrir" DefaultValue="Abre el panel de Romus: la esfera, la conversación y los resultados."/>
+        <bt:String id="T.Hablar" DefaultValue="Activa el micrófono: di lo que necesitas sin escribir «Ok Romus»."/>
+        <bt:String id="T.ModoVoz" DefaultValue="Romus a pantalla completa para conversar por voz."/>
+        <bt:String id="T.Burbuja" DefaultValue="Romus en una ventanita flotante, sin el panel lateral."/>
+        <bt:String id="T.Leer" DefaultValue="Lee el documento en voz alta."/>
+        <bt:String id="T.Corregir" DefaultValue="Corrige ortografía y gramática con control de cambios."/>
+        <bt:String id="T.Revisar" DefaultValue="Revisa el documento y deja comentarios."/>
+        <bt:String id="T.Resumir" DefaultValue="Resume el documento en pocas frases."/>
+        <bt:String id="T.M.Mas" DefaultValue="Más: Explicar, Leer selección, Simplificar, Más formal, Dictar."/>
+        <bt:String id="T.Explicar" DefaultValue="Explica con palabras sencillas lo seleccionado."/>
+        <bt:String id="T.LeerSel" DefaultValue="Lee en voz alta lo que tienes seleccionado."/>
+        <bt:String id="T.Simplificar" DefaultValue="Reescribe la selección con un lenguaje más sencillo."/>
+        <bt:String id="T.Formal" DefaultValue="Reescribe la selección con tono académico."/>
+        <bt:String id="T.Dictar" DefaultValue="Lo que digas se escribe en el documento."/>
+        <bt:String id="T.Asesor" DefaultValue="Tu asesor de investigación: te guía según dónde estés."/>
+        <bt:String id="T.MiProyecto" DefaultValue="Avance, etapa, cronograma y sesiones de asesoría."/>
+        <bt:String id="T.Crear" DefaultValue="Crea tu proyecto completo desde cero con el método Kuetz (Pro)."/>
+        <bt:String id="T.M.Planear" DefaultValue="Planear y fundamentar: Idear, Estructura, Coherencia, Rúbrica, Buscar literatura, Mi biblioteca, Matriz de antecedentes, Frases sin cita."/>
+        <bt:String id="T.idear" DefaultValue="De la idea al problema, la pregunta y los objetivos"/>
+        <bt:String id="T.estructura" DefaultValue="Los apartados de tu trabajo según el nivel"/>
+        <bt:String id="T.coherencia" DefaultValue="¿Problema, pregunta, objetivos y método encajan?"/>
+        <bt:String id="T.rubrica" DefaultValue="Qué tan completo está para tu nivel"/>
+        <bt:String id="T.literatura" DefaultValue="Fuentes reales, también en español"/>
+        <bt:String id="T.biblioteca" DefaultValue="Fuentes guardadas, fichas e importación de Zotero"/>
+        <bt:String id="T.matriz" DefaultValue="Con tus fichas de lectura"/>
+        <bt:String id="T.sincita" DefaultValue="Lo que el jurado preguntaría «¿según quién?»"/>
+        <bt:String id="T.M.Disenar" DefaultValue="Diseñar y analizar: Tamaño de muestra, Instrumento, Validación por jueces, Ética, SPSS o R, ATLAS.ti."/>
+        <bt:String id="T.muestra" DefaultValue="Cálculo exacto y párrafo para tu método"/>
+        <bt:String id="T.instrumento" DefaultValue="Cuestionario o guion de entrevista"/>
+        <bt:String id="T.validacion" DefaultValue="V de Aiken y Lawshe"/>
+        <bt:String id="T.etica" DefaultValue="Consentimientos, asentimiento y carta"/>
+        <bt:String id="T.spss" DefaultValue="Sintaxis y resultados en APA verificados"/>
+        <bt:String id="T.atlas" DefaultValue="Libro de códigos y hallazgos con citas verificadas"/>
+        <bt:String id="T.M.Entregar" DefaultValue="Escribir y entregar: Discusión, Conclusiones, Resumen y abstract, ¿Mis fuentes existen?, Observaciones, Acta de asesoría, Simulacro de sustentación, Diapositivas, Tesis → artículo, Uso de IA."/>
+        <bt:String id="T.discusion" DefaultValue="Tus resultados frente a los antecedentes"/>
+        <bt:String id="T.conclusiones" DefaultValue="¿Cada objetivo tiene su conclusión?"/>
+        <bt:String id="T.resumen" DefaultValue="Con palabras clave y extensión correcta"/>
+        <bt:String id="T.existen" DefaultValue="Verifica citas y referencias"/>
+        <bt:String id="T.observaciones" DefaultValue="Matriz de respuesta al jurado o asesor"/>
+        <bt:String id="T.acta" DefaultValue="Con compromisos y firmas"/>
+        <bt:String id="T.sustentacion" DefaultValue="Romus hace de jurado por voz"/>
+        <bt:String id="T.diapositivas" DefaultValue="Esquema para PowerPoint y guion"/>
+        <bt:String id="T.articulo" DefaultValue="Borrador IMRyD y revistas"/>
+        <bt:String id="T.usoia" DefaultValue="Declaración para tu universidad"/>
+        <bt:String id="T.apaasesor" DefaultValue="Dudas de citas y referencias"/>
+        <bt:String id="T.aparevisor" DefaultValue="Revisa todo el documento y corrige lo seguro"/>
+        <bt:String id="T.apaformato" DefaultValue="Fuente, interlineado, títulos, portada, índice"/>
+        <bt:String id="T.apareferencia" DefaultValue="Libro, artículo, tesis, web, ley, IA…"/>
+        <bt:String id="T.M.Aprender" DefaultValue="Aprender: Guía, Teoría, Tutorial, Qué puedo decir."/>
+        <bt:String id="T.guia" DefaultValue="Dudas de metodología"/>
+        <bt:String id="T.teoria" DefaultValue="Libro de Brian Suárez"/>
+        <bt:String id="T.tutorial" DefaultValue="Investigar paso a paso"/>
+        <bt:String id="T.Ayuda" DefaultValue="Comandos de voz y colores de Romus."/>
+        <bt:String id="T.director" DefaultValue="Informe de revisión de un estudiante"/>
       </bt:LongStrings>
     </Resources>
   </VersionOverrides>

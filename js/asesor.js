@@ -86,6 +86,10 @@ window.Asesor = (function () {
     const sig = el("div", "guia-sencillo");
     sig.append(el("b", "", "Lo que sigue: " + a.actual.nombre), el("span", "", a.actual.consejo));
     c.appendChild(sig);
+    if (window.Herramientas) {
+      const hs = Herramientas.paraEtapa(a.actual.id);
+      if (hs.length) { c.appendChild(el("div", "inv-sub", "Herramientas para esta etapa")); const g = el("div", "etapa-herr"); hs.forEach(t => g.appendChild(Herramientas.boton(t))); c.appendChild(g); }
+    }
     // Etapas
     const lista = el("div", "etapas");
     a.filas.forEach(f => {
@@ -446,5 +450,5 @@ Redacta con calidad académica en español. No inventes cifras, autores ni citas
     return null;
   }
 
-  return { miProyecto, sesion, bitacora, nuevoProyecto, comando, esPro, codigoValido, avance, ETAPAS };
+  return { proyecto, miProyecto, sesion, bitacora, nuevoProyecto, comando, esPro, codigoValido, avance, ETAPAS };
 })();

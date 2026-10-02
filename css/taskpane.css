@@ -547,3 +547,44 @@ main > .lector, main > .progreso { position: sticky; top: 0; z-index: 3; box-sha
 .leyenda-estados { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; margin: 6px 0 4px; padding: 0; list-style: none; }
 .leyenda-estados li { display: flex; align-items: center; gap: 7px; font-size: 12px; }
 .leyenda-estados i { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* ---------- v3.0 · APA 7, formato y documentos ---------- */
+.apa-resumen { display: flex; flex-wrap: wrap; gap: 5px; }
+.apa-chip { font-size: 11px; padding: 3px 8px; border-radius: 99px; border: 1px solid var(--linea-2); color: var(--texto-2); background: var(--superficie); }
+.apa-chip.ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 40%, transparent); }
+.apa-chip.con { color: var(--oro); border-color: color-mix(in srgb, var(--oro) 50%, transparent); font-weight: 600; }
+.apa-cat { border: 1px solid var(--linea); border-radius: 8px; padding: 6px 10px; background: var(--superficie); }
+.apa-cat summary { cursor: pointer; font-weight: 600; font-size: 12.5px; }
+.apa-hall { display: flex; flex-direction: column; gap: 3px; padding: 7px 0; border-top: 1px solid var(--linea); font-size: 12px; }
+.apa-hall:first-of-type { border-top: none; }
+.apa-hall code { font-family: Consolas, "Cascadia Mono", monospace; font-size: 11px; color: var(--texto-2); background: var(--superficie-2); padding: 2px 5px; border-radius: 4px; align-self: flex-start; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.apa-hall .inv-acciones { gap: 12px; }
+.apa-campos { display: flex; flex-direction: column; gap: 6px; }
+.apa-vista { display: flex; flex-direction: column; gap: 3px; padding: 9px 11px; border-radius: 8px; border: 1px solid var(--linea); background: var(--superficie); }
+.apa-vista small, .prioridad small { font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--texto-2); }
+.apa-ref, .apa-despues { font-family: "Times New Roman", Georgia, serif; font-size: 13px; line-height: 1.55; padding-left: 1.2em; text-indent: -1.2em; margin: 0; }
+.apa-cita { font-size: 12.5px; margin: 0; color: var(--acento); }
+.apa-antes { font-size: 12px; color: var(--texto-2); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--error) 50%, transparent); }
+.lista-ok li::marker { content: "✓  "; color: var(--ok); }
+.lista-revisar li::marker { content: "→  "; color: var(--oro); }
+.campo-pro input.ajuste, .campo-pro select.ajuste { width: 100%; font: inherit; font-weight: 400; font-size: 12.5px; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--linea-2); background: var(--superficie); color: var(--texto); box-sizing: border-box; }
+.herramientas-etapa { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.herr { display: flex; align-items: flex-start; gap: 8px; text-align: left; padding: 8px 9px; border-radius: 8px; border: 1px solid var(--linea); background: var(--superficie); color: var(--texto); font: inherit; cursor: pointer; min-width: 0; }
+.herr:hover { border-color: var(--acento); background: var(--hover); }
+.herr i { font-style: normal; font-size: 15px; line-height: 1.2; }
+.herr span { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.herr b { font-size: 12px; line-height: 1.3; }
+.herr small { font-size: 10.5px; color: var(--texto-2); line-height: 1.35; }
+.herr .pro { color: var(--oro); font-style: normal; font-weight: 700; }
+.etapa-grupo { display: flex; flex-direction: column; gap: 6px; }
+.etapa-grupo > b { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--texto-2); margin-top: 6px; }
+.resultado-calc { font-size: 26px; font-weight: 700; color: var(--acento); letter-spacing: -.02em; }
+.tabla-mini { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+.tabla-mini th, .tabla-mini td { border: 1px solid var(--linea); padding: 4px 6px; text-align: left; vertical-align: top; }
+.tabla-mini th { background: var(--superficie); font-weight: 600; }
+.tabla-mini td.ok { color: var(--ok); font-weight: 600; } .tabla-mini td.mal { color: var(--error); font-weight: 600; } .tabla-mini td.medio { color: var(--oro); font-weight: 600; }
+.herr i { color: var(--acento); display: flex; }
+.herr i svg { width: 17px; height: 17px; }
+.inv-herramientas { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+.etapa-herr { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+@media (max-width: 300px) { .herramientas-etapa, .etapa-herr { grid-template-columns: 1fr; } }
