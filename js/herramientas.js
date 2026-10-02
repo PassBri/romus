@@ -74,6 +74,7 @@ window.Herramientas = (function () {
     contrastar: '<path d="M4 7h13l-3-3M20 17H7l3 3"/>',
     sintesis: '<path d="M14 4l6 6-9 9H5v-6z"/><path d="M12 6l6 6"/>',
     estudiar: '<path d="M3 6.5C5 5 8 5 12 7c4-2 7-2 9-.5V19c-2-1.5-5-1.5-9 .5-4-2-7-2-9-.5z"/><path d="M12 7v12.5"/>',
+    cita: '<path d="M5 11h4v6H4v-4c0-3 1-5 4-6M14 11h4v6h-5v-4c0-3 1-5 4-6"/>',
     cronometro: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5M18.5 6.5l1.5-1.5"/>',
     ayuda: '<circle cx="12" cy="12" r="9.5"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.2-2.5 3.9"/><circle cx="12" cy="17.2" r=".6"/>'
   };
@@ -113,6 +114,7 @@ window.Herramientas = (function () {
     ["apa", "apaasesor", "Asesor APA 7", "Dudas de citas y referencias", "apa", () => APA.asesor()],
     ["apa", "aparevisor", "Revisor APA 7", "Revisa todo el documento y corrige lo seguro", "revisor", run(() => APA.revisor())],
     ["apa", "apaformato", "Formato APA 7", "Fuente, interlineado, títulos, portada, índice", "formato", () => Formato.tarjetaOpciones()],
+    ["apa", "apacita", "Generar cita", "Paráfrasis, textual, de autor, cita de cita, corporativa…", "cita", () => APA.generadorCitas()],
     ["apa", "apareferencia", "Generar referencia", "Libro, artículo, tesis, web, ley, IA…", "referencia", () => APA.generador()],
     ["entregar", "existen", "¿Mis fuentes existen?", "Verifica citas y referencias", "existen", cmd("verifica las referencias")],
     ["entregar", "observaciones", "Observaciones", "Matriz de respuesta al jurado o asesor", "observaciones", run(() => Revision.observaciones())],

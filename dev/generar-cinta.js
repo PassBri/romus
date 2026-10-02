@@ -40,7 +40,7 @@ const info = (clave) => {
 };
 // Etiquetas cortas, como las de Word (el nombre completo queda en la información sobre herramientas).
 const CORTOS = {
-  apaasesor: "Asesor APA", aparevisor: "Revisor", apaformato: "Formato", apareferencia: "Referencia",
+  apacita: "Cita", apaasesor: "Asesor APA", aparevisor: "Revisor", apaformato: "Formato", apareferencia: "Referencia",
   literatura: "Literatura", biblioteca: "Biblioteca", matriz: "Matriz", sincita: "Sin cita", fidelidad: "Fidelidad",
   pendientes: "Por confirmar", existen: "Verificar", muestra: "Muestra", validacion: "Validación", spss: "SPSS o R",
   resumen: "Resumen", articulo: "Artículo", usoia: "Uso de IA", diapositivas: "Presentación", sustentacion: "Simulacro",
@@ -63,7 +63,7 @@ const GRUPOS = [
     { menu: "Nexus", nombre: "Pensar y crear", ico: "contrastar", items: ["docscontrastar", "docssintesis", "docsestudiar", "docsreporte"] }] },
   { id: "Metodo", nombre: "Método y datos", ico: "instrumento", controles: ["instrumento", "muestra", "validacion", "etica", "spss", "atlas"] },
   { id: "Escribir", nombre: "Escribir", ico: "discusion", controles: ["discusion", "conclusiones", "resumen", "articulo", "usoia"] },
-  { id: "Apa", nombre: "APA 7", ico: "apa", controles: ["aparevisor", "apaformato", "apareferencia", "apaasesor"] },
+  { id: "Apa", nombre: "APA 7", ico: "apa", controles: ["aparevisor", "apacita", "apareferencia", "apaformato", "apaasesor"] },
   { id: "Entregar", nombre: "Entregar", ico: "sustentacion", controles: ["diapositivas", "sustentacion", "observaciones", "acta", "director"] },
   { id: "Ayuda", nombre: "Aprender", ico: "guia", controles: ["guia", "tutorial", "teoria", "Ayuda"] }
 ];

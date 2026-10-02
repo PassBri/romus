@@ -10,6 +10,11 @@ window.APA = (function () {
   /* ================= 1. Base de conocimiento (se suma a la guía de Romus) ================= */
   const T = (id, titulo, claves, resumen, puntos, ejemplo, error) => ({ id: "apa-" + id, cat: "APA 7", titulo, claves, resumen, puntos, ejemplo, error, fuente: FUENTE });
   const TEMAS = [
+    T("tipos-cita", "Clasificación de las citas: todas las clases", ["tipos de citas", "clases de citas", "clasificacion de citas", "tipos de cita", "que tipos de citas hay", "cita de autor", "cita de contenido", "cita parafraseada", "cita corporativa", "cita de cita", "cita indirecta", "cita directa", "cita en bloque", "cita textual larga"],
+      "Las citas se clasifican por cómo usas las palabras del autor (textual o paráfrasis), por dónde pones al autor (narrativa o de autor, y parentética o de contenido) y por el tipo de autor o fuente (personas, institución, sin autor, cita de cita, comunicación personal, clásicos, leyes, IA).",
+      ["Textual corta (menos de 40 palabras): entre comillas y con página: «se burlan del que pierde» (Ruiz, 2021, p. 4).", "Textual en bloque (40 o más): párrafo aparte con sangría, sin comillas; la cita va después del punto final.", "Paráfrasis (indirecta): con tus palabras; página opcional pero recomendada: (Ruiz, 2021, p. 4).", "Narrativa o de autor: Ruiz (2021) encontró que… · Parentética o de contenido: …reduce la agresión (Ruiz, 2021).", "Cita de cita: (Piaget, 1932, como se citó en Ruiz, 2021); en referencias va solo Ruiz.", "Corporativa: primera vez (Organización Mundial de la Salud [OMS], 2020); después (OMS, 2020).", "Dos autores con «y»; tres o más: primer autor + et al. desde la primera cita.", "Varias obras: orden alfabético con «;» · mismo autor: (Pérez, 2018, 2020) · mismo año: (Pérez, 2020a, 2020b).", "Sin autor: título breve entre comillas (artículo) o en cursiva (libro) · sin fecha: s. f. · clásicos: (Freud, 1900/1953).", "Comunicación personal: (L. Gómez, comunicación personal, 12 de marzo de 2026), no va en referencias · traducción propia y énfasis añadido dentro del paréntesis."],
+      "Ruiz (2021) afirma que en el fútbol «se burlan del que pierde» (p. 4), algo que también describe la Organización Mundial de la Salud (OMS, 2020) como violencia entre pares; para Piaget (1932, como se citó en Ruiz, 2021), el juego reglado…",
+      "Mezclar clases: poner comillas a una paráfrasis, citar textual sin página, escribir «citado por» en lugar de «como se citó en» o repetir el nombre completo de una institución después de presentar su sigla."),
     T("cita-basica", "Cómo citar en el texto (autor-fecha)", ["citar", "cita", "como cito", "como se cita", "cita parentetica", "cita narrativa", "autor fecha", "citas en el texto"],
       "APA usa el sistema autor-fecha. La cita puede ir entre paréntesis al final de la idea (parentética) o integrada en la frase (narrativa). Cada cita del texto debe tener su referencia en la lista final, y cada referencia debe estar citada.",
       ["Parentética: (Pérez, 2020).", "Narrativa: Pérez (2020) señala que…", "Si citas textualmente, agrega la página: (Pérez, 2020, p. 15).", "Varias obras en la misma cita: en orden alfabético y separadas con punto y coma: (Gómez, 2018; Pérez, 2020)."],
@@ -294,6 +299,7 @@ window.APA = (function () {
     const add = (cat, p, fragmento, mensaje, arreglo) => hall.push({ cat, parrafo: p.i, fragmento: String(fragmento || "").slice(0, 200), mensaje, arreglo });
     const esTit = (p) => Doc.esTitulo(p.estilo);
     const cuerpo = ps.filter(p => p.texto.trim() && !enRefs(p.i) && p.i !== ini);
+    const sigDef = new Set(), sigAvisada = new Set(); // siglas de autores corporativos presentadas / ya avisadas
 
     cuerpo.forEach(p => {
       const t = p.texto;
@@ -330,6 +336,39 @@ window.APA = (function () {
         const tieneCita = /\((?:[^()]*?(?:19|20)\d{2}|s\. f\.)[^()]*\)/.test(despues) || /\((?:p|pp|párr)\.\s*\d/.test(despues);
         if (tieneCita && palabras >= 4 && !/\b(p|pp|párr)\.\s*\d/.test(despues)) add("citas", p, m[1].slice(0, 60), "A las citas textuales les falta la página: (Autor, año, p. 00).");
       }
+      // Cita de cita: APA 7 usa «como se citó en».
+      const reCit = /\b(?:citad[oa]s? (?:por|en)|cit\. (?:por|en)|tomado de|en palabras de)\s+(?=[A-ZÁÉÍÓÚÑ])/g;
+      while ((m = reCit.exec(t))) { const enParen = /\([^()]*$/.test(t.slice(0, m.index)); if (enParen) add("citas", p, m[0].trim(), "Para la cita de cita APA 7 usa «como se citó en»: (Piaget, 1932, como se citó en Ruiz, 2021). En referencias va solo la fuente que leíste.", { buscar: m[0].trim(), reemplazar: "como se citó en" }); }
+      // Autor corporativo: la sigla se presenta una sola vez, en la primera cita (se recorre en el orden del texto).
+      const evs = [];
+      const reDef = /([A-ZÁÉÍÓÚÑ][^()[\]]{3,90}?)\s*\[([A-ZÁÉÍÓÚÑ]{2,10})\]/g;
+      while ((m = reDef.exec(t))) evs.push({ i: m.index, tipo: "def", s: m[2], nombre: m[1].trim() });
+      const reNarr = /[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+(?:(?:de|del|la|las|los|el|y|para|en|e)\s+)*[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)+\s+\(([A-ZÁÉÍÓÚÑ]{2,10}),\s*(?:(?:19|20)\d{2}|s\. f\.)/g;
+      while ((m = reNarr.exec(t))) evs.push({ i: m.index, tipo: "def", s: m[1], narrativa: true });
+      const reSig = /\(([A-ZÁÉÍÓÚÑ]{2,10}),\s*((?:19|20)\d{2}[a-z]?|s\. f\.)/g;
+      while ((m = reSig.exec(t))) { const k = m.index; if (!evs.some(e => e.narrativa && e.s === m[1] && k > e.i && k - e.i < 120)) evs.push({ i: k, tipo: "uso", s: m[1], txt: m[0] + ")", anio: m[2] }); }
+      evs.sort((a, b) => a.i - b.i).forEach(e => {
+        if (e.tipo === "def") {
+          if (sigDef.has(e.s) && !e.narrativa) add("citas", p, `${e.nombre} [${e.s}]`, `Ya presentaste la sigla «${e.s}». Desde la segunda cita usa solo la sigla: (${e.s}, año).`, { buscar: `${e.nombre} [${e.s}]`, reemplazar: e.s });
+          sigDef.add(e.s);
+        } else if (!sigDef.has(e.s) && !sigAvisada.has(e.s)) {
+          add("citas", p, e.txt, `Primera cita de «${e.s}»: escribe el nombre completo de la institución y la sigla entre corchetes, (Nombre completo [${e.s}], ${e.anio}). Después, solo (${e.s}, ${e.anio}).`);
+          sigAvisada.add(e.s);
+        }
+      });
+      // Varias obras en un mismo paréntesis: orden alfabético y años del mismo autor juntos.
+      const reVar = /\(([^()]*?(?:(?:19|20)\d{2}[a-z]?|s\. f\.)[^()]*?;[^()]*)\)/g;
+      while ((m = reVar.exec(t))) {
+        const partes = m[1].split(/\s*;\s*/).map(x => x.trim()).filter(Boolean);
+        if (partes.some(x => /como se citó|p\.|pp\.|párr\./.test(x)) || !partes.every(x => /,\s*(?:(?:19|20)\d{2}|s\. f\.)/.test(x))) continue;
+        const ord = window.Citas ? Citas.varias(partes) : "";
+        if (ord && ord.replace(/\s+/g, " ") !== `(${partes.join("; ")})`) add("citas", p, m[0], "Con varias obras en el mismo paréntesis: orden alfabético por el primer autor, separadas con «;» y los años de un mismo autor juntos.", { buscar: m[0], reemplazar: ord });
+      }
+      // Énfasis añadido y traducción: dentro del paréntesis de la cita, no sueltos.
+      if (/\((?:el )?(?:subrayado|resaltado|énfasis|cursivas?) (?:es )?(?:mío|nuestro|propio|añadido)\)/i.test(t)) add("citas", p, (t.match(/\((?:el )?(?:subrayado|resaltado|énfasis|cursivas?)[^)]*\)/i) || [""])[0], "En APA 7 se escribe [énfasis añadido] justo después de las palabras resaltadas, o dentro de la cita: (Ruiz, 2021, p. 4, énfasis añadido).");
+      if (/\((?:la )?traducción (?:es )?(?:mía|nuestra)\)/i.test(t)) add("citas", p, (t.match(/\((?:la )?traducción[^)]*\)/i) || [""])[0], "Indica la traducción dentro de la cita: (Smith, 2020, p. 5, traducción propia).");
+      // Comunicaciones personales: forma correcta
+      if (/\(entrevista personal|\(comunicaci[oó]n personal\)/i.test(t)) add("citas", p, (t.match(/\((?:entrevista personal|comunicaci[oó]n personal)[^)]*\)/i) || [""])[0], "Comunicación personal: (L. Gómez, comunicación personal, 12 de marzo de 2026). No va en la lista de referencias. Si es una entrevista de tu investigación, no se cita así: es un dato (Participante 3).");
       // ----- Tablas y figuras -----
       const rot = t.trim().match(/^(Tabla|Figura)\s*(N[°º.]*\s*|No\.\s*|#\s*)(\d+)/i);
       if (rot) add("tablas", p, rot[0], `El rótulo se escribe «${rot[1]} ${rot[3]}», sin «N.°» ni «No.».`, { buscar: rot[0], reemplazar: `${rot[1].charAt(0).toUpperCase() + rot[1].slice(1).toLowerCase()} ${rot[3]}` });
@@ -379,6 +418,11 @@ window.APA = (function () {
       const pals = String(r.titulo || "").split(/\s+/).filter(w => w.length > 3);
       if (pals.length >= 4 && pals.slice(1).filter(w => /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]/.test(w)).length / Math.max(1, pals.length - 1) > 0.6) add("refs", p, r.titulo.slice(0, 50), "En la lista de referencias los títulos de artículos, libros y capítulos van con mayúscula solo al inicio (y en nombres propios).");
     });
+    refs.forEach(r => { if (/comunicaci[oó]n personal/i.test(r.texto)) add("refs", { i: r.i }, r.texto.slice(0, 50), "Las comunicaciones personales no van en la lista de referencias: se citan solo en el texto."); });
+    // Mismo autor y mismo año: letras a, b en la referencia y en la cita.
+    const claveAA = (r) => norm(String(r.autor || "")).split(/[,.]/)[0].trim() + "|" + String(r.anio || "").slice(0, 4);
+    const grupoAA = {}; refs.forEach(r => { const k = claveAA(r); (grupoAA[k] = grupoAA[k] || []).push(r); });
+    Object.values(grupoAA).filter(g => g.length > 1 && g.some(r => !/\d{4}[a-z]/.test(String(r.anio) + (r.texto.match(/\((\d{4}[a-z]?)/) || [""])[0]))).forEach(g => add("refs", { i: g[1].i }, g[1].texto.slice(0, 50), `Hay ${g.length} obras del mismo autor y año: agrégales letras (${String(g[0].anio).slice(0, 4)}a, ${String(g[0].anio).slice(0, 4)}b…) en las referencias y en las citas, ordenadas por título.`));
     const ordenadas = refs.map(r => r.texto).slice().sort((a, b) => a.localeCompare(b, "es", { sensitivity: "base" }));
     const fuera = refs.findIndex((r, k) => r.texto !== ordenadas[k]);
     if (fuera >= 0) add("refs", { i: refs[fuera].i }, refs[fuera].texto.slice(0, 40), "Las referencias deben ir en orden alfabético por el apellido del primer autor.");
@@ -565,6 +609,105 @@ ${lote.map((r, k) => `${k + 1}. ${r.texto}`).join("\n")}`, signal);
   }
 
   /* ================= 4. Asesor APA 7 (puerta de entrada) ================= */
+  /* ================= Generador de citas en el texto (todas las clases) ================= */
+  async function insertarCitaEnWord(res, textual) {
+    await Word.run(async (ctx) => {
+      const sel = ctx.document.getSelection();
+      let rango;
+      if (textual && textual.bloque) {
+        const ps = sel.paragraphs; ps.load("items"); await ctx.sync();
+        const p = ps.items[ps.items.length - 1].insertParagraph(textual.texto.replace(/\*/g, ""), "After");
+        try { p.leftIndent = 36; p.firstLineIndent = 0; } catch (e) { /* sangría opcional */ }
+        rango = p;
+      } else rango = sel.insertText(" " + (textual ? textual.texto : res.texto).replace(/\*/g, ""), "End");
+      await ctx.sync();
+      // Título en cursiva (obras sin autor que son libros o informes)
+      const cur = (res.texto.match(/\*([^*]+)\*/) || [])[1];
+      if (cur && rango && rango.search) { const r = rango.search(cur, { matchCase: true }); r.load("items"); await ctx.sync(); if (r.items.length) r.items[0].font.italic = true; await ctx.sync(); }
+    });
+  }
+  async function textoDocumento() { try { const ps = await Doc.leerParrafos(); return ps.map(p => p.texto).join("\n"); } catch (e) { return ""; } }
+  function generadorCitas(tipoIni) {
+    const { el, tarjeta, etiqueta } = H();
+    const c = el("div", "inv-cuerpo apa-gen");
+    c.appendChild(etiqueta("reglas", "APA 7 · en español"));
+    const selT = el("select", "ajuste"); Citas.TIPOS.forEach(([id, n]) => { const o = el("option", "", n); o.value = id; selT.appendChild(o); }); selT.value = tipoIni || "parafrasis";
+    c.appendChild(selT);
+    const ayuda = el("div", "guia-caja"); c.appendChild(ayuda);
+    const campos = el("div", "apa-campos"); c.appendChild(campos);
+    const vista = el("div", "cita-vista"); c.appendChild(vista);
+    const nota = el("p", "inv-nota"); c.appendChild(nota);
+    let ins = {}, ultimo = null, textualRes = null;
+    const campo = (k, t, ph, tipo) => {
+      const l = el("label", tipo === "check" ? "interruptor-simple" : "campo-pro");
+      const i = el(tipo === "area" ? "textarea" : tipo === "select" ? "select" : "input", "ajuste");
+      if (tipo === "check") { i.type = "checkbox"; l.append(i, el("span", "", t)); }
+      else { l.appendChild(el("span", "", t)); if (tipo === "area") i.rows = 3; if (ph) i.placeholder = ph; l.appendChild(i); }
+      i.oninput = i.onchange = pintar; ins[k] = i; campos.appendChild(l); return i;
+    };
+    function armar() {
+      campos.innerHTML = ""; ins = {};
+      const t = selT.value, [, , dsc, ej] = Citas.TIPOS.find(x => x[0] === t);
+      ayuda.innerHTML = ""; ayuda.append(el("span", "", dsc), el("small", "", "Ejemplo: " + ej));
+      if (t === "varias") { campo("lista", "Una cita por línea", "(Ruiz, 2021)\n(Álvarez, 2019)\n(Ruiz, 2018)", "area"); return pintar(); }
+      if (t === "comunicacion") { campo("nombre", "Nombre de la persona", "Ej.: Luis Gómez"); campo("fecha", "Fecha", "Ej.: 12 de marzo de 2026"); campo("narrativa", "Narrativa (el nombre dentro de mi oración)", "", "check"); return pintar(); }
+      if (t === "ley") { campo("norma", "Norma", "Ej.: Ley 1581 de 2012"); return pintar(); }
+      if (t === "corporativa" || t === "ia") {
+        campo("nombre", t === "ia" ? "Empresa del modelo" : "Nombre completo de la institución", t === "ia" ? "Ej.: OpenAI · Anthropic · Google" : "Ej.: Organización Mundial de la Salud");
+        if (t === "corporativa") campo("sigla", "Sigla (si la tiene)", "Ej.: OMS");
+      } else if (t === "sinautor") { campo("titulo", "Título de la obra", "Ej.: Juego y escuela"); const s0 = campo("tipoObra", "Tipo de obra", "", "select"); [["articulo", "Artículo, capítulo o página web"], ["libro", "Libro o informe"]].forEach(([v, x]) => { const o = el("option", "", x); o.value = v; s0.appendChild(o); }); }
+      else campo("autor", "Autor(es)", "Ej.: Ruiz Díaz, A.; Pérez, L.  (o «Ana Ruiz y Luis Pérez»)");
+      if (t === "secundaria") { campo("origAutor", "Autor de la idea original (la que NO leíste)", "Ej.: Piaget"); campo("origAnio", "Año de la obra original", "Ej.: 1932"); }
+      if (t !== "sinfecha") campo("anio", t === "secundaria" ? "Año de la fuente que SÍ leíste" : "Año", "Ej.: 2021");
+      if (t === "clasica") campo("anioOriginal", "Año original de publicación", "Ej.: 1900");
+      if (t === "mismo") campo("sufijo", "Letra (si hay dos obras del mismo autor y año)", "a, b…");
+      if (["textual", "bloque", "traduccion", "enfasis"].includes(t)) campo("texto", "Texto exacto que citas", "Pega aquí las palabras del autor", "area");
+      campo("ubic", ["textual", "bloque", "traduccion", "enfasis"].includes(t) ? "Página (obligatoria)" : "Página (opcional)", "Ej.: 45 · 45-46 · párr. 3");
+      if (t !== "parentetica") campo("narrativa", "Narrativa: el autor forma parte de mi oración", "", "check");
+      if (t === "narrativa") ins.narrativa.checked = true;
+      pintar();
+    }
+    function pintar() {
+      const t = selT.value, v = (k) => ins[k] ? (ins[k].type === "checkbox" ? ins[k].checked : ins[k].value.trim()) : "";
+      vista.innerHTML = ""; nota.textContent = ""; textualRes = null; ultimo = null;
+      if (t === "varias") { const ls = v("lista").split(/\n+/).filter(Boolean); if (!ls.length) return; ultimo = { texto: Citas.varias(ls), nota: "Orden alfabético por el primer autor; los años del mismo autor, de menor a mayor." }; }
+      else if (t === "ley") { if (!v("norma")) return; ultimo = { texto: `(${v("norma")})`, nota: "En referencias: Ley 1581 de 2012. (2012, 17 de octubre). Congreso de la República. Diario Oficial No. 48.587." }; }
+      else {
+        const o = { anio: v("anio"), ubic: v("ubic"), narrativa: !!v("narrativa"), sufijo: v("sufijo"), anioOriginal: v("anioOriginal"), traduccion: t === "traduccion", enfasis: t === "enfasis" };
+        if (t === "comunicacion") o.comunicacion = { nombre: v("nombre"), fecha: v("fecha") };
+        else if (t === "corporativa" || t === "ia") o.corporativo = { nombre: v("nombre"), sigla: t === "corporativa" ? v("sigla") : "" }, o.primera = !!(ins.sigla && v("sigla")) && !definidas.has(v("sigla"));
+        else if (t === "sinautor") { o.titulo = v("titulo"); o.tipoObra = v("tipoObra"); }
+        else o.autor = v("autor");
+        if (t === "secundaria") o.original = { autor: v("origAutor"), anio: v("origAnio") };
+        if (!(o.autor || o.titulo || (o.corporativo && o.corporativo.nombre) || (o.comunicacion && o.comunicacion.nombre))) return;
+        ultimo = Citas.formato(o);
+        if (["textual", "bloque", "traduccion", "enfasis"].includes(t) && v("texto")) {
+          textualRes = Citas.textual(v("texto"), ultimo.texto, o.narrativa);
+          if (o.narrativa) { const lead = Citas.formato(Object.assign({}, o, { ubic: "", traduccion: false, enfasis: false })).texto; const fin = [Citas.ubicacion(v("ubic")) || "p. 00"].concat(o.traduccion ? ["traducción propia"] : []).concat(o.enfasis ? ["énfasis añadido"] : []).join(", "); textualRes.texto = textualRes.bloque ? `${lead} afirma:\n${textualRes.texto} (${fin})` : `${lead} afirma que ${textualRes.texto} (${fin}).`; }
+          if (!v("ubic")) nota.textContent = "⚠ Falta la página: en las citas textuales es obligatoria. ";
+          if (t === "bloque" && !textualRes.bloque) nota.textContent += `Tu cita tiene ${textualRes.palabras} palabras: con menos de 40 va entre comillas dentro del párrafo. `;
+          if (t === "textual" && textualRes.bloque) nota.textContent += `Tu cita tiene ${textualRes.palabras} palabras: va en bloque. `;
+        }
+      }
+      const mostrar = textualRes ? textualRes.texto : ultimo.texto;
+      const caja = el("div", textualRes && textualRes.bloque ? "cita-bloque" : "cita-linea");
+      String(mostrar).split(/(\*[^*]+\*)/).forEach(seg => caja.appendChild(/^\*.*\*$/.test(seg) ? el("i", "", seg.slice(1, -1)) : document.createTextNode(seg)));
+      vista.appendChild(caja);
+      nota.textContent += [ultimo.nota, textualRes && textualRes.nota].filter(Boolean).join(" ");
+    }
+    let definidas = new Set();
+    textoDocumento().then(t => { definidas = Citas.siglasDefinidas(t); pintar(); });
+    selT.onchange = armar;
+    const acc = el("div", "inv-acciones");
+    const bI = el("button", "boton primario", "Insertar en el cursor");
+    bI.onclick = () => H().ejecutar(async () => { if (!ultimo) { H().ui.hablar("Completa los datos de la cita."); return; } await insertarCitaEnWord(ultimo, textualRes); H().registrar("Cita en el texto", selT.value, "reglas"); H().ui.confirmar("Inserté la cita en el cursor."); if (ins.sigla && ins.sigla.value) definidas.add(ins.sigla.value.trim()); pintar(); });
+    const bC = el("button", "boton secundario", "Copiar"); bC.onclick = async () => { if (!ultimo) return; try { await navigator.clipboard.writeText((textualRes ? textualRes.texto : ultimo.texto).replace(/\*/g, "")); H().ui.confirmar("Copié la cita."); } catch (e) { /* sin portapapeles */ } };
+    acc.append(bI, bC); c.appendChild(acc);
+    armar();
+    tarjeta("Generar cita en el texto", c);
+    H().ui.hablar("Elige el tipo de cita y completa los datos. Te muestro cómo queda en APA 7.");
+  }
+
   function asesor() {
     const { el, tarjeta } = H();
     const c = el("div", "inv-cuerpo asesor");
@@ -595,8 +738,12 @@ ${lote.map((r, k) => `${k + 1}. ${r.texto}`).join("\n")}`, signal);
       return () => generador(t);
     }
     if (/^corrige (mis |las )?referencias( con ia| en apa( 7)?)?$/.test(n)) return tarea(corregirReferenciasIA);
+    if (/(genera|crea|haz|hazme|arma|dame|necesito|como (hago|escribo))( me)? (una )?cita( en el texto| apa| de cita| textual| parafraseada| corporativa| institucional)?$|^generador de citas$|^tipos de citas?$/.test(n)) {
+      const t = /de cita/.test(n) ? "secundaria" : /textual/.test(n) ? "textual" : /parafrase/.test(n) ? "parafrasis" : /corporativa|institucional/.test(n) ? "corporativa" : "parafrasis";
+      return () => generadorCitas(t);
+    }
     return null;
   }
 
-  return { asesor, generador, construir, insertarReferencia, revisor, revisar, corregir, corregirReferenciasIA, comando, TEMAS, TIPOS, _listaAutores: listaAutores };
+  return { asesor, generador, generadorCitas, insertarCitaEnWord, construir, insertarReferencia, revisor, revisar, corregir, corregirReferenciasIA, comando, TEMAS, TIPOS, _listaAutores: listaAutores };
 })();

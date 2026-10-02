@@ -202,10 +202,24 @@ window.Archivos = (function () {
     const p = s.indexOf(c); if (p < 0) return null;
     return { ini: idx[p], fin: idx[p + c.length - 1] + 1 };
   }
-  function citaAPA(d, refTxt, conParentesis) {
-    const a = d.meta.autor ? apellidos(d.meta.autor) : `«${(d.meta.titulo || d.nombre).slice(0, 40)}»`;
-    const y = d.meta.anio || "s. f.";
-    return conParentesis === false ? `${a} (${y}, ${refTxt})` : `(${a}, ${y}, ${refTxt})`;
+  /** Datos del documento → opciones del formateador de citas (persona, institución o sin autor). */
+  function opcionesCita(d) {
+    const m = d.meta || {};
+    const tipo = m.tipoAutor || (m.autor ? (window.Citas && Citas.esCorporativo(m.autor) ? "institucion" : "persona") : "sinautor");
+    const o = { anio: m.anio, anioOriginal: m.anioOriginal || "" };
+    if (tipo === "institucion") o.corporativo = { nombre: m.autor, sigla: m.sigla || "" };
+    else if (tipo === "sinautor") { o.titulo = m.titulo || d.nombre.replace(/\.[^.]+$/, ""); o.tipoObra = m.tipoObra || (/^(pdf|docx)$/.test(d.tipo) ? "libro" : "articulo"); }
+    else o.autor = m.autor;
+    return o;
+  }
+  let siglasVistas = new Set(); // siglas de instituciones ya presentadas en el documento de Word
+  async function refrescarSiglas() { try { const ps = await Doc.leerParrafos(); siglasVistas = Citas.siglasDefinidas(ps.map(p => p.texto).join("\n")); } catch (e) { /* sin documento */ } }
+  /** Cita APA 7 del documento: parentética o narrativa; con autor corporativo, la primera vez nombre completo + sigla. */
+  function citaAPA(d, refTxt, conParentesis, extra) {
+    if (!window.Citas) return `(${d.meta.autor || d.nombre}, ${d.meta.anio || "s. f."}${refTxt ? ", " + refTxt : ""})`;
+    const o = Object.assign(opcionesCita(d), { ubic: refTxt || "", narrativa: conParentesis === false }, extra || {});
+    if (o.corporativo && o.corporativo.sigla) { o.primera = !siglasVistas.has(o.corporativo.sigla); if (!o.noMarcar) siglasVistas.add(o.corporativo.sigla); }
+    return Citas.formato(o).texto.replace(/\*/g, "");
   }
   function apellidos(autor) {
     const as = String(autor).split(/\s*(?:;|&|\by\b|\band\b)\s*/).map(x => x.trim()).filter(Boolean);
@@ -258,7 +272,7 @@ window.Archivos = (function () {
         const f = el("div", "arch-doc");
         const n = citas.filter(x => x.doc === d.id).length;
         const info = el("div", "");
-        info.append(el("b", "", d.nombre), el("small", "", `${d.tipo.toUpperCase()} · ${nombreIdioma(idiomaDe(d))} · ${d.conPaginas ? d.paginas.length + (d.unidad === "diap." ? " diap." : " pág.") + " · " : ""}${d.palabras.toLocaleString("es-CO")} palabras${n ? ` · ${n} citas` : ""}`), el("small", "arch-meta", d.meta.autor ? `${apellidos(d.meta.autor)} (${d.meta.anio || "s. f."})` : "Sin autor: agrégalo para citar en APA"));
+        info.append(el("b", "", d.nombre), el("small", "", `${d.tipo.toUpperCase()} · ${nombreIdioma(idiomaDe(d))} · ${d.conPaginas ? d.paginas.length + (d.unidad === "diap." ? " diap." : " pág.") + " · " : ""}${d.palabras.toLocaleString("es-CO")} palabras${n ? ` · ${n} citas` : ""}`), el("small", "arch-meta", d.meta.autor || d.meta.tipoAutor === "sinautor" ? citaAPA(d, "", undefined, { noMarcar: true, primera: false }) : "Sin autor: agrégalo para citar en APA"));
         const bA = el("button", "enlace-sutil", "Abrir"); bA.onclick = () => leer(d.id);
         const bD = el("button", "enlace-sutil", "Datos"); bD.onclick = () => datosDoc(d.id);
         const bQ = el("button", "enlace-sutil peligro", "Quitar"); bQ.onclick = async () => { if (!confirm(`¿Quitar «${d.nombre}» y sus citas de Romus? (El archivo original no se borra.)`)) return; await borrar("docs", d.id); for (const x of citas.filter(x => x.doc === d.id)) await borrar("citas", x.id); abrir(); };
@@ -297,14 +311,33 @@ window.Archivos = (function () {
   async function datosDoc(id, recien) {
     const { el, tarjeta } = H();
     const d = await obtener(id); if (!d) return abrir();
+    const m0 = d.meta || {};
     const c = el("div", "inv-cuerpo");
-    if (recien) c.appendChild(el("p", "guia-resumen", "Para que Romus pueda citar este documento en APA, completa el autor y el año (si los conoces)."));
-    const campo = (k, t, ph) => { const l = el("label", "campo-pro"); l.appendChild(el("span", "", t)); const i = el("input", "ajuste"); i.value = d.meta[k] || ""; i.placeholder = ph; l.appendChild(i); c.appendChild(l); return i; };
-    const iA = campo("autor", "Autor(es)", "Ej.: Searle, J. R.  ·  o  Ministerio de Educación Nacional");
-    const iY = campo("anio", "Año", "Ej.: 2021");
-    const iT = campo("titulo", "Título", "Título de la obra");
+    if (recien) c.appendChild(el("p", "guia-resumen", "Para que Romus pueda citar este documento en APA, completa sus datos (si los conoces)."));
+    const lT = el("label", "campo-pro"); lT.appendChild(el("span", "", "¿Quién es el autor?"));
+    const sT = el("select", "ajuste"); [["persona", "Una o varias personas"], ["institucion", "Una institución (autor corporativo)"], ["sinautor", "No tiene autor"]].forEach(([v, x]) => { const o = el("option", "", x); o.value = v; sT.appendChild(o); });
+    sT.value = m0.tipoAutor || (m0.autor ? (Citas.esCorporativo(m0.autor) ? "institucion" : "persona") : "persona"); lT.appendChild(sT); c.appendChild(lT);
+    const campo = (k, t, ph) => { const l = el("label", "campo-pro"); l.appendChild(el("span", "", t)); const i = el("input", "ajuste"); i.value = m0[k] || ""; i.placeholder = ph; l.appendChild(i); c.appendChild(l); return [l, i]; };
+    const [lA, iA] = campo("autor", "Autor(es)", "Ej.: Ruiz Díaz, A.; Pérez, L.");
+    const [lS, iS] = campo("sigla", "Sigla de la institución (si la tiene)", "Ej.: OMS");
+    const [, iY] = campo("anio", "Año de publicación", "Ej.: 2021");
+    const [, iT] = campo("titulo", "Título", "Título de la obra");
+    const lO = el("label", "campo-pro"); lO.appendChild(el("span", "", "Tipo de obra")); const sO = el("select", "ajuste"); [["articulo", "Artículo, capítulo o página web"], ["libro", "Libro, informe o tesis"]].forEach(([v, x]) => { const o = el("option", "", x); o.value = v; sO.appendChild(o); }); sO.value = m0.tipoObra || "articulo"; lO.appendChild(sO); c.appendChild(lO);
+    const [, iOr] = campo("anioOriginal", "Año original (solo obras clásicas o reeditadas)", "Ej.: 1900 → (Freud, 1900/1953)");
+    const vista = el("p", "cita-linea"); c.appendChild(vista);
+    const leer0 = () => ({ tipoAutor: sT.value, autor: iA.value.trim(), sigla: iS.value.trim().toUpperCase(), anio: iY.value.trim(), titulo: iT.value.trim(), tipoObra: sO.value, anioOriginal: iOr.value.trim() });
+    const pintar = () => {
+      lA.classList.toggle("oculto", sT.value === "sinautor"); lS.classList.toggle("oculto", sT.value !== "institucion");
+      lA.querySelector("span").textContent = sT.value === "institucion" ? "Nombre completo de la institución" : "Autor(es)";
+      const prueba = Object.assign({}, d, { meta: leer0() });
+      const o = opcionesCita(prueba);
+      const pri = Citas.formato(Object.assign({}, o, { ubic: "p. 4", primera: true })).texto.replace(/\*/g, "");
+      const sig = o.corporativo && o.corporativo.sigla ? " · después: " + Citas.formato(Object.assign({}, o, { ubic: "p. 4" })).texto : "";
+      vista.textContent = "Así quedará: " + pri + sig + " · narrativa: " + Citas.formato(Object.assign({}, o, { narrativa: true, primera: true })).texto.replace(/\*/g, "");
+    };
+    [sT, iA, iS, iY, iT, sO, iOr].forEach(x => { x.oninput = x.onchange = pintar; }); pintar();
     const acc = el("div", "inv-acciones");
-    const bG = el("button", "boton primario", "Guardar"); bG.onclick = async () => { d.meta = { autor: iA.value.trim(), anio: iY.value.trim(), titulo: iT.value.trim() }; await guardar("docs", d); H().ui.confirmar("Guardé los datos del documento."); abrir(); };
+    const bG = el("button", "boton primario", "Guardar"); bG.onclick = async () => { d.meta = leer0(); await guardar("docs", d); H().ui.confirmar("Guardé los datos del documento."); abrir(); };
     const bV = el("button", "enlace-sutil", "Volver"); bV.onclick = () => abrir();
     acc.append(bG, bV); c.appendChild(acc);
     tarjeta(`Datos de «${d.nombre}»`, c);
@@ -417,21 +450,94 @@ window.Archivos = (function () {
     const ps = ctx.document.getSelection().paragraphs; ps.load("items"); await ctx.sync();
     return ps.items[ps.items.length - 1];
   }
-  /** Inserta la cita textual en Word con su referencia APA 7 (en bloque si tiene 40 palabras o más). */
+  /** Citar un fragmento en Word: el usuario elige la clase de cita (textual, paráfrasis o cita de cita) y la forma
+      (parentética o narrativa). Textual de 40 palabras o más → en bloque. Idioma distinto → traducción propia. */
   async function citarEnWord(d, texto, refTxt) {
-    const palabras = texto.split(/\s+/).length;
-    const cita = citaAPA(d, refTxt);
-    await Word.run(async (ctx) => {
-      const sel = ctx.document.getSelection();
-      if (palabras >= 40) {
-        const p = (await parrafoDelCursor(ctx)).insertParagraph(`${texto.replace(/^[«"“]|[»"”]$/g, "")} ${cita}`, "After");
-        try { p.leftIndent = 36; p.firstLineIndent = 0; } catch (e) { /* sangría opcional */ }
-      } else sel.insertText(` «${texto.replace(/^[«"“]|[»"”]$/g, "")}» ${cita}`, "End");
-      await ctx.sync();
+    const { el, tarjeta, etiqueta } = H();
+    await refrescarSiglas();
+    const c = el("div", "inv-cuerpo apa-gen");
+    c.appendChild(el("code", "cita-sel", texto.length > 300 ? texto.slice(0, 297) + "…" : texto));
+    const fila = (t, ops) => { const l = el("label", "campo-pro"); l.appendChild(el("span", "", t)); const s0 = el("select", "ajuste"); ops.forEach(([v, x]) => { const o = el("option", "", x); o.value = v; s0.appendChild(o); }); l.appendChild(s0); c.appendChild(l); return s0; };
+    const selC = fila("Clase de cita", [["textual", "Textual (palabras exactas)"], ["parafrasis", "Paráfrasis (con mis palabras)"], ["secundaria", "Cita de cita (el autor cita a otro)"]]);
+    const selF = fila("Forma", [["parentetica", "Parentética: … (Autor, año, p. 4)"], ["narrativa", "Narrativa: Autor (año) afirma…"]]);
+    // ¿El fragmento cita a otro autor? → sugerir cita de cita
+    const interna = texto.match(/([A-ZÁÉÍÓÚÑ][\wáéíóúñ'-]+(?: et al\.)?)\s*\(((?:1[5-9]|20)\d{2})|\(([A-ZÁÉÍÓÚÑ][^(),;]{1,40}),\s*((?:1[5-9]|20)\d{2})/);
+    const cajaSec = el("div", "oculto");
+    const iOA = el("input", "ajuste"); iOA.placeholder = "Autor original (ej.: Piaget)"; const iOY = el("input", "ajuste"); iOY.placeholder = "Año original (ej.: 1932)";
+    if (interna) { iOA.value = interna[1] || interna[3] || ""; iOY.value = interna[2] || interna[4] || ""; selC.value = "secundaria"; }
+    cajaSec.append(el("small", "inv-nota", "La idea es de otro autor que tú no leíste: en referencias va solo este documento."), iOA, iOY); c.appendChild(cajaSec);
+    const otroIdioma = idiomaDe(d) !== "es";
+    const chkT = el("input"); chkT.type = "checkbox"; chkT.checked = otroIdioma;
+    const lT = el("label", "interruptor-simple" + (otroIdioma ? "" : " oculto")); lT.append(chkT, el("span", "", `Traducir al español (traducción propia; el documento está en ${nombreIdioma(idiomaDe(d)).toLowerCase()})`)); c.appendChild(lT);
+    const vista = el("div", "cita-vista"), nota = el("p", "inv-nota"); c.append(vista, nota);
+    let listo = null, texto2 = texto, parafrasis = "";
+    const pintar = async (marcar) => {
+      const nm = marcar === true ? {} : { noMarcar: true };
+      cajaSec.classList.toggle("oculto", selC.value !== "secundaria");
+      vista.innerHTML = ""; nota.textContent = ""; listo = null;
+      const narr = selF.value === "narrativa";
+      const secundaria = selC.value === "secundaria" && iOA.value.trim() ? { original: { autor: iOA.value.trim(), anio: iOY.value.trim() } } : {};
+      const trad = chkT.checked && otroIdioma;
+      const citaCon = (ub) => citaAPA(d, ub, !narr ? undefined : false, Object.assign({ traduccion: trad && selC.value === "textual" }, secundaria, nm));
+      if (selC.value === "parafrasis") {
+        if (!parafrasis) { vista.appendChild(el("p", "inv-nota", "Toca «Proponer paráfrasis» o escribe la tuya.")); }
+        const cita = citaCon(refTxt);
+        listo = { texto: narr ? `Según ${cita}, ${minus(parafrasis || "[tu paráfrasis]")}` : `${(parafrasis || "[tu paráfrasis]").replace(/[.\s]+$/, "")} ${cita}.`, bloque: false };
+        const comp = parafrasis ? Citas.coincidenciaMaxima(parafrasis, texto) : 0;
+        nota.textContent = "Paráfrasis: la idea del autor con tus palabras y estructura; la página es opcional pero recomendada." + (comp >= 6 ? ` ⚠ Comparte ${comp} palabras seguidas con el original: reescríbela más o úsala como cita textual.` : "");
+      } else {
+        const base = trad ? (texto2 !== texto ? texto2 : "") : texto;
+        if (trad && !base) { vista.appendChild(el("p", "inv-nota", "Toca «Traducir» para ver la cita en español.")); return; }
+        if (narr) {
+          const lead = citaAPA(d, "", false, Object.assign({}, secundaria, nm));
+          const tx = Citas.textual(base, "", true);
+          const fin = [refTxt].concat(trad ? ["traducción propia"] : []).join(", ");
+          listo = tx.bloque ? { texto: `${lead} afirma:`, bloqueTexto: `${tx.texto} (${fin})`, bloque: true } : { texto: `${lead} afirma que ${tx.texto} (${fin}).`, bloque: false };
+          nota.textContent = tx.nota;
+        } else {
+          const tx = Citas.textual(base, citaCon(refTxt), false);
+          listo = tx.bloque ? { texto: "", bloqueTexto: tx.texto, bloque: true } : { texto: tx.texto, bloque: false };
+          nota.textContent = tx.nota + (trad ? " Al traducir tú la cita, se indica «traducción propia»." : "");
+        }
+      }
+      if (listo.texto) vista.appendChild(el("div", "cita-linea", listo.texto));
+      if (listo.bloque) vista.appendChild(el("div", "cita-bloque", listo.bloqueTexto));
+      if (!d.meta.autor && !(d.meta.tipoAutor === "sinautor")) nota.textContent += " Ojo: el documento no tiene autor; complétalo en «Datos» para que la cita quede bien.";
+    };
+    [selC, selF, chkT, iOA, iOY].forEach(x => { x.oninput = x.onchange = () => pintar(); });
+    const acc = el("div", "inv-acciones");
+    const bP = el("button", "boton secundario", "Proponer paráfrasis");
+    bP.onclick = () => H().ejecutar(async () => {
+      exigirIA();
+      const r = await H().pedirHerramienta("parafrasear", "Paráfrasis académica fiel al sentido.",
+        { type: "object", properties: { parafrasis: { type: "string", description: "Paráfrasis en español, con palabras y estructura distintas al original, sin cambiar el sentido ni agregar ideas" } }, required: ["parafrasis"] },
+        `Parafrasea este fragmento para una tesis en español (APA 7). Cambia vocabulario y estructura, conserva el sentido exacto, no agregues ideas ni opiniones y no copies más de cuatro palabras seguidas del original.\n\nFRAGMENTO:\n${texto}`);
+      parafrasis = r.parafrasis || ""; selC.value = "parafrasis"; await pintar();
     });
-    H().registrar("Cita textual de un documento propio", `${d.nombre} ${refTxt}`, "documento");
-    H().ui.confirmar(palabras >= 40 ? "Inserté la cita en bloque (40 palabras o más), con su referencia." : `Inserté la cita ${cita}.`);
-    if (!d.meta.autor) H().ui.hablar("Ojo: el documento no tiene autor. Agrégalo en «Datos» para que la cita quede completa en APA.");
+    const bT = el("button", "boton secundario" + (otroIdioma ? "" : " oculto"), "Traducir");
+    bT.onclick = () => H().ejecutar(async () => {
+      exigirIA();
+      const r = await H().pedirHerramienta("traducir_cita", "Traducción fiel de una cita.", { type: "object", properties: { traduccion: { type: "string" } }, required: ["traduccion"] }, `Traduce al español, de forma fiel y académica, sin resumir:\n\n${texto}`);
+      texto2 = r.traduccion || texto; await pintar();
+    });
+    const bI = el("button", "boton primario", "Insertar en Word");
+    bI.onclick = () => H().ejecutar(async () => {
+      if (!listo) return;
+      if (selC.value === "parafrasis" && !parafrasis) { H().ui.hablar("Primero propón o escribe la paráfrasis."); return; }
+      await refrescarSiglas(); await pintar(true);
+      await Word.run(async (ctx) => {
+        if (listo.texto) ctx.document.getSelection().insertText(" " + listo.texto, "End");
+        if (listo.bloque) { const p = (await parrafoDelCursor(ctx)).insertParagraph(listo.bloqueTexto, "After"); try { p.leftIndent = 36; p.firstLineIndent = 0; } catch (e) { /* sangría opcional */ } }
+        await ctx.sync();
+      });
+      H().registrar(selC.value === "parafrasis" ? "Paráfrasis de un documento propio" : selC.value === "secundaria" ? "Cita de cita de un documento propio" : "Cita textual de un documento propio", `${d.nombre} ${refTxt}`, "documento");
+      H().ui.confirmar(listo.bloque ? "Inserté la cita en bloque (40 palabras o más)." : "Inserté la cita en el cursor.");
+    });
+    const editar = el("textarea", "ajuste"); editar.rows = 3; editar.placeholder = "O escribe aquí tu propia paráfrasis"; editar.oninput = () => { parafrasis = editar.value.trim(); selC.value = "parafrasis"; pintar(); };
+    acc.append(bI, bP, bT); c.append(editar, acc);
+    c.appendChild(etiqueta("reglas", "APA 7 · clase y forma de la cita"));
+    tarjeta("Citar en Word", c);
+    pintar();
   }
 
   /* ================= Buscar (sin IA) ================= */
@@ -578,6 +684,7 @@ window.Archivos = (function () {
       a.appendChild(el("small", "inv-nota", `Certeza ${cert}: ${ev} de ${tot} afirmaciones con evidencia verificada en tus documentos${r.afirmaciones.some(x => x.tipo === "sin_verificar") ? " · revisa las marcadas en rojo" : ""}.`));
       const acc = el("div", "inv-acciones");
       const bI = el("button", "enlace-sutil", "Insertar en Word"); bI.onclick = () => H().ejecutar(async () => {
+        await refrescarSiglas();
         const texto = textoDeAfirmaciones(r, true);
         await Word.run(async (ctx) => { (await parrafoDelCursor(ctx)).insertParagraph(texto, "After"); await ctx.sync(); });
         for (const x of r.afirmaciones.filter(y => y.tipo === "literatura" && y.lit)) { try { await Inv.citarObra(x.lit.apa, false); } catch (e) { /* referencia opcional */ } }
@@ -690,6 +797,7 @@ ${listaFr(frs)}`);
       const acc = el("div", "inv-acciones");
       const bW = el("button", "boton secundario", "Insertar como borrador de estado del arte");
       bW.onclick = () => H().ejecutar(async () => {
+        await refrescarSiglas();
         const ps = [];
         (d.consensos || []).forEach(x => { const cs = Array.from(new Set((x.evidencias || []).map(e => cita(e.n, e.cita)).filter(Boolean))); if (cs.length) ps.push(`${x.afirmacion.replace(/[.\s]+$/, "")} ${cs.join("; ").replace(/\)\s*;\s*\(/g, "; ")}.`); });
         (d.contradicciones || []).forEach(x => { const pos = (x.posiciones || []).map(po => { const ct = cita(po.n, po.cita); return ct ? `${po.postura.replace(/[.\s]+$/, "")} ${ct}` : ""; }).filter(Boolean); if (pos.length > 1) ps.push(`En cuanto a ${minus(x.tema)}, hay posiciones distintas: ${pos.map(minus).join("; mientras que ")}.`.replace(/\ba el\b/g, "al").replace(/\bde el\b/g, "del")); });
@@ -718,6 +826,7 @@ ${listaFr(frs)}`);
     b.onclick = () => H().ejecutar(async () => {
       exigirIA();
       const us = elegidos(); if (!us.length) throw new Error("Elige al menos un documento.");
+      await refrescarSiglas();
       const extra = await terminosEnIdiomas(foco.value, us);
       const frs = fragmentosRepartidos(us, `${foco.value} ${extra}`.trim(), Math.max(5, Math.floor(30 / us.length)));
       let proyecto = ""; try { proyecto = (await H().documentoNumerado()).parrafos.filter(p => /objetivo|pregunta/i.test(p.texto)).map(p => p.texto).join("\n").slice(0, 2500); } catch (e) { /* sin documento */ }
@@ -750,7 +859,7 @@ ${listaFr(frs)}`);
       bW.onclick = () => H().ejecutar(async () => {
         await Word.run(async (ctx) => { let p = (await parrafoDelCursor(ctx)).insertParagraph(SECCIONES[selS.value], "After"); p.styleBuiltIn = "Heading2"; parrafos.forEach(t => { p = p.insertParagraph(t, "After"); p.styleBuiltIn = "Normal"; }); await ctx.sync(); });
         // Referencias de los documentos con autor y año
-        for (const dd of usadosDocs.filter(x => x.meta.autor)) { const tit = (dd.meta.titulo || dd.nombre).replace(/\.$/, ""); try { await Inv.citarObra({ texto: `${autoresAPA(dd.meta.autor)} (${dd.meta.anio || "s. f."}). ${tit}.`, cursiva: tit, cita: citaAPA(dd, "").replace(/, \)$/, ")"), titulo: tit }, false); } catch (e) { /* opcional */ } }
+        for (const dd of usadosDocs.filter(x => x.meta.autor)) { const tit = (dd.meta.titulo || dd.nombre).replace(/\.$/, ""); try { await Inv.citarObra({ texto: `${dd.meta.tipoAutor === "institucion" ? dd.meta.autor : autoresAPA(dd.meta.autor)} (${dd.meta.anioOriginal ? dd.meta.anio + "" : dd.meta.anio || "s. f."}). ${tit}.${dd.meta.anioOriginal ? ` (Trabajo original publicado en ${dd.meta.anioOriginal})` : ""}`, cursiva: tit, cita: citaAPA(dd, ""), titulo: tit }, false); } catch (e) { /* opcional */ } }
         const sinAutor = usadosDocs.filter(x => !x.meta.autor).length;
         H().ui.confirmar(`Inserté la sección y agregué las referencias de tus documentos.${sinAutor ? ` ${sinAutor} documentos no tienen autor: complétalo en «Datos» para que su cita quede bien.` : ""}`);
       });

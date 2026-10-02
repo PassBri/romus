@@ -715,3 +715,10 @@ main > .lector, main > .progreso { position: sticky; top: 0; z-index: 3; box-sha
 .quiz-op.mal { border-color: var(--error); background: color-mix(in srgb, var(--error) 10%, transparent); }
 .arch-herr { grid-template-columns: repeat(4, 1fr); }
 @media (max-width: 300px) { .arch-herr { grid-template-columns: repeat(2, 1fr); } }
+
+/* Citas en el texto */
+.cita-vista { margin: 8px 0 4px; }
+.cita-linea { padding: 8px 10px; border-radius: 8px; background: var(--superficie-2); font-family: "Times New Roman", Georgia, serif; font-size: 13.5px; line-height: 1.6; }
+.cita-bloque { margin-top: 6px; padding: 8px 10px 8px 34px; border-radius: 8px; background: var(--superficie-2); font-family: "Times New Roman", Georgia, serif; font-size: 13.5px; line-height: 1.6; border-left: 3px solid var(--acento); }
+.interruptor-simple { display: flex; gap: 6px; align-items: center; font-size: 12px; margin: 6px 0; }
+.apa-gen .campo-pro textarea { width: 100%; box-sizing: border-box; }

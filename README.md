@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-3.7-185abd" alt="versión 3.7">
+  <img src="https://img.shields.io/badge/versión-3.8-185abd" alt="versión 3.8">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -373,6 +373,12 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 
 ## Novedades
 
+### v3.8 · Todas las clases de citas (APA 7)
+- **Generador de citas en el texto**: paráfrasis, textual corta y en bloque, narrativa (de autor) y parentética (de contenido), cita de cita («como se citó en»), autor corporativo con sigla (primera mención y siguientes, detectadas en tu documento), uno, dos o tres o más autores, varias obras, mismo autor y año (a, b), sin autor, sin fecha, obras clásicas (1900/1953), comunicación personal, traducción propia, énfasis añadido, leyes e IA. Vista previa con la regla de cada clase.
+- **Citar desde Mis documentos**: eliges textual, paráfrasis (Romus propone una y avisa si se parece demasiado al original) o cita de cita (detecta si el fragmento cita a otro autor), y la forma parentética o narrativa; traducción propia si el documento está en otro idioma. Los datos del documento distinguen persona, institución (con sigla) o sin autor, tipo de obra y año original.
+- **Revisor APA 7**: detecta siglas institucionales usadas antes de presentarlas o presentadas dos veces, «citado por» en lugar de «como se citó en», varias obras fuera de orden, traducción o énfasis mal indicados, comunicaciones personales en la lista de referencias y obras del mismo autor y año sin letras.
+- Nuevo tema en la guía: «Clasificación de las citas: todas las clases».
+
 ### v3.7 · Romus Nexus (ideas de IDOC)
 Inspirado en IDOC (Brian G. Suárez Acevedo · Ruta a la Cima): de documentos que se leen a documentos con los que se piensa.
 - **Trust Layer**: cada afirmación de una respuesta dice de dónde sale: **evidencia** de tus documentos (cita verificada), **literatura** académica real (OpenAlex) o **inferencia** de la IA, con un nivel de certeza.
@@ -509,4 +515,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word y PowerPoint · v3.7</sub></p>
+<p align="center"><sub>Romus para Word y PowerPoint · v3.8</sub></p>
