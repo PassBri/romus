@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-3.2.1-185abd" alt="versión 3.2.1">
+  <img src="https://img.shields.io/badge/versión-3.3-185abd" alt="versión 3.3">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -373,6 +373,10 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 
 ## Novedades
 
+### v3.3 · Cinta de opciones al estilo de Word
+- La pestaña «Romus» se organiza como las de Word: **9 grupos por función** (Romus, Texto, Proyecto, Fuentes y citas, Método y datos, Escribir, APA 7, Entregar y Aprender) con sus **subfunciones a la vista**. La acción principal de cada grupo va en grande y las demás en botones pequeños apilados, sin menús escondidos.
+- 51 botones con etiquetas cortas (el nombre completo y la explicación aparecen al pasar el mouse).
+
 ### v3.2.1 · Citas fieles y datos completos
 - **¿Tus citas dicen lo que les atribuyes?** El proyecto Pro compara cada cita con el resumen real de su fuente y deja un comentario donde la frase podría exagerar o cambiar lo que dice el autor. La herramienta manual ahora revisa hasta 24 citas, permite dejar comentarios y se ofrece desde el verificador de referencias.
 - **Datos por confirmar**: nueva herramienta que encuentra las marcas [dato por confirmar], busca fuentes reales para cada una y pone en el texto el dato que tú escribes, con su cita y su referencia APA 7. Romus no inventa el dato.
@@ -474,4 +478,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word y PowerPoint · v3.2.1</sub></p>
+<p align="center"><sub>Romus para Word y PowerPoint · v3.3</sub></p>
