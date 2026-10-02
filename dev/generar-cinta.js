@@ -21,6 +21,16 @@ const EXTRA = {
   Simplificar: ["Simplificar", "Reescribe la selección con un lenguaje más sencillo.", "simplificar"], Formal: ["Más formal", "Reescribe la selección con tono académico.", "formal"],
   Dictar: ["Dictar", "Lo que digas se escribe en el documento.", "dictar"], Ayuda: ["Qué puedo decir", "Comandos de voz y colores de Romus.", "ayuda"],
   Asesor: ["Asesor", "Tu asesor de investigación: te guía según dónde estés.", "asesor"], MiProyecto: ["Mi proyecto", "Avance, etapa, cronograma y sesiones de asesoría.", "proyecto"],
+  ConectarIA: ["Conectar IA", "Configura tu inteligencia artificial: proveedor, clave y modelo (Gemini gratis, Claude, OpenAI…).", "conectar"],
+  NivelPregrado: ["Pregrado", "Trabajo de grado de pregrado.", "nivel"], NivelEspecializacion: ["Especialización", "Trabajo aplicado o de intervención.", "nivel"],
+  NivelMaestria: ["Maestría", "Tesis de investigación o de profundización.", "nivel"], NivelDoctorado: ["Doctorado", "Proyecto de tesis doctoral.", "nivel"],
+  NivelPosdoctorado: ["Posdoctorado", "Proyecto posdoctoral financiable.", "nivel"],
+  EnfoqueCuantitativo: ["Cuantitativo", "Hipótesis, variables, muestra estadística, SPSS o R.", "enfoque"], EnfoqueCualitativo: ["Cualitativo", "Categorías, participantes, saturación, ATLAS.ti.", "enfoque"],
+  EnfoqueMixto: ["Mixto", "Combina e integra datos cuantitativos y cualitativos.", "enfoque"], EnfoqueTeorico: ["Teórico-documental", "Filosofía o teoría: corpus de textos, fichas de análisis y tesis a defender.", "enfoque"],
+  EtapaTema: ["1. Idea y tema", "Define un tema acotado.", "bombillo"], EtapaPlanteamiento: ["2. Planteamiento", "Problema, pregunta, objetivos y justificación.", "coherencia"],
+  EtapaFundamentacion: ["3. Fundamentación", "Antecedentes, estado del arte y marco teórico.", "libro"], EtapaMetodologia: ["4. Metodología", "Enfoque, diseño, participantes o corpus, instrumentos y análisis.", "instrumento"],
+  EtapaCampo: ["5. Trabajo de campo", "Validación, piloto y recolección (o corpus y fichaje en tesis teóricas).", "validacion"], EtapaResultados: ["6. Resultados", "Análisis y resultados o hallazgos.", "spss"],
+  EtapaDiscusion: ["7. Discusión", "Discusión, conclusiones y limitaciones.", "discusion"], EtapaSustentacion: ["8. Sustentación", "Presentación y simulacro de jurado.", "sustentacion"],
   Crear: ["Crear proyecto ★", "Crea tu proyecto completo desde cero con el método Kuetz (Pro).", "crear"]
 };
 const info = (clave) => {
@@ -34,15 +44,20 @@ const CORTOS = {
   literatura: "Literatura", biblioteca: "Biblioteca", matriz: "Matriz", sincita: "Sin cita", fidelidad: "Fidelidad",
   pendientes: "Por confirmar", existen: "Verificar", muestra: "Muestra", validacion: "Validación", spss: "SPSS o R",
   resumen: "Resumen", articulo: "Artículo", usoia: "Uso de IA", diapositivas: "Presentación", sustentacion: "Simulacro",
-  director: "Modo director", Ayuda: "Comandos", LeerSel: "Leer selección", Crear: "Crear ★"
+  director: "Modo director", Ayuda: "Comandos", LeerSel: "Leer selección", Crear: "Crear ★", ruta: "Ruta de mi tesis"
 };
 /* Estructura de la pestaña, al estilo de Word: cada grupo es una función y sus botones son las subfunciones.
    La primera es la acción principal; Word muestra las demás como botones pequeños apilados cuando el grupo
    tiene más de tres (lo decide Office según el espacio). Máximo 7 por grupo, como recomienda Microsoft. */
 const GRUPOS = [
-  { id: "Voz", nombre: "Romus", ico: "logo", controles: ["ABRIR", "Hablar", "ModoVoz", "Burbuja", "Dictar", "Leer", "LeerSel"] },
-  { id: "Texto", nombre: "Texto", ico: "corregir", controles: ["Corregir", "Revisar", "Resumir", "Explicar", "Simplificar", "Formal"] },
-  { id: "Proy", nombre: "Proyecto", ico: "asesor", controles: ["Asesor", "MiProyecto", "Crear", "idear", "estructura", "coherencia", "rubrica"] },
+  { id: "Voz", nombre: "Romus", ico: "logo", controles: ["ABRIR", "Hablar", "ModoVoz", "Burbuja", "Dictar", "Leer", "ConectarIA"] },
+  { id: "Tesis", nombre: "Mi tesis", ico: "nivel", controles: ["ruta",
+    { menu: "Nivel", nombre: "Nivel", ico: "nivel", items: ["NivelPregrado", "NivelEspecializacion", "NivelMaestria", "NivelDoctorado", "NivelPosdoctorado"] },
+    { menu: "Enfoque", nombre: "Enfoque", ico: "enfoque", items: ["EnfoqueCuantitativo", "EnfoqueCualitativo", "EnfoqueMixto", "EnfoqueTeorico"] },
+    { menu: "Etapas", nombre: "Etapas", ico: "etapas", items: ["EtapaTema", "EtapaPlanteamiento", "EtapaFundamentacion", "EtapaMetodologia", "EtapaCampo", "EtapaResultados", "EtapaDiscusion", "EtapaSustentacion"] },
+    "MiProyecto", "estructura"] },
+  { id: "Texto", nombre: "Texto", ico: "corregir", controles: ["Corregir", "Revisar", "Resumir", "Explicar", "Simplificar", "Formal", "LeerSel"] },
+  { id: "Proy", nombre: "Proyecto", ico: "asesor", controles: ["Asesor", "Crear", "idear", "coherencia", "rubrica"] },
   { id: "Fuentes", nombre: "Fuentes y citas", ico: "libro", controles: ["literatura", "biblioteca", "matriz", "existen", "fidelidad", "sincita", "pendientes"] },
   { id: "Metodo", nombre: "Método y datos", ico: "instrumento", controles: ["instrumento", "muestra", "validacion", "etica", "spss", "atlas"] },
   { id: "Escribir", nombre: "Escribir", ico: "discusion", controles: ["discusion", "conclusiones", "resumen", "articulo", "usoia"] },

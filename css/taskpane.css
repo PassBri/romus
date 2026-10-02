@@ -600,3 +600,12 @@ main > .lector, main > .progreso { position: sticky; top: 0; z-index: 3; box-sha
 .apa-hall.pendiente textarea { width: 100%; margin: 6px 0 2px; }
 .apa-hall.pendiente.hecho { opacity: .65; }
 .pendiente-fuentes .verif-fila { margin-top: 6px; }
+
+/* Ruta de la tesis */
+.ruta-tesis { margin: 8px 0; padding-left: 0; list-style: none; display: grid; gap: 4px; }
+.ruta-tesis li { border-left: 3px solid var(--borde, #ccd); padding: 4px 8px; background: var(--superficie-2); border-radius: 6px; }
+.ruta-tesis li.actual { border-left-color: var(--acento, #3b6fd8); }
+.ruta-tesis li.hecha { border-left-color: var(--ok); opacity: .8; }
+.ruta-tesis li button { font-weight: 600; padding: 0; text-align: left; }
+.ruta-tesis li small, .ruta-apartados small { display: block; color: var(--texto-2); font-size: 11.5px; }
+.ruta-apartados li.ok { color: var(--ok); }

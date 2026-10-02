@@ -61,6 +61,10 @@ window.Herramientas = (function () {
     mas: '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
     pendiente: '<path d="M7 4H5v16h2M17 4h2v16h-2"/><path d="M10 9h4M10 13h4M10 17h2"/><circle cx="16.5" cy="17" r=".6"/>',
     fidelidad: '<path d="M4 6h7v12H4zM13 6h7v12h-7"/><path d="M6 10h3M6 13h3M15 10h3M15 13h3"/><path d="M10.5 3.5l1.5 1.5 1.5-1.5"/>',
+    etapas: '<circle cx="5" cy="6" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="18" r="2"/><path d="M7 6h3a2 2 0 0 1 2 2v2M14 12h3a2 2 0 0 1 2 2v2"/>',
+    nivel: '<path d="M2.5 9L12 4.5 21.5 9 12 13.5z"/><path d="M6.5 11v4.5c1.6 1.6 3.4 2.4 5.5 2.4s3.9-.8 5.5-2.4V11M21.5 9v5"/>',
+    enfoque: '<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
+    conectar: '<path d="M9 3v4M15 3v4M7 7h10v4a5 5 0 0 1-10 0z"/><path d="M12 16v5"/>',
     cronometro: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5M18.5 6.5l1.5-1.5"/>',
     ayuda: '<circle cx="12" cy="12" r="9.5"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.2-2.5 3.9"/><circle cx="12" cy="17.2" r=".6"/>'
   };
@@ -68,6 +72,7 @@ window.Herramientas = (function () {
   const GRUPOS = { planear: "Planear", fundamentar: "Fundamentar", disenar: "Diseñar y recolectar", analizar: "Analizar datos", escribir: "Escribir resultados", apa: "Normas APA 7", entregar: "Entregar y sustentar", aprender: "Aprender", docentes: "Para directores y jurados" };
   // [grupo, id, nombre, descripción, ícono, acción]
   const LISTA = [
+    ["planear", "ruta", "Etapas de mi tesis", "La ruta según tu nivel y enfoque", "etapas", () => Asesor.rutaTesis()],
     ["planear", "idear", "Idear", "De la idea al problema, la pregunta y los objetivos", "bombillo", pref("Ayúdame a idear un proyecto sobre ", "Escribe o dime tu idea en una frase.")],
     ["planear", "estructura", "Estructura", "Los apartados de tu trabajo según el nivel", "estructura", cmd("inserta la estructura")],
     ["planear", "coherencia", "Coherencia", "¿Problema, pregunta, objetivos y método encajan?", "coherencia", cmd("revisa la coherencia")],
@@ -131,7 +136,7 @@ window.Herramientas = (function () {
   }
   /** Herramientas recomendadas para cada etapa del método Kuetz. */
   const POR_ETAPA = {
-    tema: ["idear", "literatura", "estructura"],
+    tema: ["ruta", "idear", "literatura", "estructura"],
     planteamiento: ["coherencia", "pendientes", "sincita", "rubrica"],
     fundamentacion: ["biblioteca", "matriz", "fidelidad", "sincita"],
     metodologia: ["muestra", "instrumento", "etica", "coherencia"],

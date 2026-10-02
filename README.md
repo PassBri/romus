@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-3.3-185abd" alt="versión 3.3">
+  <img src="https://img.shields.io/badge/versión-3.4-185abd" alt="versión 3.4">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -373,6 +373,12 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 
 ## Novedades
 
+### v3.4 · Mi tesis en la cinta
+- **Conectar IA** desde la cinta (grupo Romus): abre la configuración del proveedor, la clave y el modelo.
+- Nuevo grupo **Mi tesis**: menús **Nivel** (pregrado a posdoctorado) y **Enfoque** (cuantitativo, cualitativo, mixto o teórico-documental), y **Etapas** de la tesis.
+- **Ruta de mi tesis**: las 8 etapas con sus apartados según tu nivel y enfoque (por ejemplo, «Inmersión y trabajo de campo» en lo cualitativo o «Corpus y fichaje documental» en lo teórico). Cada etapa muestra qué lograr, qué apartados ya tienes, agrega los que faltan y ofrece sus herramientas.
+- Por voz: «etapas de mi tesis», «etapa de resultados».
+
 ### v3.3 · Cinta de opciones al estilo de Word
 - La pestaña «Romus» se organiza como las de Word: **9 grupos por función** (Romus, Texto, Proyecto, Fuentes y citas, Método y datos, Escribir, APA 7, Entregar y Aprender) con sus **subfunciones a la vista**. La acción principal de cada grupo va en grande y las demás en botones pequeños apilados, sin menús escondidos.
 - 51 botones con etiquetas cortas (el nombre completo y la explicación aparecen al pasar el mouse).
@@ -478,4 +484,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word y PowerPoint · v3.3</sub></p>
+<p align="center"><sub>Romus para Word y PowerPoint · v3.4</sub></p>

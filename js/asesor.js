@@ -59,6 +59,127 @@ window.Asesor = (function () {
     return { filas, porc, actual, totalPal };
   }
 
+  /* ---------- Ruta de la tesis según nivel y enfoque ---------- */
+  // Nombre y apartados de cada etapa cambian con el enfoque; los de las primeras etapas salen de la estructura del nivel.
+  const ETAPA_ENFOQUE = {
+    campo: { cuantitativo: ["Instrumentos y trabajo de campo", ["Validación de instrumentos", "Prueba piloto", "Procedimiento de recolección"]],
+             cualitativo: ["Inmersión y trabajo de campo", ["Acceso al campo", "Recolección (entrevistas, observación)", "Diario de campo"], "Entra al campo, recolecta y lleva tu diario; en lo cualitativo se analiza mientras se recolecta, hasta la saturación."],
+             mixto: ["Trabajo de campo por fases", ["Validación de instrumentos", "Recolección cuantitativa", "Recolección cualitativa"], "Valida los instrumentos y recolecta cada fase en el orden que fija tu diseño mixto."],
+             teorico: ["Corpus y fichaje documental", ["Construcción del corpus", "Fichas de análisis documental", "Matriz autor × categoría"], "Cierra el corpus con criterios explícitos y llena una ficha de análisis por cada texto."] },
+    resultados: { cuantitativo: ["Análisis y resultados", ["Resultados descriptivos", "Contraste de hipótesis"]],
+                  cualitativo: ["Análisis y hallazgos", ["Categorías y subcategorías", "Hallazgos con citas de los participantes"], "Presenta cada categoría con su definición y las citas de los participantes que la sustentan."],
+                  mixto: ["Resultados e integración", ["Resultados cuantitativos", "Hallazgos cualitativos", "Integración (metainferencias)"], "Presenta los resultados de cada enfoque y explica cómo se integran."],
+                  teorico: ["Análisis y argumentación", ["Reconstrucción de posiciones", "Contraste por categorías", "Tesis y objeciones"], "Reconstruye las posiciones, compáralas por categorías y defiende tu tesis frente a las objeciones más fuertes."] },
+    discusion: { _: ["Discusión y conclusiones", ["Discusión", "Conclusiones", "Limitaciones", "Recomendaciones"]] },
+    sustentacion: { _: ["Sustentación", ["Presentación", "Simulacro de jurado"]] }
+  };
+  const HERR_ENFOQUE = { teorico: { campo: ["instrumento", "biblioteca", "matriz", "fidelidad"], resultados: ["matriz", "fidelidad", "sincita", "aparevisor"] },
+                         cualitativo: { campo: ["instrumento", "validacion", "etica", "atlas"], resultados: ["atlas", "aparevisor"] },
+                         cuantitativo: { campo: ["instrumento", "validacion", "muestra", "spss"], resultados: ["spss", "aparevisor"] } };
+  const ETAPA_DE_SECCION = [
+    [/^(t[ií]tulo|resumen)/i, "tema"],
+    [/(cronograma|presupuesto|financiaci|plan de trabajo|entidad anfitriona|trayectoria)/i, "metodologia"],
+    [/(aporte original|referencias|estado del arte)/i, "fundamentacion"],
+    [/(resultados esperados|impacto|divulgaci|introducci|hip[oó]tesis|supuestos|tesis|contexto|propuesta de intervenci)/i, "planteamiento"]
+  ];
+  function etapaDeSeccion(t) { const x = ETAPA_DE_SECCION.find(([re]) => re.test(t)); if (x) return x[1]; const e = ETAPAS.find(e => e.re.test(t)); return e ? e.id : "planteamiento"; }
+  /** Etapas de la tesis para el nivel y enfoque actuales, con sus apartados. */
+  function ruta() {
+    const n = Inv.nivel(), e = Inv.enfoque();
+    const porEtapa = {}; ETAPAS.forEach(x => { porEtapa[x.id] = []; });
+    Inv.secciones().forEach(([t, subs]) => {
+      const id = etapaDeSeccion(t);
+      if (/^(Metodolog|Dise[ñn]o metodol)/i.test(t)) porEtapa.metodologia.push([t, subs || []]);
+      else porEtapa[id].push([t, subs || []]);
+    });
+    return ETAPAS.map(x => {
+      const ov = ETAPA_ENFOQUE[x.id] && (ETAPA_ENFOQUE[x.id][e.id] || ETAPA_ENFOQUE[x.id]._);
+      const apartados = porEtapa[x.id].length ? porEtapa[x.id] : (ov ? ov[1].map(t => [t, []]) : []);
+      const herr = (HERR_ENFOQUE[e.id] && HERR_ENFOQUE[e.id][x.id]) || (window.Herramientas ? Herramientas.paraEtapa(x.id).map(t => t.id) : []);
+      return Object.assign({}, x, { nombre: ov ? ov[0] : x.nombre, consejo: (ov && ov[2]) || (e.id === "teorico" && x.id === "metodologia" ? "Diseño teórico, corpus y criterios de selección, técnica de análisis documental, rigor y ética." : x.consejo), apartados, herr, nivel: n, enfoque: e });
+    });
+  }
+  function cabeceraRuta(c) {
+    const { el } = H();
+    const n = Inv.nivel(), e = Inv.enfoque();
+    const fila = el("div", "inv-selectores");
+    const sN = el("select"); Object.entries(Inv.NIVELES).forEach(([id, x]) => { const o = el("option", "", x.nombre); o.value = id; sN.appendChild(o); }); sN.value = n.id;
+    const sE = el("select"); Object.entries(Inv.ENFOQUES).forEach(([id, x]) => { const o = el("option", "", x.nombre); o.value = id; sE.appendChild(o); }); sE.value = e.id;
+    sN.onchange = () => { Inv.fijarNivel(sN.value); rutaTesis(); }; sE.onchange = () => { Inv.fijarEnfoque(sE.value); rutaTesis(); };
+    fila.append(sN, sE); c.appendChild(fila);
+  }
+  async function rutaTesis() {
+    const { tarjeta, el, etiqueta } = H();
+    const n = Inv.nivel(), e = Inv.enfoque();
+    let a = null; try { a = await avance(); } catch (x) { /* sin documento */ }
+    const c = el("div", "inv-cuerpo asesor");
+    c.appendChild(el("p", "guia-resumen", `${n.producto} (${n.nombre.toLowerCase()}) con enfoque ${e.nombre.toLowerCase()}: estas son sus etapas y los apartados de cada una.`));
+    cabeceraRuta(c);
+    c.appendChild(etiqueta("guia", "método Kuetz · cambia el nivel o el enfoque y la ruta se ajusta"));
+    const ol = el("ol", "ruta-tesis");
+    ruta().forEach((x, k) => {
+      const f = a && a.filas.find(y => y.id === x.id);
+      const li = el("li", f && f.hecha ? "hecha" : a && a.actual && a.actual.id === x.id ? "actual" : "");
+      const b = el("button", "enlace-sutil", `${k + 1}. ${x.nombre}`); b.onclick = () => etapa(x.id);
+      li.appendChild(b);
+      if (x.apartados.length) li.appendChild(el("small", "", x.apartados.map(([t]) => t).join(" · ")));
+      ol.appendChild(li);
+    });
+    c.appendChild(ol);
+    const acc = el("div", "inv-acciones");
+    const bE = el("button", "boton secundario", "Insertar la estructura completa"); bE.onclick = () => H().ejecutar(() => Inv.insertarEstructura());
+    acc.appendChild(bE); c.appendChild(acc);
+    tarjeta("Etapas de mi tesis", c);
+    H().ui.hablar(`Tu ${n.producto.toLowerCase()}, nivel ${n.nombre.toLowerCase()} y enfoque ${e.nombre.toLowerCase()}, tiene ${ETAPAS.length} etapas. Toca una para ver qué incluye.`);
+  }
+  async function etapa(id) {
+    const { tarjeta, el } = H();
+    const x = ruta().find(y => y.id === id); if (!x) return rutaTesis();
+    const c = el("div", "inv-cuerpo asesor");
+    c.appendChild(el("p", "inv-nota", `${x.nivel.nombre} · ${x.enfoque.nombre}`));
+    const sig = el("div", "guia-sencillo"); sig.append(el("b", "", "Qué lograr"), el("span", "", x.consejo)); c.appendChild(sig);
+    // ¿Qué apartados ya están en el documento?
+    let titulos = [];
+    try { titulos = (await Doc.leerParrafos()).filter(p => Doc.esTitulo(p.estilo)).map(p => H().norm(p.texto)); } catch (e) { /* sin documento */ }
+    const tiene = (t) => titulos.some(y => y.includes(H().norm(t).slice(0, 18)));
+    if (x.apartados.length) {
+      c.appendChild(el("div", "inv-sub", "Apartados de esta etapa"));
+      const ul = el("ul", "guia-puntos ruta-apartados");
+      x.apartados.forEach(([t, subs]) => {
+        const li = el("li", tiene(t) ? "ok" : "", (tiene(t) ? "✓ " : "") + t);
+        if (subs.length) li.appendChild(el("small", "", subs.join(" · ")));
+        if (Inv.DESCRIPCIONES && Inv.DESCRIPCIONES[t]) li.title = Inv.DESCRIPCIONES[t];
+        ul.appendChild(li);
+      });
+      c.appendChild(ul);
+      const faltan = x.apartados.filter(([t]) => !tiene(t));
+      if (faltan.length) {
+        const bI = el("button", "boton secundario", `Agregar ${faltan.length === 1 ? "el apartado que falta" : "los " + faltan.length + " apartados que faltan"}`);
+        bI.onclick = () => H().ejecutar(async () => {
+          await Word.run(async (ctx) => {
+            const body = ctx.document.body;
+            faltan.forEach(([t, subs]) => { const h = body.insertParagraph(t, "End"); h.styleBuiltIn = "Heading1"; subs.forEach(s => { const h2 = body.insertParagraph(s, "End"); h2.styleBuiltIn = "Heading2"; }); });
+            await ctx.sync();
+          });
+          H().ui.confirmar("Agregué los apartados al final del documento."); etapa(id);
+        });
+        c.appendChild(bI);
+      }
+    }
+    if (window.Herramientas && x.herr.length) {
+      c.appendChild(el("div", "inv-sub", "Herramientas para esta etapa"));
+      const g = el("div", "etapa-herr"); x.herr.map(Herramientas.porId).filter(Boolean).forEach(t => g.appendChild(Herramientas.boton(t))); c.appendChild(g);
+    }
+    const nav = el("div", "inv-acciones");
+    const k = ETAPAS.findIndex(y => y.id === id);
+    if (k > 0) { const bA = el("button", "enlace-sutil", "← " + ruta()[k - 1].nombre); bA.onclick = () => etapa(ETAPAS[k - 1].id); nav.appendChild(bA); }
+    const bR = el("button", "enlace-sutil", "Todas las etapas"); bR.onclick = () => rutaTesis(); nav.appendChild(bR);
+    if (k < ETAPAS.length - 1) { const bS = el("button", "enlace-sutil", ruta()[k + 1].nombre + " →"); bS.onclick = () => etapa(ETAPAS[k + 1].id); nav.appendChild(bS); }
+    c.appendChild(nav);
+    tarjeta(`Etapa ${k + 1} · ${x.nombre}`, c);
+    H().ui.hablar(`Etapa ${k + 1}: ${x.nombre}. ${x.consejo}`);
+  }
+
   /* ---------- Cronograma: distribuye las etapas hacia atrás desde la fecha final ---------- */
   function planear(fechaFinal) {
     const fin = new Date(fechaFinal + "T12:00:00");
@@ -512,10 +633,13 @@ ${lote.map((x, k) => `${k + 1}. AFIRMACIÓN: ${x.frase}\n   RESUMEN DE LA FUENTE
     if (/^((abre|muestra|ver|como va) )?(mi proyecto|el proyecto|mi avance|mi cronograma|cronograma|como voy|en que etapa voy)$/.test(n)) return tarea(miProyecto);
     if (/^((haz|hagamos|quiero|dame|inicia)( una)? )?(sesion de asesoria|asesoria|revisa mi avance|revision de avance)$/.test(n)) return tarea(sesion);
     if (/^(bitacora|mis sesiones|historial de asesorias)$/.test(n)) return () => bitacora();
+    if (/^((las |mis )?etapas( de (la|mi) (tesis|investigacion|proyecto))?|ruta de (la|mi) tesis|(muestra|ver) (las )?etapas)$/.test(n)) return tarea(rutaTesis);
+    const me = n.match(/^(etapa|ve a la etapa|ir a la etapa) (de )?(tema|idea|planteamiento|fundamentacion|marco teorico|metodologia|diseno|campo|trabajo de campo|resultados|analisis|discusion|conclusiones|sustentacion)$/);
+    if (me) return tarea(() => etapa({ idea: "tema", "marco teorico": "fundamentacion", diseno: "metodologia", "trabajo de campo": "campo", analisis: "resultados", conclusiones: "discusion" }[me[3]] || me[3]));
     const m = String(original || n).match(/^\s*(?:crea|crear|creame|haz|hazme|arma|armame|construye|genera)\s+(?:mi |un |el )?proyecto(?: completo)?(?: de investigaci[oó]n)?(?: desde cero)?(?:\s+(?:sobre|de|acerca de|para)\s+(.+))?$/i);
     if (m && /proyecto/.test(n)) return () => nuevoProyecto((m[1] || "").replace(/[.?!]+$/, ""));
     return null;
   }
 
-  return { proyecto, miProyecto, sesion, bitacora, nuevoProyecto, comando, esPro, codigoValido, avance, ETAPAS };
+  return { proyecto, miProyecto, sesion, bitacora, nuevoProyecto, comando, esPro, codigoValido, avance, ETAPAS, ruta, rutaTesis, etapa };
 })();

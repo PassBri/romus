@@ -1228,7 +1228,7 @@ Reglas:
     NIVELES, ENFOQUES, nivel, fijarNivel, enfoque, fijarEnfoque, sinHipotesis, secciones, conectar, comando, etiqueta, registrar, leerRegistro,
     insertarEstructura, idear, coherencia, literatura, citar, evaluarRubrica, declaracion,
     preguntar, indiceGuia, mostrarTema, construir, asesor, iniciarTutorial, pasoTutorial, salirTutorial,
-    _apa: apa, _verificar: verificar, citarObra, _partirNombre: partirNombre, _aOracion: aOracion,
+    _apa: apa, _verificar: verificar, citarObra, insertarEstructura, DESCRIPCIONES: GUIAS, _partirNombre: partirNombre, _aOracion: aOracion,
     // Utilidades compartidas con otros módulos (jurado.js)
     _resumenDe: resumenDe,
     _h: { tarjeta, el, etiqueta, registrar, documentoNumerado, pedirHerramienta, verificar, norm, ejecutar, irA, buscarOpenAlex, apa, claveDoc, get ui() { return ui; } }

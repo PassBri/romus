@@ -1363,8 +1363,24 @@
     Resumir: "resume el documento en pocas frases", Explicar: "explícame lo que tengo seleccionado con palabras sencillas",
     Simplificar: "reescribe la selección con un lenguaje más sencillo", Formal: "reescribe la selección con un tono más formal y académico",
     Dictar: "modo dictado", Ayuda: () => abrirHoja("panelAyuda"),
+    ConectarIA: () => { abrirHoja("panelAjustes"); setTimeout(() => { const i = $("inpClave"); if (i) i.focus(); }, 150); },
+    NivelPregrado: () => fijarDesdeCinta("nivel", "pregrado"), NivelEspecializacion: () => fijarDesdeCinta("nivel", "especializacion"),
+    NivelMaestria: () => fijarDesdeCinta("nivel", "maestria"), NivelDoctorado: () => fijarDesdeCinta("nivel", "doctorado"), NivelPosdoctorado: () => fijarDesdeCinta("nivel", "posdoctorado"),
+    EnfoqueCuantitativo: () => fijarDesdeCinta("enfoque", "cuantitativo"), EnfoqueCualitativo: () => fijarDesdeCinta("enfoque", "cualitativo"),
+    EnfoqueMixto: () => fijarDesdeCinta("enfoque", "mixto"), EnfoqueTeorico: () => fijarDesdeCinta("enfoque", "teorico"),
+    EtapaTema: () => Asesor.etapa("tema"), EtapaPlanteamiento: () => Asesor.etapa("planteamiento"), EtapaFundamentacion: () => Asesor.etapa("fundamentacion"),
+    EtapaMetodologia: () => Asesor.etapa("metodologia"), EtapaCampo: () => Asesor.etapa("campo"), EtapaResultados: () => Asesor.etapa("resultados"),
+    EtapaDiscusion: () => Asesor.etapa("discusion"), EtapaSustentacion: () => Asesor.etapa("sustentacion"),
     Asesor: () => Inv.asesor(), MiProyecto: () => { if (window.Asesor) Asesor.miProyecto(); }, Crear: () => { if (window.Asesor) Asesor.nuevoProyecto(); }
   };
+  /** Nivel o enfoque elegido en la cinta: se guarda y se muestra la ruta de la tesis ajustada. */
+  function fijarDesdeCinta(que, id) {
+    if (que === "nivel") Inv.fijarNivel(id); else Inv.fijarEnfoque(id);
+    irPestana("investigar");
+    const v = que === "nivel" ? Inv.nivel() : Inv.enfoque();
+    confirmar(`${que === "nivel" ? "Nivel" : "Enfoque"}: ${v.nombre}.`);
+    if (window.Asesor) Asesor.rutaTesis();
+  }
   const SIN_PANEL = new Set(["Burbuja"]); // funciona sin abrir el panel (la burbuja es su propia ventana)
   function accionCinta(clave) {
     if (CINTA[clave]) return CINTA[clave];
