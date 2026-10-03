@@ -415,10 +415,29 @@ Respuesta del estudiante (transcrita de su voz, puede tener errores de transcrip
   }
 
   const ACCIONES = { Ensayo: () => irPestana("ensayo"), Revision: () => { irPestana("revision"); revisar(); }, Jurado: () => irPestana("jurado") };
-  function registrarCinta() {
-    if (!(window.Office && Office.actions && Office.actions.associate)) return;
-    Object.keys(ACCIONES).forEach(k => { try { Office.actions.associate("romusPpt" + k, async (ev) => { try { if (Office.addin && Office.addin.showAsTaskpane) await Office.addin.showAsTaskpane(); } catch (e) { /* visible */ } ev.completed(); ACCIONES[k](); }); } catch (e) { /* ya registrada */ } });
+  const compartido = () => { try { return !!(Office.context.requirements.isSetSupported("SharedRuntime", "1.1") && Office.addin && Office.addin.showAsTaskpane); } catch (e) { return false; } };
+  const visible = () => !window.__soyFuncion && window.innerWidth > 60 && window.innerHeight > 120;
+  function correrPendiente() {
+    if (!visible()) return;
+    try { const p = JSON.parse(localStorage.getItem("romus.ppt.pendiente") || "null"); if (!p) return; localStorage.removeItem("romus.ppt.pendiente"); if (Date.now() - p.t < 300000 && ACCIONES[p.k]) setTimeout(() => ACCIONES[p.k](), 300); } catch (e) { /* nada pendiente */ }
   }
+  function registrarCinta() {
+    if (!window.Office) return;
+    Object.keys(ACCIONES).forEach(k => {
+      const fn = (ev) => {
+        const fin = () => { try { ev && ev.completed && ev.completed(); } catch (e) { /* ya terminado */ } };
+        if (compartido()) { fin(); try { const pr = Office.addin.showAsTaskpane(); if (pr && pr.catch) pr.catch(() => {}); } catch (e) { /* visible */ } $("hojaIA").classList.add("oculto"); ACCIONES[k](); return; }
+        // PowerPoint sin motor compartido: el botón corre en una instancia oculta; el panel visible recoge la acción.
+        if (!visible()) window.__soyFuncion = true;
+        try { localStorage.setItem("romus.ppt.pendiente", JSON.stringify({ k, t: Date.now() })); } catch (e) { /* sin almacenamiento */ }
+        correrPendiente(); fin();
+      };
+      window["romusPpt" + k] = fn;
+      try { if (Office.actions && Office.actions.associate) Office.actions.associate("romusPpt" + k, fn); } catch (e) { /* ya registrada */ }
+    });
+    if (!compartido()) { correrPendiente(); setInterval(() => { try { if (localStorage.getItem("romus.ppt.pendiente")) correrPendiente(); } catch (e) { /* sin almacenamiento */ } }, 700); }
+  }
+
 
   function iniciar(info) {
     enOffice = !!(info && info.host);

@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-3.8-185abd" alt="versión 3.8">
+  <img src="https://img.shields.io/badge/versión-3.8.1-185abd" alt="versión 3.8.1">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -373,6 +373,11 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 
 ## Novedades
 
+### v3.8.1 · Botones de la cinta en todas las versiones de Office
+- En Office 2016/2019 (y en Word sin motor compartido) los botones de la pestaña «Romus» se ejecutaban en una instancia oculta y el panel no mostraba nada. Ahora la acción pasa al panel visible (al instante si está abierto, o apenas lo abras).
+- En Microsoft 365 el botón ya no se queda «trabajando»: Word atiende cada clic de inmediato.
+- Al usar un botón se cierran las hojas abiertas (Ajustes, Ayuda) que tapaban el resultado, y el panel avisa qué abrió.
+
 ### v3.8 · Todas las clases de citas (APA 7)
 - **Generador de citas en el texto**: paráfrasis, textual corta y en bloque, narrativa (de autor) y parentética (de contenido), cita de cita («como se citó en»), autor corporativo con sigla (primera mención y siguientes, detectadas en tu documento), uno, dos o tres o más autores, varias obras, mismo autor y año (a, b), sin autor, sin fecha, obras clásicas (1900/1953), comunicación personal, traducción propia, énfasis añadido, leyes e IA. Vista previa con la regla de cada clase.
 - **Citar desde Mis documentos**: eliges textual, paráfrasis (Romus propone una y avisa si se parece demasiado al original) o cita de cita (detecta si el fragmento cita a otro autor), y la forma parentética o narrativa; traducción propia si el documento está en otro idioma. Los datos del documento distinguen persona, institución (con sigla) o sin autor, tipo de obra y año original.
@@ -515,4 +520,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word y PowerPoint · v3.8</sub></p>
+<p align="center"><sub>Romus para Word y PowerPoint · v3.8.1</sub></p>

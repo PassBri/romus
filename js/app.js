@@ -1476,27 +1476,49 @@
     if (window.Herramientas && Herramientas.porId(id)) return () => Herramientas.ejecutar(id);
     return null;
   }
+  const NOMBRE_CINTA = { ConectarIA: "Conectar IA", Hablar: "Hablar", ModoVoz: "Modo voz", Burbuja: "Burbuja", Leer: "Leer", LeerSel: "Leer selección", Corregir: "Corregir", Revisar: "Revisar", Resumir: "Resumir", Explicar: "Explicar", Simplificar: "Simplificar", Formal: "Más formal", Dictar: "Dictar", Ayuda: "Comandos", Asesor: "Asesor", MiProyecto: "Mi proyecto", Crear: "Crear proyecto" };
   function correrCinta(clave) {
     const a = accionCinta(clave); if (!a) return;
+    // Lo que se abre desde la cinta debe verse: se cierran las hojas abiertas (Ajustes, Ayuda) que taparían el resultado.
+    if (!["ConectarIA", "Ayuda"].includes(clave)) document.querySelectorAll(".hoja:not(.oculto)").forEach(h => h.classList.add("oculto"));
+    const id = clave.charAt(0).toLowerCase() + clave.slice(1);
+    const t = window.Herramientas && Herramientas.porId(id);
+    const nombre = NOMBRE_CINTA[clave] || (t && t.nombre) || clave.replace(/^(Nivel|Enfoque|Etapa)/, "$1 ");
+    if (/^(Leer|LeerSel|Corregir|Revisar|Resumir|Explicar|Simplificar|Formal|Dictar)$/.test(clave)) irPestana("inicio", { sinScroll: true });
+    try { confirmar("▶ " + nombre); } catch (e) { /* aviso opcional */ }
     Promise.resolve().then(() => typeof a === "string" ? manejarComando(a, "boton") : a()).catch(mostrarError);
   }
+  /** ¿Word comparte el mismo motor entre la cinta y el panel? (Microsoft 365 reciente: sí; Office 2016/2019: no). */
+  function runtimeCompartido() {
+    try { return !!(Office.context.requirements.isSetSupported("SharedRuntime", "1.1") && Office.addin && Office.addin.showAsTaskpane); } catch (e) { return false; }
+  }
+  /** Una instancia oculta (la que Word abre solo para ejecutar el botón) no tiene tamaño en pantalla. */
+  const soyPanelVisible = () => !window.__soyFuncion && window.innerWidth > 60 && window.innerHeight > 120;
+  function accionDeCinta(clave) {
+    return (ev) => {
+      const terminar = () => { try { ev && ev.completed && ev.completed(); } catch (e) { /* ya terminado */ } };
+      if (runtimeCompartido()) {
+        // Se termina el evento de inmediato (si no, Word deja el botón «trabajando» y no atiende los siguientes clics).
+        terminar();
+        if (!(SIN_PANEL.has(clave) || (clave === "Hablar" && estado.burbuja))) { try { const pr = Office.addin.showAsTaskpane(); if (pr && pr.catch) pr.catch(() => {}); } catch (e) { /* ya visible */ } }
+        correrCinta(clave);
+        return;
+      }
+      // Word sin motor compartido: este botón corre en una instancia oculta. La acción se deja pendiente
+      // y el panel visible la recoge (al instante si está abierto, o apenas lo abras).
+      if (!soyPanelVisible()) window.__soyFuncion = true;
+      try { localStorage.setItem("romus.cinta.pendiente", JSON.stringify({ clave, t: Date.now() })); } catch (e) { /* sin almacenamiento */ }
+      if (soyPanelVisible()) ejecutarPendienteCinta();
+      terminar();
+    };
+  }
   function registrarCinta() {
-    if (!(window.Office && Office.actions && Office.actions.associate)) return;
+    if (!window.Office) return;
     const claves = Object.keys(CINTA).concat(window.Herramientas ? Herramientas.TODAS.map(t => t.id.charAt(0).toUpperCase() + t.id.slice(1)) : []);
     claves.forEach(clave => {
-      try {
-        Office.actions.associate("romus" + clave, async (ev) => {
-          const compartido = !!(Office.addin && Office.addin.showAsTaskpane);
-          if (!compartido) { // Word sin runtime compartido: la acción queda pendiente para cuando se abra el panel
-            window.__soyFuncion = true; // esta instancia oculta no debe consumir lo pendiente
-            try { localStorage.setItem("romus.cinta.pendiente", JSON.stringify({ clave, t: Date.now() })); } catch (e) { /* sin almacenamiento */ }
-            ev.completed(); return;
-          }
-          if (!(SIN_PANEL.has(clave) || (clave === "Hablar" && estado.burbuja))) { try { await Office.addin.showAsTaskpane(); } catch (e) { /* ya visible */ } }
-          ev.completed();
-          correrCinta(clave);
-        });
-      } catch (e) { /* función ya registrada */ }
+      const fn = accionDeCinta(clave);
+      window["romus" + clave] = fn; // Office antiguo: las funciones de la cinta se buscan como funciones globales
+      try { if (Office.actions && Office.actions.associate) Office.actions.associate("romus" + clave, fn); } catch (e) { /* función ya registrada */ }
     });
     // Con el panel oculto, Romus deja de escuchar (salvo que la burbuja esté abierta): privacidad del micrófono.
     try {
@@ -1508,11 +1530,12 @@
     } catch (e) { /* sin runtime compartido */ }
   }
   function ejecutarPendienteCinta() {
-    if (window.__soyFuncion) return;
+    if (!soyPanelVisible()) return;
     try {
       const p = JSON.parse(localStorage.getItem("romus.cinta.pendiente") || "null");
+      if (!p) return;
       localStorage.removeItem("romus.cinta.pendiente");
-      if (p && Date.now() - p.t < 5 * 60000) setTimeout(() => correrCinta(p.clave), 600);
+      if (Date.now() - p.t < 5 * 60000) setTimeout(() => correrCinta(p.clave), 300);
     } catch (e) { /* nada pendiente */ }
   }
 
@@ -1789,9 +1812,9 @@
     registrarCinta();
     ejecutarPendienteCinta();
     // Word sin runtime compartido: si el panel ya está abierto, recoge las acciones de la cinta
-    if (!(window.Office && Office.addin && Office.addin.showAsTaskpane)) {
+    if (!runtimeCompartido()) {
       window.addEventListener("storage", (e) => { if (e.key === "romus.cinta.pendiente" && e.newValue) ejecutarPendienteCinta(); });
-      setInterval(() => { if (document.visibilityState === "visible") { try { if (localStorage.getItem("romus.cinta.pendiente")) ejecutarPendienteCinta(); } catch (e) { /* sin almacenamiento */ } } }, 1500);
+      setInterval(() => { try { if (localStorage.getItem("romus.cinta.pendiente")) ejecutarPendienteCinta(); } catch (e) { /* sin almacenamiento */ } }, 700);
     }
     Voz.cargarVoces().then(llenarVoces);
     ajustarAltura();
