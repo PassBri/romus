@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-3.8.1-185abd" alt="versión 3.8.1">
+  <img src="https://img.shields.io/badge/versión-3.8.2-185abd" alt="versión 3.8.2">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -373,6 +373,11 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 
 ## Novedades
 
+### v3.8.2 · Word virtual: prueba Romus sin instalar nada
+- **[Word virtual](https://passbri.github.io/romus/demo.html)**: una página que imita Word con la pestaña «Romus» completa (los mismos grupos y botones del complemento) y el panel a la derecha. Cada botón abre su función de verdad sobre una hoja editable.
+- Trae un documento de ejemplo con errores APA típicos para ver el revisor, los comentarios al margen, la inserción de citas y las etapas de la tesis. Puedes escribir en la hoja, empezar en blanco u ocultar los comentarios.
+- Las funciones con reglas (revisor APA, generador de citas, ruta de tesis, etapas) funcionan sin IA; para las que usan IA conecta tu clave en el panel (queda solo en tu navegador).
+
 ### v3.8.1 · Botones de la cinta en todas las versiones de Office
 - En Office 2016/2019 (y en Word sin motor compartido) los botones de la pestaña «Romus» se ejecutaban en una instancia oculta y el panel no mostraba nada. Ahora la acción pasa al panel visible (al instante si está abierto, o apenas lo abras).
 - En Microsoft 365 el botón ya no se queda «trabajando»: Word atiende cada clic de inmediato.
@@ -520,4 +525,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word y PowerPoint · v3.8.1</sub></p>
+<p align="center"><sub>Romus para Word y PowerPoint · v3.8.2</sub></p>

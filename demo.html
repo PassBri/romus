@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Romus · Word virtual</title>
+  <style>
+    :root { --azul: #185abd; --azul-osc: #124078; --cinta: #f3f3f3; --linea: #d6d6d6; --texto: #1f1f1f; --texto-2: #605e5c; --fondo-doc: #e8e8e8; --pagina: #ffffff; --panel: #fafafa; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; font: 12px "Segoe UI", system-ui, -apple-system, sans-serif; color: var(--texto); background: var(--fondo-doc); }
+    body { display: flex; flex-direction: column; overflow: hidden; }
+    .titulo { background: var(--azul); color: #fff; display: flex; align-items: center; gap: 12px; padding: 6px 12px; font-size: 12.5px; }
+    .titulo b { font-weight: 600; } .titulo .sim { margin-left: auto; background: #ffffff22; padding: 2px 8px; border-radius: 999px; font-size: 11px; }
+    .pestanas { background: var(--azul); display: flex; gap: 2px; padding: 0 8px; overflow-x: auto; }
+    .pestanas button { background: none; border: 0; color: #e8eefb; font: inherit; padding: 6px 12px; cursor: pointer; white-space: nowrap; }
+    .pestanas button.activa { background: var(--cinta); color: var(--azul); border-radius: 4px 4px 0 0; font-weight: 600; }
+    .cinta { background: var(--cinta); border-bottom: 1px solid var(--linea); display: flex; overflow-x: auto; min-height: 98px; padding: 4px 2px 0; }
+    .grupo { display: flex; flex-direction: column; border-right: 1px solid var(--linea); padding: 0 6px; flex: none; }
+    .grupo .cuerpo { display: flex; gap: 2px; flex: 1; }
+    .grupo .nombre { text-align: center; color: var(--texto-2); font-size: 11px; padding: 2px 0 3px; }
+    .btn-g { display: flex; flex-direction: column; align-items: center; width: 62px; padding: 3px 2px; border: 1px solid transparent; border-radius: 3px; background: none; cursor: pointer; font: inherit; color: var(--texto); text-align: center; line-height: 1.15; }
+    .btn-g img { width: 32px; height: 32px; margin-bottom: 2px; }
+    .col { display: flex; flex-direction: column; gap: 1px; padding-top: 1px; }
+    .btn-p { display: flex; align-items: center; gap: 4px; padding: 2px 5px; border: 1px solid transparent; border-radius: 3px; background: none; cursor: pointer; font: inherit; color: var(--texto); white-space: nowrap; height: 24px; }
+    .btn-p img { width: 16px; height: 16px; }
+    .btn-g:hover, .btn-p:hover { background: #e1e1e1; border-color: #c8c8c8; }
+    .btn-g:active, .btn-p:active { background: #cfcfcf; }
+    .menu { position: fixed; z-index: 50; background: #fff; border: 1px solid #c8c8c8; box-shadow: 0 6px 20px rgba(0,0,0,.18); padding: 4px 0; min-width: 210px; }
+    .menu button { display: flex; align-items: center; gap: 8px; width: 100%; background: none; border: 0; padding: 6px 12px; font: inherit; cursor: pointer; text-align: left; color: var(--texto); }
+    .menu button:hover { background: #e8f0fb; }
+    .menu img { width: 16px; height: 16px; }
+    .aviso-cinta { padding: 22px; color: var(--texto-2); }
+    .zona { flex: 1; display: flex; min-height: 0; }
+    .lienzo { flex: 1; overflow: auto; padding: 18px 10px 40px; min-width: 0; }
+    .herr-doc { max-width: 816px; margin: 0 auto 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+    .herr-doc button { font: inherit; padding: 4px 10px; border: 1px solid #bbb; border-radius: 4px; background: #fff; cursor: pointer; }
+    .marco { max-width: 1080px; margin: 0 auto; display: flex; gap: 12px; align-items: flex-start; justify-content: center; }
+    .pagina { background: var(--pagina); width: 816px; max-width: 100%; min-height: 1056px; padding: 96px 96px; box-shadow: 0 1px 3px rgba(0,0,0,.25); font-family: "Times New Roman", Georgia, serif; font-size: 16px; line-height: 1.5; outline: none; }
+    .pagina p, .pagina .pf { margin: 0 0 10px; outline: none; white-space: pre-wrap; }
+    .pagina .pf:focus { background: #fffbe6; }
+    .pagina .Título { font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 18px; }
+    .pagina .Título-1 { font-size: 17px; font-weight: bold; text-align: center; margin-top: 14px; color: #1d3c6e; }
+    .pagina .Título-2 { font-size: 16px; font-weight: bold; margin-top: 10px; color: #1d3c6e; }
+    .pagina .Título-3 { font-size: 16px; font-weight: bold; font-style: italic; }
+    .pagina .salto { border-top: 1px dashed #aaa; color: #999; font-size: 11px; text-align: center; margin: 18px 0; font-family: "Segoe UI", sans-serif; }
+    .pagina table { border-collapse: collapse; width: 100%; margin: 6px 0 12px; font-size: 14px; }
+    .pagina td { border: 1px solid #555; padding: 3px 6px; vertical-align: top; }
+    .pagina tr:first-child td { font-weight: bold; }
+    .pagina .campo { color: #888; font-size: 11px; font-family: "Segoe UI", sans-serif; }
+    .pagina mark.comentado { background: #fde9a8; color: inherit; padding: 0; }
+    .pagina .flash { animation: flash 1.2s; } @keyframes flash { from { background: #cfe3ff; } to { background: transparent; } }
+    .comentarios { width: 230px; flex: none; display: flex; flex-direction: column; gap: 8px; }
+    .coment { background: #fff; border: 1px solid #d9d9d9; border-left: 3px solid #b4009e; border-radius: 4px; padding: 6px 8px; font-size: 11.5px; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+    .coment b { display: block; color: #b4009e; font-size: 11px; } .coment q { display: block; color: var(--texto-2); font-style: italic; margin: 2px 0 4px; }
+    .coment button { font: inherit; font-size: 10.5px; border: 0; background: none; color: var(--azul); cursor: pointer; padding: 0; }
+    .panel { width: 360px; flex: none; display: flex; flex-direction: column; background: var(--panel); border-left: 1px solid var(--linea); }
+    .panel.oculto { display: none; }
+    .panel .cab { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; font-size: 15px; border-bottom: 1px solid var(--linea); background: #fff; }
+    .panel .cab button { border: 0; background: none; font-size: 18px; cursor: pointer; color: var(--texto-2); }
+    .panel iframe { flex: 1; border: 0; width: 100%; background: #fff; }
+    .estado { background: #f3f3f3; border-top: 1px solid var(--linea); display: flex; gap: 18px; padding: 3px 12px; color: var(--texto-2); font-size: 11.5px; }
+    .estado .trab { color: var(--azul); }
+    .bienvenida { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+    .bienvenida > div { background: #fff; max-width: 520px; border-radius: 10px; padding: 22px 24px; box-shadow: 0 12px 40px rgba(0,0,0,.3); font-size: 13.5px; line-height: 1.5; }
+    .bienvenida h2 { margin: 0 0 8px; color: var(--azul); font-size: 18px; }
+    .bienvenida ul { padding-left: 18px; margin: 8px 0; }
+    .bienvenida button { margin-top: 10px; background: var(--azul); color: #fff; border: 0; padding: 8px 16px; border-radius: 6px; font: inherit; cursor: pointer; }
+    @media (max-width: 900px) { .comentarios { display: none; } .panel { width: 320px; } .pagina { padding: 48px 32px; } }
+    @media (max-width: 640px) { .zona { flex-direction: column; } .panel { width: 100%; height: 60vh; border-left: 0; border-top: 1px solid var(--linea); } .pagina { padding: 28px 18px; min-height: 0; } }
+  </style>
+</head>
+<body>
+  <div class="titulo"><b>Documento1 - Word</b><span>Romus para Word</span><span class="sim">Simulación en el navegador</span></div>
+  <nav class="pestanas" id="pestanas"></nav>
+  <div class="cinta" id="cinta"></div>
+  <div class="zona">
+    <div class="lienzo" id="lienzo">
+      <div class="herr-doc">
+        <button id="bEjemplo">Documento de ejemplo</button>
+        <button id="bBlanco">Documento en blanco</button>
+        <button id="bComent">Ocultar comentarios</button>
+      </div>
+      <div class="marco"><div class="pagina" id="pagina"></div><div class="comentarios" id="comentarios"></div></div>
+    </div>
+    <aside class="panel" id="panel">
+      <div class="cab"><span>Romus</span><button id="bCerrarPanel" title="Cerrar el panel">×</button></div>
+      <iframe id="romus" src="taskpane.html?demo=1" title="Panel de Romus" allow="microphone; clipboard-read; clipboard-write"></iframe>
+    </aside>
+  </div>
+  <div class="estado"><span id="ePag">Página 1 de 1</span><span id="ePal">0 palabras</span><span>Español (Colombia)</span><span id="eTrab"></span></div>
+  <div class="bienvenida" id="bienv"><div>
+    <h2>Word virtual con Romus</h2>
+    Esta página simula Word para que pruebes Romus sin instalar nada:
+    <ul>
+      <li>La pestaña <b>Romus</b> de la cinta funciona igual que en Word: cada botón abre su función en el panel derecho.</li>
+      <li>El documento es editable: escribe, selecciona texto y pide cosas a Romus. Lo que Romus inserta, corrige o comenta aparece en la página.</li>
+      <li>Las funciones de reglas (APA 7, citas, etapas, muestra, buscar en tus documentos…) funcionan sin IA. Para las demás, conecta tu IA en el panel (la clave se guarda solo en este navegador).</li>
+    </ul>
+    Es una simulación: algunas funciones propias de Word (encabezados, índice automático, control de cambios) se muestran de forma simplificada.
+    <br><button id="bEmpezar">Empezar</button>
+  </div></div>
+  <script>
+  (function () {
+    const $ = (id) => document.getElementById(id);
+    const ifr = $("romus");
+    const R = () => ifr.contentWindow;
+    const D = () => R() && R().__docu;
+    const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    try { if (localStorage.getItem("romus.demo.visto")) $("bienv").remove(); } catch (e) { /* sin almacenamiento */ }
+    $("bEmpezar").onclick = () => { $("bienv").remove(); try { localStorage.setItem("romus.demo.visto", "1"); } catch (e) { /* nada */ } };
+
+    /* ---------- Pestañas y cinta (desde el manifiesto real de Romus) ---------- */
+    const TABS = ["Archivo", "Inicio", "Insertar", "Diseño", "Disposición", "Referencias", "Correspondencia", "Revisar", "Vista", "Romus"];
+    let tabActiva = "Romus", cintaHTML = null;
+    function pintarPestanas() {
+      $("pestanas").innerHTML = "";
+      TABS.forEach(t => { const b = document.createElement("button"); b.textContent = t; if (t === tabActiva) b.className = "activa"; b.onclick = () => { tabActiva = t; pintarPestanas(); pintarCinta(); }; $("pestanas").appendChild(b); });
+    }
+    const local = (u) => (u || "").replace(/^https?:\/\/[^/]+\/romus\//, "");
+    async function cargarCinta() {
+      const xml = new DOMParser().parseFromString(await (await fetch("manifest.xml?v=" + Date.now())).text(), "application/xml");
+      const cad = {}; xml.querySelectorAll("ShortStrings String").forEach(s => { cad[s.getAttribute("id")] = s.getAttribute("DefaultValue"); });
+      const larga = {}; xml.querySelectorAll("LongStrings String").forEach(s => { larga[s.getAttribute("id")] = s.getAttribute("DefaultValue"); });
+      const img = {}; xml.querySelectorAll("Images Image").forEach(s => { img[s.getAttribute("id")] = local(s.getAttribute("DefaultValue")); });
+      const tab = Array.from(xml.getElementsByTagName("CustomTab")).find(t => t.getAttribute("id") === "Romus.Tab");
+      const icono = (el, tam) => { const i = Array.from(el.children).find(x => x.localName === "Icon"); if (!i) return ""; const im = Array.from(i.children).find(x => x.getAttribute("size") === String(tam)); return im ? img[im.getAttribute("resid")] : ""; };
+      const etiqueta = (el) => { const l = Array.from(el.children).find(x => x.localName === "Label"); return l ? cad[l.getAttribute("resid")] : ""; };
+      const ayuda = (el) => { const st = Array.from(el.children).find(x => x.localName === "Supertip"); if (!st) return ""; const d = Array.from(st.children).find(x => x.localName === "Description"); return d ? larga[d.getAttribute("resid")] : ""; };
+      const accion = (el) => { const a = Array.from(el.children).find(x => x.localName === "Action"); if (!a) return null; if (a.getAttribute("xsi:type") === "ShowTaskpane" || /ShowTaskpane/.test(a.outerHTML)) return { panel: true }; const f = a.getElementsByTagName("FunctionName")[0]; return f ? { fn: f.textContent } : null; };
+      cintaHTML = Array.from(tab.children).filter(g => g.localName === "Group").map(g => ({
+        nombre: etiqueta(g),
+        controles: Array.from(g.children).filter(c => c.localName === "Control").map(c => {
+          const tipo = /Menu/.test(c.getAttribute("xsi:type") || "") ? "menu" : "boton";
+          const o = { tipo, et: etiqueta(c), ayuda: ayuda(c), i16: icono(c, 16), i32: icono(c, 32), accion: accion(c) };
+          if (tipo === "menu") o.items = Array.from(c.getElementsByTagName("Item")).map(it => ({ et: etiqueta(it), ayuda: ayuda(it), i16: icono(it, 16), accion: accion(it) }));
+          return o;
+        })
+      }));
+      pintarCinta();
+    }
+    function cerrarMenus() { document.querySelectorAll(".menu").forEach(m => m.remove()); }
+    document.addEventListener("click", (e) => { if (!e.target.closest(".menu") && !e.target.closest("[data-menu]")) cerrarMenus(); });
+    function pintarCinta() {
+      const c = $("cinta"); c.innerHTML = "";
+      if (tabActiva !== "Romus" || !cintaHTML) { c.innerHTML = `<div class="aviso-cinta">${tabActiva === "Romus" ? "Cargando la pestaña Romus…" : `En esta simulación solo funciona la pestaña <b>Romus</b>. <a href="#" id="irRomus">Ir a Romus</a>`}</div>`; const a = $("irRomus"); if (a) a.onclick = (e) => { e.preventDefault(); tabActiva = "Romus"; pintarPestanas(); pintarCinta(); }; return; }
+      cintaHTML.forEach(g => {
+        const gr = document.createElement("div"); gr.className = "grupo";
+        const cu = document.createElement("div"); cu.className = "cuerpo";
+        const [pri, ...resto] = g.controles;
+        const crear = (o, grande) => {
+          const b = document.createElement("button"); b.className = grande ? "btn-g" : "btn-p"; b.title = o.ayuda || o.et;
+          b.innerHTML = `<img src="${grande ? o.i32 : o.i16}" alt=""><span>${esc(o.et)}${o.tipo === "menu" ? " ▾" : ""}</span>`;
+          if (o.tipo === "menu") { b.dataset.menu = "1"; b.onclick = (e) => { e.stopPropagation(); cerrarMenus(); const r = b.getBoundingClientRect(); const m = document.createElement("div"); m.className = "menu"; m.style.left = Math.min(r.left, innerWidth - 230) + "px"; m.style.top = r.bottom + 2 + "px"; o.items.forEach(it => { const x = document.createElement("button"); x.title = it.ayuda || ""; x.innerHTML = `<img src="${it.i16}" alt=""><span>${esc(it.et)}</span>`; x.onclick = () => { cerrarMenus(); ejecutar(it); }; m.appendChild(x); }); document.body.appendChild(m); }; }
+          else b.onclick = () => ejecutar(o);
+          return b;
+        };
+        if (pri) cu.appendChild(crear(pri, true));
+        for (let k = 0; k < resto.length; k += 3) { const col = document.createElement("div"); col.className = "col"; resto.slice(k, k + 3).forEach(o => col.appendChild(crear(o, false))); cu.appendChild(col); }
+        const n = document.createElement("div"); n.className = "nombre"; n.textContent = g.nombre;
+        gr.append(cu, n); c.appendChild(gr);
+      });
+    }
+    function ejecutar(o) {
+      if (!o.accion) return;
+      if (o.accion.panel) { $("panel").classList.remove("oculto"); return; }
+      $("panel").classList.remove("oculto");
+      const w = R(); if (!w) return;
+      const f = (w.__acciones && w.__acciones[o.accion.fn]) || w[o.accion.fn];
+      if (!f) { $("eTrab").textContent = "Romus aún está cargando…"; return; }
+      $("eTrab").className = "trab"; $("eTrab").textContent = `Romus está trabajando en su ${o.et}…`;
+      try { f({ completed() { setTimeout(() => { $("eTrab").textContent = ""; }, 700); } }); } catch (e) { $("eTrab").textContent = "Error: " + e.message; }
+    }
+    window.__demoMostrarPanel = () => $("panel").classList.remove("oculto");
+    $("bCerrarPanel").onclick = () => $("panel").classList.add("oculto");
+
+    /* ---------- Documento: dibujar, editar y seleccionar ---------- */
+    let escribiendo = 0, verComent = true;
+    function segmentos(p) {
+      const t = p.text, cortes = new Set([0, t.length]);
+      (p.marcas || []).forEach(m => { cortes.add(Math.max(0, Math.min(t.length, m.ini))); cortes.add(Math.max(0, Math.min(t.length, m.fin))); });
+      const cs = Array.from(cortes).sort((a, b) => a - b); let h = "";
+      for (let k = 0; k < cs.length - 1; k++) {
+        const a = cs[k], b = cs[k + 1]; if (b <= a) continue;
+        let css = "", tag = "";
+        (p.marcas || []).filter(m => m.ini <= a && m.fin >= b).forEach(m => {
+          if (m.k === "italic" && m.v) css += "font-style:italic;"; if (m.k === "bold" && m.v) css += "font-weight:bold;"; if (m.k === "underline" && m.v && m.v !== "None") css += "text-decoration:underline;";
+          if (m.k === "highlightColor" && m.v) css += `background:${m.v === "Yellow" ? "#fff36b" : m.v};`; if (m.k === "color" && m.v) css += `color:${m.v};`;
+          if (m.k === "name" && m.v) css += `font-family:'${m.v}';`; if (m.k === "size" && m.v) css += `font-size:${m.v * 1.333}px;`;
+        });
+        let x = esc(t.slice(a, b));
+        h += css ? `<span style="${css}">${x}</span>` : x;
+      }
+      return h || "<br>";
+    }
+    function pintar() {
+      const d = D(); if (!d) return;
+      const pag = $("pagina"); const foco = document.activeElement && document.activeElement.closest && document.activeElement.closest(".pf");
+      if (foco && Date.now() - escribiendo < 800) return; // no interrumpir mientras escribes
+      pag.innerHTML = "";
+      d.paras.forEach((p, i) => {
+        let el;
+        if (p.tabla) { el = document.createElement("table"); p.tabla.forEach(f => { const tr = document.createElement("tr"); f.forEach(c => { const td = document.createElement("td"); td.textContent = c; tr.appendChild(td); }); el.appendChild(tr); }); }
+        else if (p.salto) { el = document.createElement("div"); el.className = "salto"; el.textContent = "· · · Salto de página · · ·"; }
+        else {
+          el = document.createElement("p"); el.className = "pf " + String(p.style || "Normal").replace(/\s+/g, "-"); el.contentEditable = "true"; el.spellcheck = true;
+          el.innerHTML = segmentos(p) + (p.campo ? ` <span class="campo" contenteditable="false">[campo: ${p.campo}]</span>` : "");
+          const st = el.style;
+          if (p.alignment) st.textAlign = { Centered: "center", Justified: "justify", Right: "right", Left: "left" }[p.alignment] || "";
+          if (p.leftIndent) st.paddingLeft = p.leftIndent * 1.333 + "px";
+          if (p.firstLineIndent) st.textIndent = p.firstLineIndent * 1.333 + "px";
+          if (p.lineSpacing && p.lineSpacing >= 20) st.lineHeight = "2";
+          if (p.spaceAfter !== undefined && p.spaceAfter !== null) st.marginBottom = (p.spaceAfter * 1.333) + "px";
+          // resaltar texto comentado
+          if (verComent) (d.comentarios || []).forEach(c => { if (c.sobre && c.sobre.length > 2 && p.text.includes(c.sobre) && !p.marcas?.length) el.innerHTML = el.innerHTML.replace(esc(c.sobre), `<mark class="comentado">${esc(c.sobre)}</mark>`); });
+        }
+        el.dataset.i = i; pag.appendChild(el);
+      });
+      // comentarios en el margen
+      const cm = $("comentarios"); cm.innerHTML = ""; cm.style.display = verComent ? "" : "none";
+      (d.comentarios || []).forEach((c, k) => { const b = document.createElement("div"); b.className = "coment"; b.innerHTML = `<b>${esc(c.autor || "Romus")}</b>${c.sobre ? `<q>${esc(c.sobre.slice(0, 80))}</q>` : ""}${esc(c.t)}${(c.respuestas || []).map(r => `<div style="margin-top:4px;color:#605e5c">↳ ${esc(r)}</div>`).join("")}<br><button data-k="${k}">Resolver</button>`; b.querySelector("button").onclick = () => { d.comentarios.splice(k, 1); R().__demoAvisar(); }; cm.appendChild(b); });
+      const pal = d.paras.reduce((a, p) => a + (p.text.trim() ? p.text.trim().split(/\s+/).length : 0), 0);
+      $("ePal").textContent = `${pal.toLocaleString("es-CO")} palabras`;
+      $("ePag").textContent = `Página 1 de ${Math.max(1, Math.ceil(pal / 330) + d.paras.filter(p => p.salto).length)}`;
+    }
+    let tPintar = null;
+    window.__demoCambio = () => { clearTimeout(tPintar); tPintar = setTimeout(pintar, 40); };
+    window.__demoIrA = (i) => { const el = $("pagina").querySelector(`[data-i="${i}"]`); if (el) { el.scrollIntoView({ block: "center", behavior: "smooth" }); el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash"); } };
+    const indiceDe = (n) => { const el = n && (n.nodeType === 1 ? n : n.parentElement); const p = el && el.closest && el.closest("[data-i]"); return p ? +p.dataset.i : -1; };
+    const offsetEn = (pEl, node, off) => { try { const r = document.createRange(); r.setStart(pEl, 0); r.setEnd(node, off); return r.toString().length; } catch (e) { return 0; } };
+    $("pagina").addEventListener("input", (e) => {
+      const el = e.target.closest(".pf"); if (!el) return; const d = D(); const p = d.paras[+el.dataset.i]; if (!p) return;
+      escribiendo = Date.now(); p.text = el.innerText.replace(/\n+$/, "").replace(/\[campo: [^\]]+\]/, "").trim() === "" ? "" : el.innerText.replace(/\n$/, "").replace(/\s*\[campo: [^\]]+\]$/, ""); p.marcas = [];
+      try { localStorage.setItem("romus.demo.doc", JSON.stringify({ paras: d.paras, comentarios: d.comentarios })); } catch (x) { /* nada */ }
+      contar();
+    });
+    const contar = () => { const d = D(); const pal = d.paras.reduce((a, p) => a + (p.text.trim() ? p.text.trim().split(/\s+/).length : 0), 0); $("ePal").textContent = `${pal.toLocaleString("es-CO")} palabras`; };
+    $("pagina").addEventListener("keydown", (e) => {
+      const el = e.target.closest(".pf"); if (!el) return; const d = D(); const i = +el.dataset.i;
+      const s = getSelection(); const pos = s.rangeCount ? offsetEn(el, s.getRangeAt(0).startContainer, s.getRangeAt(0).startOffset) : 0;
+      if (e.key === "Enter") { e.preventDefault(); const p = d.paras[i]; const nuevo = { text: p.text.slice(pos), style: /^Título/.test(p.style) ? "Normal" : p.style }; p.text = p.text.slice(0, pos); p.marcas = []; d.paras.splice(i + 1, 0, nuevo); escribiendo = 0; pintar(); const n = $("pagina").querySelector(`[data-i="${i + 1}"]`); if (n) { n.focus(); } R().__demoAvisar(); }
+      if (e.key === "Backspace" && pos === 0 && i > 0 && !d.paras[i - 1].tabla) { e.preventDefault(); const prev = d.paras[i - 1]; const largo = prev.text.length; prev.text += d.paras[i].text; d.paras.splice(i, 1); escribiendo = 0; pintar(); const n = $("pagina").querySelector(`[data-i="${i - 1}"]`); if (n) { n.focus(); try { const r = document.createRange(); const t = n.firstChild; if (t && t.nodeType === 3) { r.setStart(t, Math.min(largo, t.length)); r.collapse(true); s.removeAllRanges(); s.addRange(r); } } catch (x) { /* cursor */ } } R().__demoAvisar(); }
+    });
+    // La selección de la página es la selección que ve Romus
+    document.addEventListener("selectionchange", () => {
+      const s = getSelection(); if (!s.rangeCount || !R() || !R().__seleccionar) return;
+      const r = s.getRangeAt(0); const a = indiceDe(r.startContainer), b = indiceDe(r.endContainer); if (a < 0 || b < 0) return;
+      const pa = $("pagina").querySelector(`[data-i="${a}"]`), pb = $("pagina").querySelector(`[data-i="${b}"]`);
+      R().__seleccionar(a, offsetEn(pa, r.startContainer, r.startOffset), b, offsetEn(pb, r.endContainer, r.endOffset));
+      try { R().__alCambiarSeleccion && R().__alCambiarSeleccion({}); } catch (e) { /* opcional */ }
+    });
+    $("bEjemplo").onclick = () => { const d = D(); if (!d) return; d.paras.splice(0, d.paras.length, ...R().__docuEjemplo()); d.comentarios.length = 0; R().__demoAvisar(); };
+    $("bBlanco").onclick = () => { const d = D(); if (!d) return; d.paras.splice(0, d.paras.length, { text: "", style: "Normal" }); d.comentarios.length = 0; R().__demoAvisar(); };
+    $("bComent").onclick = () => { verComent = !verComent; $("bComent").textContent = verComent ? "Ocultar comentarios" : "Mostrar comentarios"; pintar(); };
+    ifr.addEventListener("load", () => { setTimeout(pintar, 300); });
+    pintarPestanas(); pintarCinta();
+    cargarCinta().catch(e => { $("cinta").innerHTML = `<div class="aviso-cinta">No pude cargar la cinta: ${esc(e.message)}</div>`; });
+  })();
+  </script>
+</body>
+</html>
