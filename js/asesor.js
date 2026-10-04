@@ -591,7 +591,7 @@ Redacta con calidad académica en español. No inventes cifras, autores ni citas
   /** Oraciones con claves [F#] comparadas con el resumen de OpenAlex de cada obra. */
   async function revisarFidelidad(textos, obras, titulo) {
     const { pedirHerramienta } = H();
-    const oraciones = textos.flatMap(t => String(t || "").split(/\n+/)).flatMap(p => p.replace(/\b(et al|pp?|cap|ed|eds|vol|núm|n\.º)\./gi, "$1§").split(/(?<=[.!?»])\s+(?=[A-ZÁÉÍÓÚÑ¿¡«])/).map(x => x.replace(/§/g, "."))).map(x => x.trim()).filter(x => /\[F\d+/.test(x));
+    const oraciones = textos.flatMap(t => String(t || "").split(/\n+/)).flatMap(p => p.replace(/\b(et al|pp?|cap|ed|eds|vol|núm|n\.º)\./gi, "$1§").replace(/([.!?»])\s+(?=[A-ZÁÉÍÓÚÑ¿¡«])/g, "$1\u0001").split("\u0001").map(x => x.replace(/§/g, "."))).map(x => x.trim()).filter(x => /\[F\d+/.test(x));
     const pares = [];
     let sinResumen = 0;
     oraciones.forEach(o => {

@@ -524,6 +524,7 @@
     if (/^(desactiva|desactivar|apaga|quita) (el )?control de cambios$/.test(n)) {
       return async () => { await Doc.fijarControlCambios(false); Config.set({ controlCambios: false }); $("chkControlCambios").checked = false; confirmar("Control de cambios desactivado."); };
     }
+    if (/^(quita|quitar|borra|borrar|elimina|eliminar|limpia) (todas )?(las )?notas( de romus)?$/.test(n)) return async () => { const k = await Doc.quitarNotas(); confirmar(k ? `Quité ${k} ${k === 1 ? "nota" : "notas"} de Romus del documento.` : "No hay notas de Romus en el documento."); };
     if (/^acepta(r)? (todos )?(los )?cambios$/.test(n)) return async () => { await Doc.resolverCambios(true); confirmar("Acepté todos los cambios."); };
     if (/^rechaza(r)? (todos )?(los )?cambios$/.test(n)) return async () => { await Doc.resolverCambios(false); confirmar("Rechacé todos los cambios."); };
 
@@ -718,7 +719,7 @@
       }
       case "comentar": {
         const { hechos, conComentarios } = await Doc.comentar(d.comentarios || []);
-        const msg = d.resumen || (conComentarios ? `Agregué ${hechos} ${hechos === 1 ? "comentario" : "comentarios"}.` : `Resalté ${hechos} fragmentos (tu Word no permite comentarios desde complementos).`);
+        const msg = d.resumen || (conComentarios ? `Agregué ${hechos} ${hechos === 1 ? "comentario" : "comentarios"}.` : `Dejé ${hechos} ${hechos === 1 ? "nota" : "notas"} [Romus: …] resaltadas en el texto, porque tu versión de Word no deja que los complementos pongan comentarios. Cuando las atiendas, di «quita las notas de Romus».`);
         confirmar(msg);
         return { resumen: msg };
       }
@@ -1048,7 +1049,7 @@
       .trim();
     // mayúsculas al comenzar oración
     const inicioOracion = !previo.trim() || /[.!?…]\s*$/.test(previo) || /\n$/.test(previo);
-    t = t.replace(/([.!?…]\s+|\n|^)([¿¡«(]?)(\p{Ll})/gu, (m, a, b, c, pos) => (pos === 0 && !inicioOracion) ? m : a + b + c.toUpperCase());
+    t = t.replace(/([.!?…]\s+|\n|^)([¿¡«(]?)([a-zà-öø-ÿ])/g, (m, a, b, c, pos) => (pos === 0 && !inicioOracion) ? m : a + b + c.toUpperCase());
     // espacio con lo anterior
     if (previo && !/\s$/.test(previo) && !/^[.,;:!?»)…\n]/.test(t)) t = " " + t;
     return t;
@@ -1262,7 +1263,16 @@
 
   function abrirHoja(id) { $(id).classList.remove("oculto"); if (id === "panelAjustes") { pintarNotaMotor(); pintarNotaCinta(); } }
   /** Diagnóstico de la cinta: qué motor usa Word y qué pasó con el último botón. */
+  function pintarNotaCompat() {
+    const n = $("notaCompat"); if (!n || !window.Compat) return;
+    const c = Compat.info();
+    const base = `Word ${escaparHTML(c.version || "(versión no informada)")}${c.plataforma ? " · " + escaparHTML(c.plataforma) : ""} · API de Word ${c.api || "?"} · motor ${escaparHTML(c.motor)}.`;
+    n.innerHTML = c.faltan.length
+      ? `${base}<br>Todo Romus funciona, con estas diferencias en tu versión:<ul style="margin:4px 0 0;padding-left:18px">${c.faltan.map(f => `<li>${escaparHTML(f)}</li>`).join("")}</ul>`
+      : `${base}<br>Tu Word permite todas las funciones de Romus.`;
+  }
   function pintarNotaCinta() {
+    pintarNotaCompat();
     const n = $("notaCinta"); if (!n) return;
     const hace = (t) => { const s = Math.round((Date.now() - t) / 1000); return s < 60 ? `hace ${s} s` : s < 3600 ? `hace ${Math.round(s / 60)} min` : "hace más de una hora"; };
     let u = null, rec = 0;
@@ -1917,6 +1927,18 @@
       setTimeout(() => correrCinta(deCinta), 500);
     }
     setTimeout(ejecutarPendienteCinta, compartido ? 0 : 1500);
+    // Word sin motor compartido y sin señales de la cinta clásica: se avisa una vez por semana cómo arreglar la cinta.
+    try {
+      if (deCinta) localStorage.setItem("romus.cinta.clasicaVista", "1");
+      const ultimoAviso = +localStorage.getItem("romus.cinta.avisoClasica") || 0;
+      if (estado.enWord && !compartido && !deCinta && !localStorage.getItem("romus.cinta.clasicaVista") && Date.now() - ultimoAviso > 7 * 86400000) {
+        localStorage.setItem("romus.cinta.avisoClasica", String(Date.now()));
+        const d = document.createElement("div"); d.className = "tarjeta-oido";
+        d.innerHTML = `<b>Si los botones de la pestaña Romus no responden</b><p>Tu Word (2016, 2019, 2021 o 2024 sin Microsoft 365) necesita la <b>cinta clásica</b>, en la que cada botón abre este panel directamente en su función.</p><ol><li>Guarda tu respaldo en Ajustes → Respaldo de la configuración.</li><li>Cierra Word y ejecuta de nuevo el instalador de Romus, con «Cinta para Office 2016, 2019 o 2021» marcada.</li></ol><button type="button" class="boton secundario">Descargar el instalador ↗</button><small class="oido-alt">Mientras tanto, todo funciona desde este panel: pestañas Inicio e Investigar.</small>`;
+        d.querySelector("button").addEventListener("click", () => Conexion.abrirEnlace("https://github.com/PassBri/romus/raw/main/descargas/Instalar-Romus.exe"));
+        setTimeout(() => agregarMensaje("sistema", "Un aviso sobre la cinta de Word:", d), 2500);
+      }
+    } catch (e) { /* sin almacenamiento */ }
     if (!compartido) {
       window.addEventListener("storage", (e) => { if (e.key === "romus.cinta.pendiente" && e.newValue) ejecutarPendienteCinta(); });
       window.addEventListener("focus", () => ejecutarPendienteCinta());

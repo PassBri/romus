@@ -163,6 +163,24 @@ window.Doc = (function () {
     });
   }
 
+  /* Comentario de Word, o en Word 2019/2021 (sin comentarios para complementos) una nota visible
+     «[Romus: …]» resaltada justo después del texto. «Quitar notas de Romus» las borra todas. */
+  function notaEn(rango, texto) {
+    if (soporta("1.4")) { rango.insertComment(texto); return "comentario"; }
+    const n = rango.insertText(` [Romus: ${String(texto).replace(/[\[\]]/g, "")}]`, "After");
+    n.font.highlightColor = "Yellow"; n.font.italic = true; n.font.bold = false;
+    return "nota";
+  }
+  async function quitarNotas() {
+    return Word.run(async (ctx) => {
+      const r = ctx.document.body.search(" [[]Romus:*[]]", { matchWildcards: true });
+      r.load("items"); await ctx.sync();
+      r.items.slice().reverse().forEach(x => x.insertText("", "Replace")); // del último al primero: las posiciones no se corren
+      await ctx.sync();
+      return r.items.length;
+    });
+  }
+
   function activarSeguimiento(ctx) {
     if (Config.get().controlCambios && soporta("1.4")) {
       ctx.document.changeTrackingMode = Word.ChangeTrackingMode.trackAll;
@@ -239,8 +257,7 @@ window.Doc = (function () {
         const rango = r.items[0];
         if (modo === "comentarios") {
           const nota = `${c.motivo || "Sugerencia"}. Sugerencia: «${c.correccion}»`;
-          if (puedeComentar) rango.insertComment(nota);
-          else rango.font.highlightColor = "Yellow";
+          notaEn(rango, nota);
         } else {
           rango.insertText((c.correccion || "").replace(/[\r\n]+/g, " "), "Replace");
         }
@@ -332,12 +349,14 @@ window.Doc = (function () {
         const o = objetivos[k];
         if (!o) return;
         const rango = (o.r && o.r.items.length) ? o.r.items[0] : o.p.getRange("Content");
-        if (puede) rango.insertComment(c.comentario);
-        else rango.font.highlightColor = "Yellow";
+        notaEn(rango, c.comentario);
         hechos++;
       });
       await ctx.sync();
-      return { hechos, conComentarios: puede };
+      const texto = puede
+        ? `Dejé ${hechos} ${hechos === 1 ? "comentario" : "comentarios"} en tu documento.`
+        : `Dejé ${hechos} ${hechos === 1 ? "nota" : "notas"} [Romus: …] resaltadas en el texto (tu versión de Word no deja que los complementos pongan comentarios). Cuando las atiendas, di «quita las notas de Romus».`;
+      return { hechos, conComentarios: puede, texto };
     });
   }
 
@@ -383,6 +402,6 @@ window.Doc = (function () {
     estadoControlCambios, fijarControlCambios, resolverCambios, contarCambios,
     seleccionarFrase, insertarDictado, textoAntesDelCursor, borrarUltimo,
     aplicarCorrecciones, buscarYReemplazar, reescribirParrafos, insertarTexto,
-    comentar, darFormato, esTitulo
+    comentar, darFormato, esTitulo, notaEn, quitarNotas
   };
 })();

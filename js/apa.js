@@ -513,7 +513,7 @@ window.APA = (function () {
     const acc = el("div", "inv-acciones");
     const seguros = hall.filter(h => h.arreglo);
     if (seguros.length) { const b = el("button", "boton primario", `Corregir lo seguro (${seguros.length})`); b.onclick = () => H().ejecutar(async () => { const n = await corregir(seguros); ui.confirmar(`Corregí ${n} detalles de APA 7.`); b.disabled = true; b.textContent = `Corregidos ${n} ✓`; }); acc.appendChild(b); }
-    if (hall.length) { const b = el("button", "boton secundario", "Poner comentarios en el documento"); b.onclick = () => H().ejecutar(async () => { const x = await Doc.comentar(hall.filter(h => !h.arreglo).slice(0, 80).map(h => ({ parrafo: h.parrafo, fragmento: h.fragmento, comentario: "APA 7 · " + h.mensaje }))); ui.confirmar(`Dejé ${x.hechos} comentarios en tu documento.`); }); acc.appendChild(b); }
+    if (hall.length) { const b = el("button", "boton secundario", "Poner comentarios en el documento"); b.onclick = () => H().ejecutar(async () => { const x = await Doc.comentar(hall.filter(h => !h.arreglo).slice(0, 80).map(h => ({ parrafo: h.parrafo, fragmento: h.fragmento, comentario: "APA 7 · " + h.mensaje }))); ui.confirmar(x.texto); }); acc.appendChild(b); }
     c.appendChild(acc);
     const acc2 = el("div", "inv-acciones");
     if (window.Formato) { const b = el("button", "boton secundario", "Aplicar formato APA 7"); b.onclick = () => Formato.tarjetaOpciones(); acc2.appendChild(b); }

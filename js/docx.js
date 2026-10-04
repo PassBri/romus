@@ -34,10 +34,12 @@ window.Docx = (function () {
     let seg = Array.isArray(texto) ? texto : [];
     if (!Array.isArray(texto)) {
       const s = String(texto == null ? "" : texto);
-      const re = /\*\*(.+?)\*\*|(?<![\w])_(.+?)_(?![\w])/g; let m, ult = 0;
+      // Sin «lookbehind» (Word 2019 usa un motor que no lo entiende): el carácter previo se captura aparte.
+      const re = /\*\*(.+?)\*\*|(^|[^\w])_(.+?)_(?![\w])/g; let m, ult = 0;
       while ((m = re.exec(s))) {
-        if (m.index > ult) seg.push({ texto: s.slice(ult, m.index) });
-        seg.push(m[1] != null ? { texto: m[1], negrita: true } : { texto: m[2], cursiva: true });
+        const ini = m[1] != null ? m.index : m.index + m[2].length;
+        if (ini > ult) seg.push({ texto: s.slice(ult, ini) });
+        seg.push(m[1] != null ? { texto: m[1], negrita: true } : { texto: m[3], cursiva: true });
         ult = m.index + m[0].length;
       }
       if (ult < s.length) seg.push({ texto: s.slice(ult) });

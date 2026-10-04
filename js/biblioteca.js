@@ -301,7 +301,7 @@ ${doc.texto}`, signal);
       const bB = el("button", "enlace-sutil", "Buscar fuente"); bB.onclick = () => H().ejecutar(() => Inv.literatura(h.buscar || h.frase.split(/\s+/).filter(w => w.length > 4).slice(0, 6).join(" ")));
       a.append(bI, bB); b.appendChild(a); c.appendChild(b);
     });
-    if (hall.length) { const b = el("button", "boton secundario", "Poner comentarios en el documento"); b.onclick = () => H().ejecutar(async () => { const x = await Doc.comentar(hall.map(h => ({ parrafo: h.parrafo, fragmento: h.frase.slice(0, 200), comentario: "¿Según quién? " + h.motivo + ": agrega la cita (Autor, año) o reformúlalo como tu interpretación." }))); ui.confirmar(`Dejé ${x.hechos} comentarios.`); }); c.appendChild(b); }
+    if (hall.length) { const b = el("button", "boton secundario", "Poner comentarios en el documento"); b.onclick = () => H().ejecutar(async () => { const x = await Doc.comentar(hall.map(h => ({ parrafo: h.parrafo, fragmento: h.frase.slice(0, 200), comentario: "¿Según quién? " + h.motivo + ": agrega la cita (Autor, año) o reformúlalo como tu interpretación." }))); ui.confirmar(`${x.texto}`); }); c.appendChild(b); }
     const b2 = el("button", "boton secundario", "¿Mis citas dicen lo que les atribuyo?"); b2.onclick = () => H().ejecutar(citaFuente); c.appendChild(b2);
     tarjeta("Afirmaciones sin respaldo", c);
     ui.hablar(hall.length ? `Encontré ${hall.length} afirmaciones que necesitan una cita.` : "No encontré afirmaciones sin respaldo.");

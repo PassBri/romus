@@ -10,6 +10,7 @@ window.Revision = (function () {
 
   /* ---------- Leer comentarios de Word ---------- */
   async function leerComentarios() {
+    if (!Doc.soporta("1.4")) throw new Error("Tu versión de Word (2016, 2019 o 2021) no deja que los complementos lean los comentarios. Copia las observaciones del jurado y pégalas en la caja de Romus así: «responde a estas observaciones: …». En Word para la web o Microsoft 365 Romus las lee solo.");
     const ps = await Doc.leerParrafos();
     const titulos = ps.filter(p => Doc.esTitulo(p.estilo) && p.texto.trim());
     const lista = await Word.run(async (ctx) => {
@@ -216,7 +217,7 @@ ${doc.texto}`, signal);
     mejoras.forEach(m => { const b = el("div", "prioridad"); b.append(el("b", "", `${m.aspecto} · ${m.prioridad}`), el("span", "", m.detalle)); if (m.i >= 0) { const bI = el("button", "enlace-sutil", "Ver en el documento"); bI.onclick = () => H().irA(m.i); b.appendChild(bI); } c.appendChild(b); });
     c.appendChild(Docx.botones(bloques, `informe-revision-${norm(info.estudiante || "estudiante").replace(/[^a-z0-9]+/g, "-")}.docx`, { tam: 11 }, "Abrir informe en Word"));
     const conEv = mejoras.filter(m => m.i >= 0);
-    if (conEv.length) { const b = el("button", "boton secundario", `Comentar ${conEv.length} aspectos en el documento`); b.onclick = () => H().ejecutar(async () => { const x = await Doc.comentar(conEv.map(m => ({ parrafo: m.i, fragmento: m.evidencia, comentario: `${m.aspecto}: ${m.detalle}` }))); ui.confirmar(`Dejé ${x.hechos} comentarios en el trabajo.`); }); c.appendChild(b); }
+    if (conEv.length) { const b = el("button", "boton secundario", `Comentar ${conEv.length} aspectos en el documento`); b.onclick = () => H().ejecutar(async () => { const x = await Doc.comentar(conEv.map(m => ({ parrafo: m.i, fragmento: m.evidencia, comentario: `${m.aspecto}: ${m.detalle}` }))); ui.confirmar(`${x.texto}`); }); c.appendChild(b); }
     const bV = el("button", "boton secundario", "Revisar otro trabajo"); bV.onclick = () => director(); c.appendChild(bV);
     tarjeta("Informe de revisión", c);
     ui.ocupar(false);

@@ -88,6 +88,16 @@
 <section id="instalar">
   <h2><span class="num">1</span>Instalar Romus</h2>
   <p class="bajada">Elige según el Word que uses. No necesitas permisos de administrador. Funciona en Word 2016, 2019, 2021, 2024, Microsoft 365, Word para la web y Mac.</p>
+  <table>
+    <tr><th>Tu Word</th><th>Cómo instalar</th><th>Botones de la cinta</th></tr>
+    <tr><td>Microsoft 365 en Windows</td><td>Instalador</td><td>Actúan al instante en el panel.</td></tr>
+    <tr><td>Word 2016, 2019, 2021 o 2024 en Windows</td><td>Instalador (detecta tu versión y marca solo la <b>cinta clásica</b>)</td><td>Cada botón abre el panel directamente en su función.</td></tr>
+    <tr><td>Word para la web (gratis en office.com)</td><td>Manifiesto «Microsoft 365 o Word para la web»</td><td>Actúan al instante.</td></tr>
+    <tr><td>Mac con Microsoft 365</td><td>Manifiesto «Microsoft 365» en la carpeta <code>wef</code></td><td>Actúan al instante.</td></tr>
+    <tr><td>Mac con Word 2019, 2021 o 2024</td><td>Manifiesto «Word 2016, 2019, 2021 o 2024» en la carpeta <code>wef</code></td><td>Cada botón abre el panel en su función.</td></tr>
+    <tr><td>Word 2013, o Windows anterior a Windows 10 (1903)</td><td colspan="2">Romus no puede funcionar: esos Word abren los complementos con el motor de Internet Explorer. Usa Word para la web, gratis.</td></tr>
+  </table>
+  <p>Algunas funciones dependen de tu versión (por ejemplo, poner comentarios o activar el control de cambios en Word 2016). Romus se adapta solo y te dice qué cambia en <b>Ajustes → Tu versión de Word</b>.</p>
   <h3>Word de escritorio en Windows (recomendado: instalador)</h3>
   <ol class="pasos">
     <li><b>Cierra Word</b> por completo.</li>
@@ -98,7 +108,7 @@
   <div class="caja"><strong>Qué hace el instalador</strong>Copia el manifiesto de Romus en tu equipo, lo registra en Word para tu usuario y agrega esta guía y un desinstalador al menú Inicio. Si estás actualizando y ves una versión vieja, marca «Limpiar la caché de complementos» (borra tus ajustes: tendrás que pegar de nuevo la clave de la IA). Romus se actualiza solo: no hay que volver a instalarlo.<br><br><b>Antes de limpiar la caché</b>, guarda tu respaldo en Romus (<b>Ajustes → Respaldo de la configuración</b>): así recuperas tus IA con un clic en lugar de pegar las claves otra vez.</div>
   <h3>Word para la web (office.com) o Mac</h3>
   <ol class="pasos">
-    <li>Abre <a href="https://passbri.github.io/romus/">passbri.github.io/romus</a> y pulsa <b>Descargar mi manifest.xml</b>.</li>
+    <li>Abre <a href="https://passbri.github.io/romus/">passbri.github.io/romus</a> y descarga el manifiesto de tu Word: <b>Microsoft 365 o Word para la web</b>, o <b>Word 2016, 2019, 2021 o 2024</b>.</li>
     <li><b>Word para la web:</b> abre un documento → <b>Inicio → Complementos → Más complementos → Mis complementos → Cargar mi complemento</b> → elige el archivo → <b>Cargar</b>.</li>
     <li><b>Mac:</b> copia el archivo en <code>~/Library/Containers/com.microsoft.Word/Data/Documents/wef</code> (créala si no existe) y reinicia Word.</li>
   </ol>
@@ -327,6 +337,6 @@
 </section>
 
 </main>
-<footer>Romus para Word y PowerPoint v3.9.0 · creado por Brian Gonzalo Suárez Acevedo · <a href="https://github.com/PassBri/romus">github.com/PassBri/romus</a></footer>
+<footer>Romus para Word y PowerPoint v3.9.1 · creado por Brian Gonzalo Suárez Acevedo · <a href="https://github.com/PassBri/romus">github.com/PassBri/romus</a></footer>
 </body>
 </html>

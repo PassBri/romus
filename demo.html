@@ -67,7 +67,9 @@
     .bienvenida button { margin-top: 10px; background: var(--azul); color: #fff; border: 0; padding: 8px 16px; border-radius: 6px; font: inherit; cursor: pointer; }
     @media (max-width: 900px) { .comentarios { display: none; } .panel { width: 320px; } .pagina { padding: 48px 32px; } }
     @media (max-width: 640px) { .zona { flex-direction: column; } .panel { width: 100%; height: 60vh; border-left: 0; border-top: 1px solid var(--linea); } .pagina { padding: 28px 18px; min-height: 0; } }
-  </style>
+    .ver-word { font-size: 12.5px; color: #444; display: inline-flex; align-items: center; gap: 6px; margin-left: 6px; }
+  .ver-word select { font: inherit; padding: 3px 6px; border: 1px solid #c8c6c4; border-radius: 3px; background: #fff; }
+</style>
 </head>
 <body>
   <div class="titulo"><b>Documento1 - Word</b><span>Romus para Word</span><span class="sim">Simulación en el navegador</span></div>
@@ -79,6 +81,7 @@
         <button id="bEjemplo">Documento de ejemplo</button>
         <button id="bBlanco">Documento en blanco</button>
         <button id="bComent">Ocultar comentarios</button>
+        <label class="ver-word">Simular <select id="selVersion"><option value="">Microsoft 365</option><option value="1.3">Word 2019 o 2021</option></select></label>
       </div>
       <div class="marco"><div class="pagina" id="pagina"></div><div class="comentarios" id="comentarios"></div></div>
     </div>
@@ -164,12 +167,16 @@
       if (!o.accion) return;
       if (o.accion.panel) { $("panel").classList.remove("oculto"); return; }
       $("panel").classList.remove("oculto");
+      // Word 2019/2021: cinta clásica, el botón abre el panel directamente en su función.
+      const api = $("selVersion").value;
+      if (api) { $("romus").src = `taskpane.html?demo=1&api=${api}&cinta=${encodeURIComponent(o.accion.fn.replace(/^romus/, ""))}`; $("eTrab").textContent = ""; return; }
       const w = R(); if (!w) return;
       const f = (w.__acciones && w.__acciones[o.accion.fn]) || w[o.accion.fn];
       if (!f) { $("eTrab").textContent = "Romus aún está cargando…"; return; }
       $("eTrab").className = "trab"; $("eTrab").textContent = `Romus está trabajando en su ${o.et}…`;
       try { f({ completed() { setTimeout(() => { $("eTrab").textContent = ""; }, 700); } }); } catch (e) { $("eTrab").textContent = "Error: " + e.message; }
     }
+    $("selVersion").onchange = () => { const v = $("selVersion").value; $("romus").src = "taskpane.html?demo=1" + (v ? "&api=" + v : ""); };
     window.__demoMostrarPanel = () => $("panel").classList.remove("oculto");
     $("bCerrarPanel").onclick = () => $("panel").classList.add("oculto");
 

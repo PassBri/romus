@@ -63,6 +63,11 @@
       t = String(t).replace(/\^\^/g, "^");
       const res = [];
       const a = idx(this.p0), b = idx(this.p1);
+      if (opts && opts.matchWildcards) { // comodines de Word: [[] = «[», []] = «]», * = cualquier texto
+        const re = new RegExp(t.split(/(\[\[\]|\[\]\]|\*)/).map(x => x === "[[]" ? "\\[" : x === "[]]" ? "\\]" : x === "*" ? "[^\\]]*?" : x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join(""), "g");
+        for (let k = a; k <= b; k++) { const p = docu.paras[k]; let m; while ((m = re.exec(p.text))) res.push(new Rango(p, m.index, p, m.index + m[0].length)); }
+        return new Col(res);
+      }
       for (let k = a; k <= b; k++) {
         const p = docu.paras[k];
         const hay = opts && opts.matchCase ? p.text : p.text.toLowerCase();
@@ -179,11 +184,14 @@
   };
   const acciones = {};
   window.__acciones = acciones;
+  const API_SIM = parseFloat((location.search.match(/[?&]api=([\d.]+)/) || [])[1]) || 0;
   window.Office = {
     HostType: { Word: "Word" },
     DevicePermissionType: { microphone: "microphone" },
     context: {
-      requirements: { isSetSupported: () => true },
+      // ?api=1.3 simula Word 2019/2021 (API de Word 1.3, sin motor compartido)
+      requirements: { isSetSupported: (n, v) => !API_SIM ? true : n === "WordApi" ? parseFloat(v) <= API_SIM : n !== "SharedRuntime" },
+      diagnostics: { version: API_SIM ? "16.0.10827 (simulado: Word 2019)" : "16.0.18227 (simulado: Microsoft 365)", platform: "PC" },
       document: { url: "documento-demo", addHandlerAsync(t, fn) { window.__alCambiarSeleccion = fn; }, settings: { get() { return null; }, set() {}, saveAsync(cb) { cb && cb({ status: "succeeded" }); } } },
       ui: {
         displayDialogAsync(url, opts, cb) {

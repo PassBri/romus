@@ -46,8 +46,11 @@
   <section>
     <h2>Otra opción: Word para la web o Mac</h2>
     <h3 style="margin:0 0 8px">1. Descarga tu manifiesto</h3>
-    <p style="margin:0 0 14px">Este botón crea el archivo <code>manifest.xml</code> con la dirección de esta página, listo para cargar en Word. No tienes que editar nada.</p>
-    <button class="boton" id="btnManifiesto">Descargar mi manifest.xml</button>
+    <p style="margin:0 0 14px">Elige según tu Word. El archivo sale con la dirección de esta página, listo para cargar. No tienes que editar nada.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="boton" id="btnManifiesto" data-archivo="manifest.xml">Microsoft 365 o Word para la web</button>
+      <button class="boton" id="btnManifiestoClasico" data-archivo="manifest-clasico.xml" style="background:#fff;color:#185abd;border:1px solid #185abd">Word 2016, 2019, 2021 o 2024 (también Mac sin 365)</button>
+    </div>
     <p class="nota" id="notaManifiesto">Dirección detectada: <span id="base">…</span></p>
   </section>
 
@@ -64,27 +67,30 @@
     <p style="margin:0">Pulsa <b>Romus</b> en la pestaña <b>Inicio</b>, abre <b>Ajustes</b> (ícono de controles, arriba a la derecha) → <b>+ Agregar</b>, elige tu IA (Claude, ChatGPT, Gemini, una IA local…), pega la clave y pulsa <b>Probar conexión y corrección</b>.</p>
   </section>
 
-  <footer>Romus para Word y PowerPoint v3.9.0 · Brian Gonzalo Suárez Acevedo</footer>
+  <footer>Romus para Word y PowerPoint v3.9.1 · Brian Gonzalo Suárez Acevedo</footer>
 </main>
 <script>
   // Carpeta donde está publicada esta página (por ejemplo https://usuario.github.io/romus)
   const base = location.href.split(/[?#]/)[0].replace(/\/[^/]*$/, "");
   document.getElementById("base").textContent = base;
-  document.getElementById("btnManifiesto").addEventListener("click", async () => {
+  const descargar = async (ev) => {
     const nota = document.getElementById("notaManifiesto");
+    const archivo = ev.currentTarget.dataset.archivo;
     try {
       if (!/^https:\/\//.test(base)) throw new Error("La página debe abrirse desde una dirección https:// (por ejemplo, GitHub Pages).");
-      const r = await fetch("manifest.xml", { cache: "no-store" });
+      const r = await fetch(archivo, { cache: "no-store" });
       if (!r.ok) throw new Error("No encontré manifest.xml junto a esta página.");
       const xml = (await r.text()).replaceAll("https://TU-USUARIO.github.io/romus", base);
       const url = URL.createObjectURL(new Blob([xml], { type: "application/xml" }));
       const a = Object.assign(document.createElement("a"), { href: url, download: "manifest.xml" });
       document.body.appendChild(a); a.click(); a.remove();
-      nota.innerHTML = '<span class="ok">Listo: se descargó <b>manifest.xml</b> configurado para ' + base + '</span>';
+      nota.innerHTML = '<span class="ok">Listo: se descargó <b>manifest.xml</b> ' + (archivo === "manifest.xml" ? "(Microsoft 365)" : "(cinta clásica)") + ' configurado para ' + base + '</span>';
     } catch (e) {
       nota.textContent = e.message;
     }
-  });
+  };
+  document.getElementById("btnManifiesto").addEventListener("click", descargar);
+  document.getElementById("btnManifiestoClasico").addEventListener("click", descargar);
 </script>
 </body>
 </html>

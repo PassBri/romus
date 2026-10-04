@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-3.9.0-185abd" alt="versión 3.9.0">
+  <img src="https://img.shields.io/badge/versión-3.9.1-185abd" alt="versión 3.9.1">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -373,6 +373,12 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 
 ## Novedades
 
+### v3.9.1 · Romus en cada versión de Word
+- **Instalador**: reconoce tu Office. Con Microsoft 365 instala la cinta de botones instantáneos; con Word 2016, 2019, 2021 o 2024, la cinta clásica. Si solo encuentra Word 2013 (que no puede ejecutar Romus) o ningún Word, te lo explica antes de instalar y te sugiere Word para la web, que es gratis.
+- **Página de Romus**: dos manifiestos para cargar a mano, uno para Microsoft 365 y Word para la web, y otro para Word 2016 a 2024 (también Mac sin 365).
+- **Aviso en el panel**: si tu Word no comparte motor con la cinta y aún no tienes la cinta clásica, Romus te explica una vez cómo arreglarlo.
+- **Tutorial**: tabla de compatibilidad por versión de Word.
+
 ### v3.9.0 · Cinta clásica para Office 2016, 2019 y 2021
 - En Word sin Microsoft 365, los botones que «dejaban la orden» al panel podían no hacer nada. Ahora el instalador detecta tu Office y, si no es Microsoft 365, instala la **cinta clásica**: cada botón abre el panel de Romus directamente en su función, con el mecanismo que Word garantiza en todas sus versiones.
 - La conversación se conserva aunque Word recargue el panel.
@@ -540,4 +546,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word y PowerPoint · v3.9.0</sub></p>
+<p align="center"><sub>Romus para Word y PowerPoint · v3.9.1</sub></p>

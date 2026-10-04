@@ -1105,7 +1105,7 @@ ${lote.map((f, k) => `[${k + 1}] ${f.texto}`).join("\n\n")}`);
           // ubicar el párrafo exacto dentro del fragmento
           const pags = d.paginas.find(p => p.n === f.pag);
           // Si la cita abarca dos párrafos, se usa su trozo más largo que esté completo en un párrafo.
-          const trozos = [x.cita].concat(String(x.cita).split(/(?<=[.?!])\s+/).filter(z => z.length >= 25).sort((p1, p2) => p2.length - p1.length));
+          const trozos = [x.cita].concat(String(x.cita).replace(/([.?!])\s+/g, "$1\u0001").split("\u0001").filter(z => z.length >= 25).sort((p1, p2) => p2.length - p1.length));
           let hecho = false;
           for (const cita of trozos) { if (hecho) break; for (let k = f.par; k < pags.parrafos.length; k++) { const t = pags.parrafos[k]; const u = buscarEn(t, cita); if (u && u.fin - u.ini > 8) { if (!propuestas.some(q => q.doc === d && q.pag === f.pag && q.par === k && q.ini === u.ini && q.codigo === cd)) propuestas.push({ doc: d, pag: f.pag, par: k, ini: u.ini, fin: u.fin, texto: t.slice(u.ini, u.fin), codigo: cd, razon: x.razon || "" }); hecho = true; break; } } }
         });

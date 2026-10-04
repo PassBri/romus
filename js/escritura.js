@@ -129,7 +129,7 @@ ${doc.texto}`, signal);
     pares.filter(p => p.estado !== "respondido" && p.sugerencia).forEach(p => { const b = el("div", "prioridad"); b.append(el("b", "", p.objetivo.slice(0, 80)), el("span", "", p.sugerencia)); const bI = el("button", "enlace-sutil", "Ver el objetivo"); bI.onclick = () => irA(p.iO); b.appendChild(bI); c.appendChild(b); });
     if (sobran.length) { const f = el("div", "guia-caja error"); f.appendChild(el("b", "", "Conclusiones que no responden a un objetivo")); const ul = el("ul", "guia-puntos"); sobran.forEach(x => ul.appendChild(el("li", "", x))); f.appendChild(ul); c.appendChild(f); }
     const pend = pares.filter(p => p.estado !== "respondido");
-    if (pend.length) { const b = el("button", "boton secundario", "Comentar en el documento"); b.onclick = () => H().ejecutar(async () => { const x = await Doc.comentar(pend.map(p => ({ parrafo: p.iO, fragmento: p.objetivo.slice(0, 200), comentario: `Este objetivo ${p.estado === "parcial" ? "solo se responde en parte" : "no tiene conclusión"}. ${p.sugerencia || ""}` }))); H().ui.confirmar(`Dejé ${x.hechos} comentarios.`); }); c.appendChild(b); }
+    if (pend.length) { const b = el("button", "boton secundario", "Comentar en el documento"); b.onclick = () => H().ejecutar(async () => { const x = await Doc.comentar(pend.map(p => ({ parrafo: p.iO, fragmento: p.objetivo.slice(0, 200), comentario: `Este objetivo ${p.estado === "parcial" ? "solo se responde en parte" : "no tiene conclusión"}. ${p.sugerencia || ""}` }))); H().ui.confirmar(`${x.texto}`); }); c.appendChild(b); }
     tarjeta("Conclusiones frente a objetivos", c);
     H().ui.hablar(`${ok} de ${pares.length} objetivos tienen su conclusión.`);
     return { pares, sobran };
