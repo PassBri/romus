@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-3.9.1-185abd" alt="versión 3.9.1">
+  <img src="https://img.shields.io/badge/versión-3.9.2-185abd" alt="versión 3.9.2">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -373,6 +373,13 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 
 ## Novedades
 
+### v3.9.2 · Biblioteca de metodología para leer o escuchar
+- **[Biblioteca de metodología](https://passbri.github.io/romus/biblioteca.html)**: 114 temas para leer o escuchar. Cubre todo el proceso de investigación, en el orden de Hernández Sampieri et al. (2014), más APA 7 y los 39 temas del libro *Teoría: conocimiento científico* de Brian Suárez. Los textos son explicaciones originales y cada uno indica qué capítulo leer para profundizar.
+- **Escuchar**: lee en voz alta y resalta cada frase. Puedes elegir la voz y la velocidad, tocar una frase para saltar a ella o seguir con el siguiente tema para oír una ruta completa, como un audiolibro.
+- **Rutas de lectura** cuantitativa, cualitativa, mixta, teórico-documental y la Teoría de Brian Suárez, con buscador y marca de temas leídos.
+- **19 temas nuevos**: antecedentes, marco conceptual, niveles de medición, cuestionarios y Likert, tipos de muestreo, validez experimental, estadística descriptiva e inferencial, entrevista, observación, triangulación, teoría fundamentada, etnografía, fenomenología, narrativo, investigación-acción, discusión, resumen y abstract, y proyecto de investigación. También aparecen en la guía del panel.
+- Botón **Lecturas** en la pestaña Romus (grupo Aprender) y sección nueva en el tutorial.
+
 ### v3.9.1 · Romus en cada versión de Word
 - **Instalador**: reconoce tu Office. Con Microsoft 365 instala la cinta de botones instantáneos; con Word 2016, 2019, 2021 o 2024, la cinta clásica. Si solo encuentra Word 2013 (que no puede ejecutar Romus) o ningún Word, te lo explica antes de instalar y te sugiere Word para la web, que es gratis.
 - **Página de Romus**: dos manifiestos para cargar a mano, uno para Microsoft 365 y Word para la web, y otro para Word 2016 a 2024 (también Mac sin 365).
@@ -546,4 +553,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word y PowerPoint · v3.9.1</sub></p>
+<p align="center"><sub>Romus para Word y PowerPoint · v3.9.2</sub></p>

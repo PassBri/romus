@@ -14,7 +14,7 @@ window.Presentacion = (function () {
     if (window.PptxGenJS) return Promise.resolve();
     return new Promise((ok, mal) => {
       const s = document.createElement("script");
-      s.src = "vendor/pptxgen.bundle.js?v=3.9.1";
+      s.src = "vendor/pptxgen.bundle.js?v=3.9.2";
       s.onload = () => window.PptxGenJS ? ok() : mal(new Error("No pude cargar el generador de PowerPoint."));
       s.onerror = () => mal(new Error("No pude cargar el generador de PowerPoint. Revisa tu conexión."));
       document.head.appendChild(s);

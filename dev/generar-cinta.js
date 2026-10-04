@@ -43,7 +43,7 @@ const info = (clave) => {
 };
 // Etiquetas cortas, como las de Word (el nombre completo queda en la información sobre herramientas).
 const CORTOS = {
-  apacita: "Cita", apaasesor: "Asesor APA", aparevisor: "Revisor", apaformato: "Formato", apareferencia: "Referencia",
+  lecturas: "Lecturas", apacita: "Cita", apaasesor: "Asesor APA", aparevisor: "Revisor", apaformato: "Formato", apareferencia: "Referencia",
   literatura: "Literatura", biblioteca: "Biblioteca", matriz: "Matriz", sincita: "Sin cita", fidelidad: "Fidelidad",
   pendientes: "Por confirmar", existen: "Verificar", muestra: "Muestra", validacion: "Validación", spss: "SPSS o R",
   resumen: "Resumen", articulo: "Artículo", usoia: "Uso de IA", diapositivas: "Presentación", sustentacion: "Simulacro",
@@ -68,7 +68,7 @@ const GRUPOS = [
   { id: "Escribir", nombre: "Escribir", ico: "discusion", controles: ["discusion", "conclusiones", "resumen", "articulo", "usoia"] },
   { id: "Apa", nombre: "APA 7", ico: "apa", controles: ["aparevisor", "apacita", "apareferencia", "apaformato", "apaasesor"] },
   { id: "Entregar", nombre: "Entregar", ico: "sustentacion", controles: ["diapositivas", "sustentacion", "observaciones", "acta", "director"] },
-  { id: "Ayuda", nombre: "Aprender", ico: "guia", controles: ["guia", "tutorial", "teoria", "Ayuda"] }
+  { id: "Ayuda", nombre: "Aprender", ico: "guia", controles: ["guia", "lecturas", "tutorial", "teoria", "Ayuda"] }
 ];
 
 const imgs = new Map(), cortas = new Map(), largas = new Map();

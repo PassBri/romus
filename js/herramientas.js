@@ -41,6 +41,7 @@ window.Herramientas = (function () {
     guia: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.2-2.5 3.9M12 17.2v.3"/>',
     teoria: '<path d="M12 22V12M12 12C9 12 6 10 6 6c3 0 6 2 6 6zM12 12c3 0 6-2 6-6-3 0-6 2-6 6zM12 15c-2.5 0-4.5-1.5-5-4M12 15c2.5 0 4.5-1.5 5-4"/>',
     tutorial: '<path d="M3 8l9-4 9 4-9 4z"/><path d="M7 10v5c3 2 7 2 10 0v-5M21 8v6"/>',
+    lecturas: '<path d="M4 5h5v14H4zM10 5h4v14h-4z"/><path d="M16 6l3-1 2 13-3 1z"/>',
     director: '<rect x="3" y="4" width="13" height="10" rx="1"/><path d="M6 8h7M6 11h4"/><circle cx="19" cy="9" r="2"/><path d="M15.5 20c.3-2.5 1.6-4 3.5-4s3.2 1.5 3.5 4"/>',
     asesor: '<path d="M12 3l2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 8.3l5-.7z"/>',
     proyecto: '<rect x="3" y="5" width="18" height="16" rx="1.5"/><path d="M3 10h18M8 3v4M16 3v4M7 14h3M7 17h6"/>',
@@ -126,6 +127,7 @@ window.Herramientas = (function () {
     ["aprender", "guia", "Guía", "Dudas de metodología", "guia", cmd("abre la guía")],
     ["aprender", "teoria", "Teoría", "Libro de Brian Suárez", "teoria", cmd("abre la teoría")],
     ["aprender", "tutorial", "Tutorial", "Investigar paso a paso", "tutorial", cmd("modo tutorial")],
+    ["aprender", "lecturas", "Biblioteca de metodología", "Lee o escucha cada tema del proceso", "lecturas", () => { const u = new URL("biblioteca.html", location.href).href; if (window.Conexion && Conexion.abrirEnlace) Conexion.abrirEnlace(u); else window.open(u, "_blank"); }],
     ["docentes", "director", "Modo director", "Informe de revisión de un estudiante", "director", run(() => Revision.director())]
   ];
   const TODAS = LISTA.map(([grupo, id, nombre, desc, ico, accion]) => ({ grupo, id, nombre, desc, ico, accion }));

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biblioteca de metodología · Romus</title>
+<link rel="icon" href="assets/iconos/icon-32.png">
+<style>
+  :root { --bg:#fafafa; --sup:#fff; --sup2:#f3f4f6; --linea:#e3e6eb; --texto:#1b1d21; --texto2:#5c6370; --acento:#185abd; --suave:#eef3fb; --oro:#b8860b; --ok:#107c41; --marca:#fff3c4; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#111317; --sup:#1a1d23; --sup2:#22262d; --linea:#2c3139; --texto:#eceef2; --texto2:#a4abb8; --acento:#4f9bff; --suave:rgba(79,155,255,.12); --oro:#e0b04a; --ok:#54c28a; --marca:rgba(224,176,74,.28); } }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI Variable Text","Segoe UI",-apple-system,Roboto,sans-serif; background: var(--bg); color: var(--texto); line-height: 1.6; font-size: 16px; }
+  header.portada { background: radial-gradient(120% 120% at 80% 30%, #13305e 0%, #0a1530 45%, #05070d 100%); color: #eef4ff; padding: 36px 16px 30px; }
+  .ancho { max-width: 1120px; margin: 0 auto; }
+  .portada .ancho { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
+  .portada img { width: 64px; height: 64px; }
+  .portada h1 { margin: 0; font-weight: 600; font-size: 28px; letter-spacing: -.01em; }
+  .portada p { margin: 4px 0 0; color: #a9b8d0; max-width: 680px; }
+  .portada a { color: #9cc6ff; }
+  .barra { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--linea); }
+  .barra .ancho { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding: 10px 16px; }
+  input[type=search], select { font: inherit; font-size: 14.5px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--linea); background: var(--sup); color: var(--texto); min-height: 40px; }
+  input[type=search] { flex: 1 1 220px; min-width: 0; }
+  .progreso { font-size: 13px; color: var(--texto2); margin-left: auto; }
+  .boton { font: inherit; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; min-height: 40px; border-radius: 8px; border: 1px solid var(--linea); background: var(--sup); color: var(--texto); cursor: pointer; }
+  .boton.prim { background: var(--acento); border-color: var(--acento); color: #fff; }
+  .boton:disabled { opacity: .5; cursor: default; }
+  .boton svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .cuerpo { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 24px; padding: 18px 16px 64px; }
+  nav.indice { position: sticky; top: 74px; align-self: start; max-height: calc(100vh - 90px); overflow: auto; padding-right: 4px; }
+  nav.indice h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--texto2); margin: 16px 0 4px; }
+  nav.indice h3:first-child { margin-top: 0; }
+  nav.indice button { display: flex; gap: 8px; align-items: baseline; width: 100%; text-align: left; font: inherit; font-size: 14px; color: var(--texto); background: none; border: 0; border-radius: 6px; padding: 6px 8px; cursor: pointer; }
+  nav.indice button:hover { background: var(--sup2); }
+  nav.indice button[aria-current="true"] { background: var(--suave); color: var(--acento); font-weight: 600; }
+  nav.indice .visto { color: var(--ok); font-size: 12px; min-width: 12px; }
+  article { background: var(--sup); border: 1px solid var(--linea); border-radius: 14px; padding: 24px 28px 28px; min-width: 0; }
+  .cat { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--acento); }
+  article h2 { font-size: 28px; line-height: 1.25; margin: 4px 0 14px; letter-spacing: -.01em; }
+  .reproductor { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding: 10px; background: var(--sup2); border-radius: 10px; margin-bottom: 18px; }
+  .reproductor label { font-size: 13px; color: var(--texto2); display: flex; align-items: center; gap: 6px; }
+  .reproductor select { min-height: 36px; padding: 4px 8px; font-size: 13.5px; max-width: 210px; }
+  .lectura p { margin: 0 0 12px; }
+  .lectura h4 { font-size: 15px; margin: 18px 0 6px; }
+  .lectura ul, .lectura ol { margin: 0 0 12px; padding-left: 22px; }
+  .lectura li { margin: 4px 0; }
+  .sencillo { background: var(--suave); border-left: 4px solid var(--acento); border-radius: 10px; padding: 10px 14px; margin: 0 0 14px; }
+  .caja { border-radius: 10px; padding: 10px 14px; margin: 12px 0; background: var(--sup2); }
+  .caja.error { background: color-mix(in srgb, var(--oro) 12%, transparent); }
+  .caja b { display: block; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: var(--texto2); }
+  .fuente { font-size: 13.5px; color: var(--texto2); border-top: 1px solid var(--linea); margin-top: 18px; padding-top: 10px; }
+  .frase.leyendo { background: var(--marca); border-radius: 3px; }
+  .navegar { display: flex; justify-content: space-between; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+  .aviso { font-size: 13.5px; color: var(--texto2); }
+  .resultados { margin: 0 0 12px; font-size: 14px; color: var(--texto2); }
+  footer { border-top: 1px solid var(--linea); color: var(--texto2); font-size: 13px; padding: 24px 16px; }
+  footer p { margin: 4px 0; }
+  .solo-movil { display: none; }
+  @media (max-width: 820px) {
+    .cuerpo { grid-template-columns: 1fr; }
+    nav.indice { position: static; max-height: none; display: none; border: 1px solid var(--linea); border-radius: 12px; padding: 10px; background: var(--sup); }
+    nav.indice.abierto { display: block; }
+    .solo-movil { display: inline-flex; }
+    article { padding: 18px 16px 22px; }
+    article h2 { font-size: 23px; }
+    .progreso { margin-left: 0; width: 100%; }
+  }
+</style>
+</head>
+<body>
+<header class="portada">
+  <div class="ancho">
+    <img src="assets/logo/logo-romus-app.svg" alt="Logo de Romus">
+    <div>
+      <h1>Biblioteca de metodología</h1>
+      <p>Todo el proceso de investigación, tema por tema, para <b>leer o escuchar</b>: enfoques, planteamiento, marco teórico, rutas cuantitativa, cualitativa, mixta y teórico-documental, escritura, ética, APA 7 y la teoría del conocimiento. <a href="tutorial.html">← Volver al tutorial</a></p>
+    </div>
+  </div>
+</header>
+
+<div class="barra"><div class="ancho">
+  <button class="boton solo-movil" id="btnIndice" aria-expanded="false" aria-controls="indice">☰ Temas</button>
+  <input type="search" id="buscar" placeholder="Busca un tema: hipótesis, muestra, entrevista, Likert…" aria-label="Buscar un tema">
+  <select id="ruta" aria-label="Ruta de lectura">
+    <option value="">Todos los temas</option>
+    <option value="cuantitativo">Ruta cuantitativa</option>
+    <option value="cualitativo">Ruta cualitativa</option>
+    <option value="mixto">Ruta mixta</option>
+    <option value="teorico">Ruta teórico-documental</option>
+    <option value="suarez">Teoría: conocimiento científico (B. Suárez)</option>
+  </select>
+  <span class="progreso" id="progreso"></span>
+</div></div>
+
+<main class="ancho cuerpo">
+  <nav class="indice" id="indice" aria-label="Temas de la biblioteca"></nav>
+  <article id="lector" aria-live="polite">
+    <span class="cat" id="cat"></span>
+    <h2 id="titulo"></h2>
+    <div class="reproductor">
+      <button class="boton prim" id="btnEscuchar"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg><span>Escuchar</span></button>
+      <button class="boton" id="btnDetener" disabled><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>Detener</button>
+      <label><input type="checkbox" id="chkSeguir"> Seguir con el siguiente tema</label>
+      <label>Velocidad <select id="selVel"><option value="0.8">0,8×</option><option value="0.9">0,9×</option><option value="1" selected>1×</option><option value="1.15">1,15×</option><option value="1.3">1,3×</option><option value="1.5">1,5×</option></select></label>
+      <label>Voz <select id="selVoz"></select></label>
+    </div>
+    <div class="lectura" id="lectura"></div>
+    <div class="fuente" id="fuente"></div>
+    <div class="navegar">
+      <button class="boton" id="btnAnt">← Anterior</button>
+      <button class="boton" id="btnSig">Siguiente →</button>
+    </div>
+  </article>
+</main>
+
+<footer><div class="ancho">
+  <p><b>Sobre estos textos.</b> Son explicaciones originales escritas para Romus: resumen con palabras propias las ideas centrales de cada tema y no reproducen el texto de ningún libro. Cada tema indica dónde ampliarlo. Para estudiar a fondo, lee las obras completas:</p>
+  <p>Hernández Sampieri, R., Fernández Collado, C. y Baptista Lucio, M. P. (2014). <i>Metodología de la investigación</i> (6.ª ed.). McGraw-Hill.</p>
+  <p>Martínez Miguélez, M. (2004). <i>Epistemología y metodología cualitativa en las ciencias sociales</i>. Trillas.</p>
+  <p>American Psychological Association. (2020). <i>Publication manual of the American Psychological Association</i> (7.ª ed.).</p>
+  <p>Suárez Acevedo, B. G. (2025). <i>Teoría: conocimiento científico</i> (2.ª ed.). RouteToTop. Incluido con autorización del autor.</p>
+  <p>Romus para Word y PowerPoint · <a href="https://github.com/PassBri/romus">github.com/PassBri/romus</a></p>
+</div></footer>
+
+<script src="js/guia.js?v=3.9.2"></script>
+<script src="js/teoria.js?v=3.9.2"></script>
+<script src="js/citas.js?v=3.9.2"></script>
+<script src="js/apa.js?v=3.9.2"></script>
+<script>
+(function () {
+  if (window.TEORIA && window.Guia) { Guia.agregar(window.TEORIA); Guia.RUTAS.suarez = window.TEORIA.map((t) => t.id); }
+  const $ = (id) => document.getElementById(id);
+  const TEMAS = Guia.TEMAS;
+  const VISTOS = "romus.biblioteca.vistos";
+  let vistos = {}; try { vistos = JSON.parse(localStorage.getItem(VISTOS) || "{}"); } catch (e) { vistos = {}; }
+  const guardarVistos = () => { try { localStorage.setItem(VISTOS, JSON.stringify(vistos)); } catch (e) { /* sin almacenamiento */ } };
+  let lista = TEMAS.slice(), actual = null;
+
+  const esc = (t) => String(t == null ? "" : t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  // Cada frase va en su propio <span> para resaltarla mientras se escucha.
+  let frases = [];
+  function enFrases(texto) {
+    const partes = String(texto).replace(/\s+/g, " ").match(/[^.!?…]+[.!?…]+[»”")]*\s*|[^.!?…]+$/g) || [texto];
+    return partes.map((f) => { const i = frases.push(f.trim()) - 1; return `<span class="frase" data-f="${i}">${esc(f)}</span>`; }).join("");
+  }
+  const lista_ = (titulo, xs, ordenada) => xs && xs.length ? `<h4>${esc(titulo)}</h4><${ordenada ? "ol" : "ul"}>${xs.map((x) => `<li>${enFrases(x)}</li>`).join("")}</${ordenada ? "ol" : "ul"}>` : "";
+
+  function pintarIndice() {
+    const q = $("buscar").value.trim(), ruta = $("ruta").value;
+    if (q) lista = Guia.buscar(q, 12).map((r) => r.t);
+    else if (ruta) lista = Guia.RUTAS[ruta].map(Guia.tema).filter(Boolean);
+    else lista = TEMAS.slice();
+    const nav = $("indice"); nav.innerHTML = "";
+    if (q) nav.insertAdjacentHTML("beforeend", `<p class="resultados">${lista.length ? lista.length + " resultado" + (lista.length === 1 ? "" : "s") : "Sin resultados: prueba con otra palabra."}</p>`);
+    let cat = null;
+    lista.forEach((t, i) => {
+      const grupo = ruta && !q ? null : t.cat;
+      if (grupo && grupo !== cat) { cat = grupo; nav.insertAdjacentHTML("beforeend", `<h3>${esc(cat)}</h3>`); }
+      if (ruta && !q && i === 0) nav.insertAdjacentHTML("beforeend", `<h3>${esc($("ruta").selectedOptions[0].textContent)} · en orden</h3>`);
+      const b = document.createElement("button");
+      b.dataset.id = t.id;
+      b.innerHTML = `<span class="visto">${vistos[t.id] ? "✓" : ""}</span><span>${ruta && !q ? (i + 1) + ". " : ""}${esc(t.titulo)}</span>`;
+      b.addEventListener("click", () => { abrir(t.id); cerrarIndiceMovil(); });
+      nav.appendChild(b);
+    });
+    marcarActual(); pintarProgreso();
+  }
+  function marcarActual() { document.querySelectorAll("nav.indice button").forEach((b) => b.setAttribute("aria-current", actual && b.dataset.id === actual.id ? "true" : "false")); }
+  function pintarProgreso() { const n = TEMAS.filter((t) => vistos[t.id]).length; $("progreso").textContent = `Has leído ${n} de ${TEMAS.length} temas`; }
+
+  function abrir(id, sinScroll) {
+    const t = Guia.tema(id) || TEMAS[0];
+    detener(); actual = t; frases = [];
+    $("cat").textContent = t.cat; $("titulo").textContent = t.titulo;
+    let h = "";
+    if (t.sencillo) h += `<div class="sencillo"><b>En palabras sencillas.</b> ${enFrases(t.sencillo)}</div>`;
+    h += `<p>${enFrases(t.resumen || "")}</p>`;
+    h += lista_("Cómo se hace", t.pasos, true) + lista_("Clases o tipos", t.tipos) + lista_("Partes", t.partes) + lista_("Puntos clave", t.puntos) + lista_("Según tu nivel", t.niveles);
+    if (t.ejemplo) h += `<div class="caja"><b>Ejemplo</b>${enFrases(t.ejemplo)}</div>`;
+    if (t.error) h += `<div class="caja error"><b>Error frecuente</b>${enFrases(t.error)}</div>`;
+    $("lectura").innerHTML = h;
+    $("fuente").innerHTML = t.fuente ? `Para profundizar: ${esc(t.fuente)}.` : "";
+    try { history.replaceState(null, "", "#" + t.id); } catch (e) { location.hash = t.id; }
+    document.title = t.titulo + " · Biblioteca de metodología";
+    vistos[t.id] = true; guardarVistos();
+    const vb = document.querySelector(`nav.indice button[data-id="${t.id}"] .visto`); if (vb) vb.textContent = "✓";
+    marcarActual(); pintarProgreso();
+    const i = lista.indexOf(t); $("btnAnt").disabled = i <= 0; $("btnSig").disabled = i < 0 || i >= lista.length - 1;
+    if (!sinScroll && window.innerWidth <= 820) $("lector").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  function mover(d) { const i = lista.indexOf(actual); const t = lista[i + d]; if (t) { abrir(t.id); return true; } return false; }
+
+  /* ---------- Escuchar (voz del navegador) ---------- */
+  const voz = window.speechSynthesis;
+  let voces = [], idx = 0, sonando = false;
+  function cargarVoces() {
+    if (!voz) return;
+    voces = voz.getVoices().filter((v) => /^es/i.test(v.lang));
+    const prefer = (v) => (/natural|online|neural/i.test(v.name) ? 0 : 1) + (/es-(CO|MX|US|419)/i.test(v.lang) ? 0 : 0.5);
+    voces.sort((a, b) => prefer(a) - prefer(b));
+    const guardada = localStorage.getItem("romus.biblioteca.voz");
+    $("selVoz").innerHTML = voces.map((v, i) => `<option value="${i}">${esc(v.name.replace(/^Microsoft /, "").replace(/ - .*$/, ""))} (${esc(v.lang)})</option>`).join("") || "<option>Voz del sistema</option>";
+    const g = voces.findIndex((v) => v.name === guardada); if (g >= 0) $("selVoz").value = String(g);
+  }
+  function resaltar(i) { document.querySelectorAll(".frase.leyendo").forEach((x) => x.classList.remove("leyendo")); const e = document.querySelector(`.frase[data-f="${i}"]`); if (e) { e.classList.add("leyendo"); const r = e.getBoundingClientRect(); if (r.top < 90 || r.bottom > innerHeight - 20) e.scrollIntoView({ block: "center", behavior: "smooth" }); } }
+  function decir() {
+    if (!sonando) return;
+    // Primero el título, luego cada frase (frases cortas: así ninguna voz se corta a la mitad).
+    if (idx >= frases.length) {
+      sonando = false; resaltar(-1); botones();
+      if ($("chkSeguir").checked && mover(1)) setTimeout(() => escuchar(), 600);
+      return;
+    }
+    const texto = idx === -1 ? actual.titulo + "." : frases[idx];
+    if (idx >= 0) resaltar(idx);
+    const u = new SpeechSynthesisUtterance(texto.replace(/\(([^)]*\d{4}[^)]*)\)/g, "").replace(/→/g, ", ").replace(/×/g, " por "));
+    u.lang = "es-CO"; u.rate = parseFloat($("selVel").value) || 1;
+    const v = voces[+$("selVoz").value]; if (v) { u.voice = v; u.lang = v.lang; }
+    u.onend = () => { idx++; decir(); };
+    u.onerror = () => { idx++; decir(); };
+    voz.speak(u);
+  }
+  function escuchar() {
+    if (!voz) { alert("Este navegador no puede leer en voz alta. Prueba con Edge o Chrome."); return; }
+    voz.cancel(); sonando = true; idx = -1; botones(); decir();
+  }
+  function detener() { if (voz) voz.cancel(); sonando = false; resaltar(-1); botones(); }
+  function botones() { $("btnEscuchar").querySelector("span").textContent = sonando ? "Escuchando…" : "Escuchar"; $("btnEscuchar").disabled = sonando; $("btnDetener").disabled = !sonando; }
+
+  /* ---------- Eventos ---------- */
+  $("buscar").addEventListener("input", () => { pintarIndice(); if (lista[0] && $("buscar").value.trim().length > 3) abrir(lista[0].id, true); });
+  $("ruta").addEventListener("change", () => { $("buscar").value = ""; pintarIndice(); if (lista[0]) abrir(lista[0].id); try { localStorage.setItem("romus.biblioteca.ruta", $("ruta").value); } catch (e) { /* opcional */ } });
+  $("btnEscuchar").addEventListener("click", escuchar);
+  $("btnDetener").addEventListener("click", detener);
+  $("btnAnt").addEventListener("click", () => mover(-1));
+  $("btnSig").addEventListener("click", () => mover(1));
+  $("selVoz").addEventListener("change", () => { const v = voces[+$("selVoz").value]; if (v) try { localStorage.setItem("romus.biblioteca.voz", v.name); } catch (e) { /* opcional */ } });
+  $("lectura").addEventListener("click", (e) => { const f = e.target.closest(".frase"); if (f && sonando) { voz.cancel(); idx = +f.dataset.f; setTimeout(decir, 50); } });
+  const cerrarIndiceMovil = () => { $("indice").classList.remove("abierto"); $("btnIndice").setAttribute("aria-expanded", "false"); };
+  $("btnIndice").addEventListener("click", () => { const a = $("indice").classList.toggle("abierto"); $("btnIndice").setAttribute("aria-expanded", a ? "true" : "false"); });
+  if (voz) { cargarVoces(); voz.onvoiceschanged = cargarVoces; }
+  window.addEventListener("beforeunload", () => voz && voz.cancel());
+
+  try { $("ruta").value = localStorage.getItem("romus.biblioteca.ruta") || ""; } catch (e) { /* opcional */ }
+  pintarIndice();
+  const inicial = decodeURIComponent(location.hash.slice(1));
+  abrir(Guia.tema(inicial) ? inicial : (lista[0] || TEMAS[0]).id, true);
+})();
+</script>
+</body>
+</html>
