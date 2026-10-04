@@ -3,7 +3,10 @@
      node generar-cinta.js <carpeta-romus> <usuario-github-o-TU-USUARIO> <salida-manifest.xml> [version]
    La información de cada botón sale del catálogo único js/herramientas.js. */
 const fs = require("fs"), path = require("path");
-const [, , ROOT, USUARIO, SALIDA, VERSION = "3.0.0.0"] = process.argv;
+const [, , ROOT, USUARIO, SALIDA, VERSION = "3.0.0.0", MODO = "moderna"] = process.argv;
+// MODO «clasica» (Office 2016/2019/2021): sin motor compartido. Cada botón abre el panel en la dirección
+// taskpane.html?cinta=<Botón>; Word reemplaza el contenido del panel abierto y Romus ejecuta esa acción.
+const CLASICA = MODO === "clasica";
 global.window = global; global.Inv = { _h: {} };
 require(path.join(ROOT, "js/herramientas.js"));
 const HT = global.Herramientas;
@@ -72,12 +75,17 @@ const imgs = new Map(), cortas = new Map(), largas = new Map();
 const icono = (ico) => { const id = "I." + ico; imgs.set(ico, id); return `<Icon><bt:Image size="16" resid="${id}.16"/><bt:Image size="32" resid="${id}.32"/><bt:Image size="80" resid="${id}.80"/></Icon>`; };
 const iconoLogo = `<Icon><bt:Image size="16" resid="Icon.16x16"/><bt:Image size="32" resid="Icon.32x32"/><bt:Image size="80" resid="Icon.80x80"/></Icon>`;
 const etiqueta = (clave, texto) => { const id = ("L." + clave).slice(0, 32); cortas.set(id, texto); return id; };
+const urls = new Map();
+const urlCinta = (pagina, clave) => { const id = ("U." + clave).slice(0, 32); urls.set(id, `${BASE}/${pagina}?cinta=${encodeURIComponent(clave)}`); return id; };
+const accion = (fn, pagina, panel) => CLASICA
+  ? `<Action xsi:type="ShowTaskpane"><TaskpaneId>${panel}</TaskpaneId><SourceLocation resid="${urlCinta(pagina, fn.replace(/^romus(Ppt)?/, ""))}"/></Action>`
+  : `<Action xsi:type="ExecuteFunction"><FunctionName>${fn}</FunctionName></Action>`;
 const tip = (clave, texto) => { const id = ("T." + clave).slice(0, 32); largas.set(id, texto); return id; };
 function control(c, dentroMenu) {
   if (c === "ABRIR") return `<Control xsi:type="Button" id="Romus.Abrir"><Label resid="${etiqueta("Abrir", "Abrir Romus")}"/><Supertip><Title resid="L.Abrir"/><Description resid="${tip("Abrir", "Abre el panel de Romus: la esfera, la conversación y los resultados.")}"/></Supertip>${iconoLogo}<Action xsi:type="ShowTaskpane"><TaskpaneId>VozDocPanel</TaskpaneId><SourceLocation resid="Taskpane.Url"/></Action></Control>`;
   const i = info(c), nombre = CORTOS[c] || i.nombre;
   const tag = dentroMenu ? "Item" : "Control";
-  return `<${tag}${dentroMenu ? "" : ' xsi:type="Button"'} id="Romus.${i.fn}"><Label resid="${etiqueta(c, nombre)}"/><Supertip><Title resid="${etiqueta(c + ".t", i.nombre)}"/><Description resid="${tip(c, i.desc)}"/></Supertip>${icono(i.ico)}<Action xsi:type="ExecuteFunction"><FunctionName>${i.fn}</FunctionName></Action></${tag}>`;
+  return `<${tag}${dentroMenu ? "" : ' xsi:type="Button"'} id="Romus.${i.fn}"><Label resid="${etiqueta(c, nombre)}"/><Supertip><Title resid="${etiqueta(c + ".t", i.nombre)}"/><Description resid="${tip(c, i.desc)}"/></Supertip>${icono(i.ico)}${accion(i.fn, "taskpane.html", "VozDocPanel")}</${tag}>`;
 }
 function menu(m) {
   return `<Control xsi:type="Menu" id="Romus.Menu.${m.menu}"><Label resid="${etiqueta("M." + m.menu, m.nombre)}"/><Supertip><Title resid="L.M.${m.menu}"/><Description resid="${tip("M." + m.menu, m.nombre + ": " + m.items.map(k => (EXTRA[k] ? EXTRA[k][0] : HT.porId(k).nombre)).join(", ") + ".")}"/></Supertip>${icono(m.ico)}<Items>${m.items.map(k => control(k, true)).join("")}</Items></Control>`;
@@ -123,16 +131,16 @@ const manifiesto = `<?xml version="1.0" encoding="UTF-8"?>
   <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
     <Hosts>
       <Host xsi:type="Document">
-        <Runtimes>
+${CLASICA ? "" : `        <Runtimes>
           <Runtime resid="Taskpane.Url" lifetime="long"/>
-        </Runtimes>
+        </Runtimes>`}
         <DesktopFormFactor>
           <GetStarted>
             <Title resid="GetStarted.Title"/>
             <Description resid="GetStarted.Description"/>
             <LearnMoreUrl resid="GetStarted.LearnMoreUrl"/>
           </GetStarted>
-          <FunctionFile resid="Taskpane.Url"/>
+${CLASICA ? "" : `          <FunctionFile resid="Taskpane.Url"/>`}
           <ExtensionPoint xsi:type="PrimaryCommandSurface">
             <OfficeTab id="TabHome">
               <Group id="VozDoc.Group">
@@ -154,16 +162,16 @@ const manifiesto = `<?xml version="1.0" encoding="UTF-8"?>
         </DesktopFormFactor>
       </Host>
       <Host xsi:type="Presentation">
-        <Runtimes>
+${CLASICA ? "" : `        <Runtimes>
           <Runtime resid="Ppt.Url" lifetime="long"/>
-        </Runtimes>
+        </Runtimes>`}
         <DesktopFormFactor>
           <GetStarted>
             <Title resid="GetStarted.Title"/>
             <Description resid="GetStarted.DescPpt"/>
             <LearnMoreUrl resid="GetStarted.LearnMoreUrl"/>
           </GetStarted>
-          <FunctionFile resid="Ppt.Url"/>
+${CLASICA ? "" : `          <FunctionFile resid="Ppt.Url"/>`}
           <ExtensionPoint xsi:type="PrimaryCommandSurface">
             <CustomTab id="Romus.TabPpt">
               <Group id="Romus.G.Sustentacion">
@@ -175,7 +183,7 @@ const manifiesto = `<?xml version="1.0" encoding="UTF-8"?>
                   ${iconoLogo}
                   <Action xsi:type="ShowTaskpane"><TaskpaneId>RomusPpt</TaskpaneId><SourceLocation resid="Ppt.Url"/></Action>
                 </Control>
-                ${PPT.map(([fn, et, tipo, ico]) => `<Control xsi:type="Button" id="Romus.${fn}"><Label resid="${etiqueta(fn, et)}"/><Supertip><Title resid="L.${fn}"/><Description resid="${tip(fn, tipo)}"/></Supertip>${icono(ico)}<Action xsi:type="ExecuteFunction"><FunctionName>${fn}</FunctionName></Action></Control>`).join("\n                ")}
+                ${PPT.map(([fn, et, tipo, ico]) => `<Control xsi:type="Button" id="Romus.${fn}"><Label resid="${etiqueta(fn, et)}"/><Supertip><Title resid="L.${fn}"/><Description resid="${tip(fn, tipo)}"/></Supertip>${icono(ico)}${accion(fn, "ppt.html", "RomusPpt")}</Control>`).join("\n                ")}
               </Group>
               <Label resid="Tab.Label"/>
             </CustomTab>
@@ -194,6 +202,7 @@ ${[...imgs.entries()].map(([ico, id]) => [16, 32, 80].map(s => `        <bt:Imag
         <bt:Url id="Taskpane.Url" DefaultValue="${BASE}/taskpane.html"/>
         <bt:Url id="Ppt.Url" DefaultValue="${BASE}/ppt.html"/>
         <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="${BASE}/tutorial.html"/>
+${[...urls.entries()].map(([id, u]) => `        <bt:Url id="${id}" DefaultValue="${x(u)}"/>`).join("\n")}
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="GetStarted.Title" DefaultValue="Romus está listo"/>

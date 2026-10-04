@@ -446,7 +446,9 @@ Respuesta del estudiante (transcrita de su voz, puede tener errores de transcrip
     Voz.cargarVoces && Voz.cargarVoces();
     Voz.setManejadorHablando && Voz.setManejadorHablando((h) => estadoOrbe(h ? "hablando" : (J.escuchando ? "escuchando" : "reposo")));
     document.querySelectorAll(".pestana").forEach(b => b.addEventListener("click", () => irPestana(b.dataset.ir)));
+    const deCinta = new URLSearchParams(location.search).get("cinta"); // cinta clásica: ppt.html?cinta=<Botón>
     irPestana(Config.get().pestanaPpt || "ensayo");
+    if (deCinta && ACCIONES[deCinta]) setTimeout(() => ACCIONES[deCinta](), 600);
     $("selMinutos").value = String(Config.get().minutosSustentacion || 20);
     $("selMinutos").onchange = () => { Config.set({ minutosSustentacion: +$("selMinutos").value }); prepararEnsayo(); revisar(); };
     $("btnPlay").onclick = alternar; $("btnAnt").onclick = () => cambiar(E.idx - 1); $("btnSig").onclick = () => cambiar(E.idx + 1);

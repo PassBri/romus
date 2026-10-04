@@ -64,10 +64,28 @@
     if ((tipo === "ia" || tipo === "accion") && Voz.recordarDicho) Voz.recordarDicho(texto);
     if (extra) div.appendChild(extra);
     $("conversacion").appendChild(div);
+    if (texto && !extra && !/^▶ /.test(texto)) guardarChat({ tipo, texto, meta: div.dataset.meta });
     if (estado.burbuja && (tipo === "usuario" || tipo === "ia" || tipo === "accion" || tipo === "error")) enviarBurbuja({ tipo: "texto", quien: tipo, texto });
     if (pestanaActual() === "inicio") { const main = $("principal"); main.scrollTop = main.scrollHeight; }
     else if (tipo !== "usuario" && tipo !== "sistema") marcarPestana("inicio");
     return div;
+  }
+
+  /* La conversación sobrevive cuando Word recarga el panel (botones de la cinta clásica). */
+  const CHAT = "romus.chat";
+  function guardarChat(m) {
+    try {
+      const l = JSON.parse(localStorage.getItem(CHAT) || "[]").filter(x => Date.now() - x.t < 2 * 3600000);
+      l.push(Object.assign({ t: Date.now() }, m));
+      localStorage.setItem(CHAT, JSON.stringify(l.slice(-30)));
+    } catch (e) { /* sin almacenamiento */ }
+  }
+  function restaurarChat() {
+    try {
+      const l = JSON.parse(localStorage.getItem(CHAT) || "[]").filter(x => Date.now() - x.t < 2 * 3600000);
+      l.forEach(m => { const d = document.createElement("div"); d.className = "mensaje " + m.tipo; d.dataset.meta = m.meta || ""; d.textContent = m.texto; $("conversacion").appendChild(d); });
+      estado.historial = l.filter(m => m.tipo === "usuario" || m.tipo === "ia").slice(-12).map(m => ({ role: m.tipo === "usuario" ? "user" : "assistant", content: m.texto }));
+    } catch (e) { /* nada guardado */ }
   }
 
   function mostrarEscribiendo() {
@@ -1249,9 +1267,13 @@
     const hace = (t) => { const s = Math.round((Date.now() - t) / 1000); return s < 60 ? `hace ${s} s` : s < 3600 ? `hace ${Math.round(s / 60)} min` : "hace más de una hora"; };
     let u = null, rec = 0;
     try { u = JSON.parse(localStorage.getItem("romus.cinta.ultimo") || "null"); rec = +localStorage.getItem("romus.cinta.recogido") || 0; } catch (e) { /* sin almacenamiento */ }
-    const modo = runtimeCompartido() ? "motor compartido (Microsoft 365): los botones actúan directo en este panel" : "motor separado (Office 2016/2019): cada botón deja la orden y este panel la ejecuta";
+    const modo = u && u.clasica ? "la cinta clásica: cada botón abre este panel directamente en su función"
+      : runtimeCompartido() ? "motor compartido (Microsoft 365): los botones actúan directo en este panel"
+      : "motor separado (Office 2016/2019): cada botón deja la orden y este panel la ejecuta";
     let t = `Tu Word usa ${modo}.`;
-    if (!runtimeCompartido()) t += u ? ` Último botón recibido: «${escaparHTML(NOMBRE_CINTA[u.clave] || ((window.Herramientas && Herramientas.porId(u.clave.charAt(0).toLowerCase() + u.clave.slice(1))) || {}).nombre || u.clave)}» ${hace(u.t)}${rec >= u.t ? ", y el panel lo ejecutó." : ", pero el panel no lo recogió: cierra Word por completo y ábrelo de nuevo."}` : " Aún no ha llegado ningún clic de la cinta a este equipo: si pulsas un botón y no aparece aquí, Word no está cargando la versión nueva de Romus (vuelve a ejecutar el instalador y marca «Limpiar la caché»).";
+    const nom = (k) => NOMBRE_CINTA[k] || ((window.Herramientas && Herramientas.porId(k.charAt(0).toLowerCase() + k.slice(1))) || {}).nombre || k.replace(/^(Nivel|Enfoque|Etapa)/, "$1 ");
+    if (u && u.clasica) t += ` Último botón: «${escaparHTML(nom(u.clave))}» ${hace(u.t)}.`;
+    else if (!runtimeCompartido()) t += u ? ` Último botón recibido: «${escaparHTML(NOMBRE_CINTA[u.clave] || ((window.Herramientas && Herramientas.porId(u.clave.charAt(0).toLowerCase() + u.clave.slice(1))) || {}).nombre || u.clave)}» ${hace(u.t)}${rec >= u.t ? ", y el panel lo ejecutó." : ", pero el panel no lo recogió. Instala la cinta clásica: ejecuta de nuevo el instalador y deja marcada «Cinta para Office 2016, 2019 o 2021»."}` : " Aún no ha llegado ningún clic de la cinta a este equipo: si pulsas un botón y no aparece aquí, Word no está cargando la versión nueva de Romus (vuelve a ejecutar el instalador y marca «Limpiar la caché»).";
     n.innerHTML = t;
   }
   function cerrarHoja(id) { $(id).classList.add("oculto"); }
@@ -1615,6 +1637,7 @@
     if ($("btnLimpiarChat")) $("btnLimpiarChat").addEventListener("click", () => {
       estado.historial = [];
       $("conversacion").querySelectorAll(".mensaje:not(:first-child)").forEach(m => m.remove());
+      try { localStorage.removeItem(CHAT); } catch (e) { /* sin almacenamiento */ }
     });
     $("btnMic").addEventListener("click", alternarMic);
     $("btnModoVoz").addEventListener("click", abrirModoVoz);
@@ -1885,6 +1908,14 @@
     // Word sin runtime compartido: el panel visible recoge las acciones de la cinta. Se espera un momento al
     // arrancar: si esta instancia es la que Word abrió solo para un botón, no debe quedarse con la acción.
     const compartido = runtimeCompartido();
+    restaurarChat();
+    // Cinta clásica (Office 2016/2019/2021): el botón abre el panel en taskpane.html?cinta=<Botón>.
+    const deCinta = new URLSearchParams(location.search).get("cinta");
+    if (deCinta) {
+      try { history.replaceState(null, "", location.pathname + location.search.replace(/[?&]cinta=[^&]*/, "").replace(/^&/, "?")); } catch (e) { /* sin historial */ }
+      try { localStorage.setItem("romus.cinta.ultimo", JSON.stringify({ clave: deCinta, t: Date.now(), clasica: true })); localStorage.setItem("romus.cinta.recogido", String(Date.now() + 1)); } catch (e) { /* sin almacenamiento */ }
+      setTimeout(() => correrCinta(deCinta), 500);
+    }
     setTimeout(ejecutarPendienteCinta, compartido ? 0 : 1500);
     if (!compartido) {
       window.addEventListener("storage", (e) => { if (e.key === "romus.cinta.pendiente" && e.newValue) ejecutarPendienteCinta(); });

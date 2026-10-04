@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-3.8.4-185abd" alt="versión 3.8.4">
+  <img src="https://img.shields.io/badge/versión-3.9.0-185abd" alt="versión 3.9.0">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -373,6 +373,11 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 
 ## Novedades
 
+### v3.9.0 · Cinta clásica para Office 2016, 2019 y 2021
+- En Word sin Microsoft 365, los botones que «dejaban la orden» al panel podían no hacer nada. Ahora el instalador detecta tu Office y, si no es Microsoft 365, instala la **cinta clásica**: cada botón abre el panel de Romus directamente en su función, con el mecanismo que Word garantiza en todas sus versiones.
+- La conversación se conserva aunque Word recargue el panel.
+- En Microsoft 365 nada cambia: los botones siguen actuando al instante. Puedes elegir la cinta a mano en el instalador.
+
 ### v3.8.4 · Cinta confiable en Office 2016/2019
 - En Word sin motor compartido, cada botón de la cinta corre en una instancia oculta que Word abre aparte. Esa instancia ya no intenta ejecutar la acción ni encender el micrófono: solo deja la orden, y el panel visible la recoge en medio segundo.
 - Los botones se registran apenas arranca Romus, antes que todo lo demás, para que Word siempre los encuentre.
@@ -535,4 +540,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word y PowerPoint · v3.8.4</sub></p>
+<p align="center"><sub>Romus para Word y PowerPoint · v3.9.0</sub></p>
