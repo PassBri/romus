@@ -65,6 +65,7 @@
       <p>Tutorial completo: instala Romus en Word, conéctalo a una IA gratis y aprende a usarlo, aunque nunca hayas hecho una investigación.</p>
       <div class="cta">
         <a class="boton prim" href="https://github.com/PassBri/romus/raw/main/descargas/Instalar-Romus.exe">⬇ Descargar instalador para Windows</a>
+        <a class="boton sec" href="demo.html">Probar en el Word virtual</a>
         <a class="boton sec" href="https://github.com/PassBri/romus">Ver en GitHub</a>
       </div>
     </div>
@@ -72,7 +73,7 @@
 </header>
 
 <nav class="indice"><div class="ancho">
-  <a href="#instalar">1 · Instalar</a><a href="#abrir">2 · Abrir</a><a href="#ia">3 · Conectar IA</a><a href="#hablar">4 · Hablar</a><a href="#documentos">5 · Documentos</a><a href="#asesor">6 · Asesor</a><a href="#pro">★ Pro</a><a href="#teoria">7 · Teoría</a><a href="#datos">8 · Datos</a><a href="#apa">9 · APA 7</a><a href="#herramientas">10 · Herramientas</a><a href="#sustentar">11 · Sustentar</a><a href="#problemas">12 · Problemas</a>
+  <a href="#instalar">1 · Instalar</a><a href="#abrir">2 · Abrir</a><a href="#ia">3 · Conectar IA</a><a href="#hablar">4 · Hablar</a><a href="#documentos">5 · Tu texto</a><a href="#mis-documentos">6 · Mis documentos</a><a href="#asesor">7 · Asesor</a><a href="#pro">★ Pro</a><a href="#teoria">8 · Teoría</a><a href="#datos">9 · Datos</a><a href="#apa">10 · APA 7</a><a href="#herramientas">11 · Herramientas</a><a href="#sustentar">12 · Sustentar</a><a href="#problemas">13 · Problemas</a>
 </div></nav>
 
 <main class="ancho">
@@ -80,11 +81,13 @@
 <section id="que-es">
   <figure><img src="assets/gif/romus-esfera.gif" alt="La esfera de Romus escuchando y hablando" width="220"></figure>
   <p><b>Romus</b> es un asistente de voz con inteligencia artificial que vive dentro de Microsoft Word. Dices <span class="di">«Ok Romus»</span> y tu orden, y él lee, corrige, redacta o da formato a tu documento. También es un <b>asesor de investigación</b>: te acompaña desde la idea hasta la sustentación de tu proyecto o tesis.</p>
+  <div class="caja"><strong>¿Quieres verlo antes de instalar?</strong>Abre el <a href="demo.html"><b>Word virtual</b></a>: una página que imita Word con la pestaña Romus completa y el panel a la derecha. Cada botón funciona sobre un documento de ejemplo que puedes editar. No instala nada.</div>
+  <figure><img src="assets/capturas/word-virtual.png" alt="Romus funcionando en el Word virtual"><figcaption>El Word virtual: la misma cinta y el mismo panel que verás en tu Word.</figcaption></figure>
 </section>
 
 <section id="instalar">
   <h2><span class="num">1</span>Instalar Romus</h2>
-  <p class="bajada">Elige según el Word que uses. No necesitas permisos de administrador.</p>
+  <p class="bajada">Elige según el Word que uses. No necesitas permisos de administrador. Funciona en Word 2016, 2019, 2021, 2024, Microsoft 365, Word para la web y Mac.</p>
   <h3>Word de escritorio en Windows (recomendado: instalador)</h3>
   <ol class="pasos">
     <li><b>Cierra Word</b> por completo.</li>
@@ -92,7 +95,7 @@
     <li>Si Windows muestra «Windows protegió su PC», pulsa <b>Más información → Ejecutar de todas formas</b>. Aparece porque el instalador es nuevo y no tiene firma comercial.</li>
     <li>Sigue el asistente: <b>Siguiente → Instalar → Finalizar</b>. Deja marcada la opción de abrir Word.</li>
   </ol>
-  <div class="caja"><strong>Qué hace el instalador</strong>Copia el manifiesto de Romus en tu equipo, lo registra en Word para tu usuario y agrega esta guía y un desinstalador al menú Inicio. Si estás actualizando y ves una versión vieja, marca «Limpiar la caché de complementos» (borra tus ajustes: tendrás que pegar de nuevo la clave de la IA). Romus se actualiza solo: no hay que volver a instalarlo.</div>
+  <div class="caja"><strong>Qué hace el instalador</strong>Copia el manifiesto de Romus en tu equipo, lo registra en Word para tu usuario y agrega esta guía y un desinstalador al menú Inicio. Si estás actualizando y ves una versión vieja, marca «Limpiar la caché de complementos» (borra tus ajustes: tendrás que pegar de nuevo la clave de la IA). Romus se actualiza solo: no hay que volver a instalarlo.<br><br><b>Antes de limpiar la caché</b>, guarda tu respaldo en Romus (<b>Ajustes → Respaldo de la configuración</b>): así recuperas tus IA con un clic en lugar de pegar las claves otra vez.</div>
   <h3>Word para la web (office.com) o Mac</h3>
   <ol class="pasos">
     <li>Abre <a href="https://passbri.github.io/romus/">passbri.github.io/romus</a> y pulsa <b>Descargar mi manifest.xml</b>.</li>
@@ -108,21 +111,46 @@
     <li>Ve a la pestaña <b>Romus</b> de la cinta de Word (al final, después de «Ayuda») y pulsa <b>Abrir Romus</b>. También está el botón <b>Romus</b> en la pestaña Inicio.</li>
     <li>Se abre el panel con la esfera. La primera vez, Word puede pedir permiso para el micrófono: acéptalo.</li>
   </ol>
-  <figure><img src="assets/capturas/cinta.png" alt="Pestaña Romus en la cinta de Word"><figcaption>La pestaña <b>Romus</b>: cada botón hace su trabajo directamente. Con <b>Burbuja</b> trabajas sin el panel lateral.</figcaption></figure>
-  <div class="caja oro"><strong>¿No ves la pestaña Romus?</strong>Vuelve a ejecutar el instalador (versión 3.0 o posterior) con Word cerrado. Los botones de acción directa necesitan Microsoft 365, Word 2024, Word para la web o Word para Mac reciente; en versiones anteriores, el botón deja la acción lista y se ejecuta al abrir el panel.</div>
+  <figure><img src="assets/capturas/cinta.png" alt="Pestaña Romus en la cinta de Word"><figcaption>La pestaña <b>Romus</b>, organizada como las de Word: un botón grande para lo principal de cada grupo y botones pequeños para lo rápido. Los que tienen ▾ abren un menú.</figcaption></figure>
+  <table>
+    <tr><th>Grupo</th><th>Para qué sirve</th></tr>
+    <tr><td>Romus</td><td>Abrir el panel, hablar, dictar, leer en voz alta, la burbuja flotante y <b>Conectar IA</b>.</td></tr>
+    <tr><td>Mi tesis</td><td>La ruta de tu tesis, tu <b>nivel</b> (pregrado a posdoctorado), tu <b>enfoque</b> (cuantitativo, cualitativo, mixto o teórico-documental) y las <b>etapas</b> de tu trabajo.</td></tr>
+    <tr><td>Texto</td><td>Corregir, revisar, resumir, explicar, simplificar y cambiar el tono.</td></tr>
+    <tr><td>Proyecto</td><td>Asesor, crear tu proyecto ★ Pro, idear, coherencia y rúbrica.</td></tr>
+    <tr><td>Fuentes y citas</td><td>Buscar literatura, tu biblioteca, matriz, verificar referencias, fidelidad de citas, frases sin cita y datos por confirmar.</td></tr>
+    <tr><td>Mis documentos</td><td>Cargar tus PDF y archivos y trabajar sobre ellos (paso 6).</td></tr>
+    <tr><td>Método y datos</td><td>Instrumento, muestra, validación por jueces, ética, SPSS o R y ATLAS.ti.</td></tr>
+    <tr><td>Escribir</td><td>Discusión, conclusiones, resumen y abstract, artículo y declaración de uso de IA.</td></tr>
+    <tr><td>APA 7</td><td>Revisor, generador de citas, referencias, formato y asesor APA.</td></tr>
+    <tr><td>Entregar</td><td>Presentación, simulacro, observaciones del jurado, acta de asesoría y modo director.</td></tr>
+    <tr><td>Aprender</td><td>Guía, tutorial, teoría y lista de comandos de voz.</td></tr>
+  </table>
+  <div class="caja oro"><strong>¿No ves la pestaña Romus o un botón no hace nada?</strong>Vuelve a ejecutar el instalador con Word cerrado. En Word 2016 y 2019 el botón pasa la orden al panel: si el panel está cerrado, la acción aparece apenas lo abras con <b>Abrir Romus</b>.</div>
   <figure><img src="assets/capturas/panel.png" alt="Panel de Romus en modo claro y oscuro"><figcaption>El panel tiene tres pestañas: <b>Inicio</b> para hablar con Romus, <b>Investigar</b> para tu tesis y <b>Documento</b> para estadísticas y voz de lectura. Modo claro u oscuro con el botón de luna o sol.</figcaption></figure>
 </section>
 
 <section id="ia">
-  <h2><span class="num">3</span>Conectar una IA gratis (Google Gemini)</h2>
-  <p class="bajada">Leer en voz alta funciona sin IA. Para todo lo demás, Romus necesita una IA. Gemini tiene un plan gratuito y además permite que Romus te oiga en Word de escritorio.</p>
+  <h2><span class="num">3</span>Conectar una IA</h2>
+  <p class="bajada">Leer en voz alta, el revisor APA, el generador de citas y la ruta de tu tesis funcionan sin IA. Para redactar, corregir y asesorar, Romus necesita una. La primera vez que abres el panel verás tres formas de conectarla; también están en el botón <b>Conectar IA</b> de la cinta y en <b>Ajustes → Conexión rápida</b>.</p>
+  <figure><img src="assets/capturas/conectar.png" alt="Bienvenida de Romus con tres formas de conectar la IA" width="420"><figcaption>Elige la forma que prefieras. Puedes cambiarla cuando quieras.</figcaption></figure>
+  <h3>⚡ Un clic (sin copiar claves)</h3>
   <ol class="pasos">
-    <li>Entra a <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a> con tu cuenta de Google y pulsa <b>Create API key</b>. Copia la clave (empieza por <code>AIza…</code>).</li>
-    <li>En Romus pulsa <b>Ajustes</b> (ícono de controles, arriba a la derecha) → <b>IA en uso → + Agregar → Google Gemini</b>.</li>
-    <li>Pega la clave. En <b>Modelo</b> deja <code>gemini-flash-latest</code>.</li>
-    <li>Pulsa <b>Probar conexión y corrección</b>. Debe decir «Conexión correcta».</li>
+    <li>Pulsa <b>Un clic → Conectar con un clic</b>.</li>
+    <li>Se abre una ventana de <b>OpenRouter</b>: inicia sesión (puedes usar tu cuenta de Google) y acepta la conexión.</li>
+    <li>Listo: Romus recibe la conexión solo y elige un modelo gratuito. Si quieres otro, cámbialo en <b>Ajustes</b>.</li>
   </ol>
-  <div class="caja oro"><strong>Para escribir mejor</strong>La calidad del lenguaje depende del modelo. Para tesis de maestría o doctorado conviene Claude (console.anthropic.com), GPT (platform.openai.com) o Gemini Pro. Puedes tener varias IA y cambiar con la voz: <span class="di">«usa Claude»</span>.</div>
+  <p>Los modelos gratuitos tienen un límite diario de consultas: alcanza para corregir y consultar. Para proyectos largos conviene Gemini o recargar saldo en OpenRouter (así también puedes usar Claude, GPT o Gemini Pro).</p>
+  <h3>Gemini gratis (copias y pegas una clave)</h3>
+  <ol class="pasos">
+    <li>Pulsa <b>Abrir aistudio.google.com</b>, entra con tu cuenta de Google y pulsa <b>Create API key</b>. Copia la clave (empieza por <code>AIza…</code>). Si te pierdes, pulsa <b>Ver cómo se hace (animación)</b>.</li>
+    <li>Vuelve a Word. Si Romus detecta la clave en tu portapapeles, te ofrece usarla; si no, pégala en la caja.</li>
+    <li>Romus reconoce de qué IA es la clave y la prueba al instante. Gemini, además, permite que Romus te oiga en Word de escritorio.</li>
+  </ol>
+  <h3>Tengo un respaldo</h3>
+  <p>Si ya usaste Romus en otro equipo o antes de reinstalar, en <b>Ajustes → Respaldo de la configuración</b> de ese equipo pulsa <b>Copiar código</b> o <b>Descargar archivo</b>. Aquí pulsa <b>Tengo un respaldo</b>, pega el código (empieza por <code>ROMUS1-</code>) o carga el archivo y pulsa <b>Restaurar</b>: vuelven tus IA, tu nivel, tu enfoque y los datos de tu proyecto. El respaldo incluye tus claves: guárdalo en privado.</p>
+  <div class="caja"><strong>Tus claves no salen de tu equipo</strong>Romus guarda las claves solo en tu Word. Si una clave nueva no funciona, Romus te dice por qué y sigue usando la que ya tenías.</div>
+  <div class="caja oro"><strong>Para escribir mejor</strong>La calidad del lenguaje depende del modelo. Para tesis de maestría o doctorado conviene Claude (console.anthropic.com), GPT (platform.openai.com) o Gemini Pro: en <b>Ajustes → IA en uso → + Agregar</b>. Puedes tener varias IA y cambiar con la voz: <span class="di">«usa Claude»</span>.</div>
 </section>
 
 <section id="hablar">
@@ -138,7 +166,7 @@
 </section>
 
 <section id="documentos">
-  <h2><span class="num">5</span>Trabajar tus documentos</h2>
+  <h2><span class="num">5</span>Trabajar tu texto</h2>
   <table>
     <tr><th>Quieres…</th><th>Di…</th></tr>
     <tr><td>Escuchar el documento</td><td>«lee el documento», «lee desde aquí», «más lento», «para»</td></tr>
@@ -152,8 +180,22 @@
   </table>
 </section>
 
+<section id="mis-documentos">
+  <h2><span class="num">6</span>Mis documentos: habla con tus PDF y archivos</h2>
+  <p class="bajada">Como en ATLAS.ti, puedes cargar tus artículos, entrevistas y libros y trabajar sobre ellos sin salir de Word. Romus lee PDF, Word (.docx), PowerPoint (.pptx) y texto (.txt). Los archivos se quedan en tu equipo.</p>
+  <ol class="pasos">
+    <li>Pulsa <b>Mis documentos</b> en la cinta y arrastra tus archivos o elígelos. Revisa los <b>datos de cada documento</b> (autor, año, tipo de obra; si es una institución, su sigla): con ellos Romus cita en APA 7.</li>
+    <li><b>Preguntar:</b> escribe tu duda, por ejemplo <span class="di">«¿qué concluye el autor sobre la agresión?»</span>. Cada afirmación de la respuesta trae su etiqueta: <b>Evidencia</b> (Romus encontró la cita literal en tu documento), <b>Literatura</b> (viene de OpenAlex), <b>Inferencia</b> (razonamiento de la IA) o <b>Sin verificar</b>. Elige <b>Solo mis documentos</b> o <b>+ Literatura académica</b>.</li>
+    <li><b>Buscar</b> y <b>Extraer:</b> encuentra pasajes por palabra o idea y saca fichas de lectura, datos, conceptos, citas o una matriz.</li>
+    <li><b>Codificar:</b> crea tus códigos (o impórtalos de tus categorías), selecciona un fragmento en el lector y pulsa <b>Codificar</b>, o deja que Romus proponga dónde va cada código y tú aceptas. Exporta el proyecto a ATLAS.ti, NVivo o MAXQDA en formato <b>.qdpx</b>.</li>
+    <li><b>Pensar y crear ▾:</b> <b>Contrastar</b> muestra en qué coinciden y se contradicen tus documentos y qué vacíos dejan; <b>Redactar</b> escribe un estado del arte con cada cita comprobada; <b>Estudiar</b> te explica un documento y te hace preguntas; <b>Reporte</b> redacta tus hallazgos.</li>
+  </ol>
+  <figure><img src="assets/capturas/nexus.png" alt="Preguntar, contrastar, redactar y estudiar con tus documentos"><figcaption>Preguntar con etiquetas de confianza, contrastar, redactar y estudiar.</figcaption></figure>
+  <div class="caja"><strong>Citar desde el lector</strong>Selecciona un fragmento y pulsa <b>Citar</b>: elige cita textual, paráfrasis (Romus propone una y te avisa si se parece demasiado al original) o cita de cita, y la forma parentética o narrativa. Si el documento está en otro idioma, Romus agrega «traducción propia».</div>
+</section>
+
 <section id="asesor">
-  <h2><span class="num">6</span>El asesor de investigación (aunque no sepas nada)</h2>
+  <h2><span class="num">7</span>El asesor de investigación (aunque no sepas nada)</h2>
   <p class="bajada">No necesitas saber metodología. Romus te pregunta dónde estás y te guía.</p>
   <ol class="pasos">
     <li>En el panel, abre la pestaña <b>Investigar</b> y pulsa <b>Asesor de investigación</b>, o di <span class="di">«Ok Romus, asesor»</span> o <span class="di">«no sé por dónde empezar»</span>.</li>
@@ -168,6 +210,7 @@
     <div class="tarjeta"><div class="ico">🎓</div><h4>Voy a sustentar</h4><p>Simulacro con jurado por voz.</p></div>
     <div class="tarjeta"><div class="ico">❓</div><h4>Tengo una duda</h4><p>«¿Qué es la saturación?», «¿cómo calculo la muestra?»</p></div>
   </div>
+  <div class="caja"><strong>Mi tesis en la cinta</strong>En el grupo <b>Mi tesis</b> eliges tu <b>Nivel</b> y tu <b>Enfoque</b> en un clic. <b>Ruta de mi tesis</b> te muestra las etapas que corresponden a tu nivel y enfoque, cuáles ya tienes en el documento y las herramientas de cada una. Con <b>Etapas ▾</b> vas directo a una (por ejemplo, Metodología) y Romus agrega los apartados que te faltan. Si tu trabajo es solo de revisión de textos, elige el enfoque <b>teórico-documental</b>: Romus cambia la metodología por corpus, ficha documental y análisis documental.</div>
   <figure><img src="assets/capturas/asesor.png" alt="Asesor de investigación"><figcaption>El asesor, una explicación «en palabras sencillas» y la sección Teoría.</figcaption></figure>
   <figure><img src="assets/capturas/investigacion.png" alt="Coherencia, rúbrica y literatura"><figcaption>Matriz de coherencia, rúbrica y literatura con citas reales en APA 7.</figcaption></figure>
   <div class="caja"><strong>¿Cómo sé si puedo confiar?</strong>Cada resultado trae una etiqueta: <b>Basado en tu documento</b> (Romus comprobó la evidencia), <b>Fuente verificable</b> (viene de OpenAlex), <b>Rúbrica Romus</b> (puntaje calculado con reglas fijas), <b>Guía Romus</b> o <b>Teoría · Suárez</b> (vienen de los libros base) e <b>Inferencia de la IA</b> (hay que revisarla).</div>
@@ -184,7 +227,7 @@
 </section>
 
 <section id="teoria">
-  <h2><span class="num">7</span>Teoría: construir conocimiento</h2>
+  <h2><span class="num">8</span>Teoría: construir conocimiento</h2>
   <p class="bajada">Una investigación no solo recoge datos: también construye ideas. Esta sección se basa en el libro <i>Teoría: conocimiento científico</i> de Brian Suárez.</p>
   <ol class="pasos">
     <li>Pulsa el botón <b>Teoría</b> o di <span class="di">«Ok Romus, abre la teoría»</span>.</li>
@@ -197,7 +240,7 @@
 </section>
 
 <section id="datos">
-  <h2><span class="num">8</span>Analizar tus datos con SPSS o ATLAS.ti</h2>
+  <h2><span class="num">9</span>Analizar tus datos con SPSS o ATLAS.ti</h2>
   <figure><img src="assets/capturas/datos.png" alt="Resultados en APA desde SPSS y hallazgos desde ATLAS.ti" width="560"><figcaption>Cada número y cada cita se comprueban contra tu salida.</figcaption></figure>
   <h3>Cuantitativo (SPSS o PSPP, que es gratis)</h3>
   <ol class="pasos">
@@ -217,33 +260,35 @@
 </section>
 
 <section id="apa">
-  <h2><span class="num">9</span>Normas APA 7 sin dolor</h2>
+  <h2><span class="num">10</span>Normas APA 7 sin dolor</h2>
   <ol class="pasos">
     <li><b>Dudas:</b> pestaña Romus → <b>Asesor APA</b>, o di <span class="di">«¿cómo cito una ley?»</span>, <span class="di">«¿cómo cito a ChatGPT?»</span>.</li>
+    <li><b>Citas en el texto:</b> pulsa <b>Cita</b>, elige la clase (paráfrasis, textual corta o en bloque, narrativa o parentética, cita de cita, autor corporativo con sigla, varias obras, sin autor, sin fecha, comunicación personal, traducción propia y más), llena los datos y pulsa <b>Insertar en el cursor</b>. Cada clase muestra su regla y un ejemplo.</li>
     <li><b>Referencias:</b> <b>Referencia</b> → elige el tipo (artículo, libro, tesis, página web, ley, video, IA…) → llena los datos → <b>Insertar cita y referencia</b>. Queda en orden alfabético, con sangría francesa y cursivas.</li>
-    <li><b>Revisión:</b> <b>Revisor</b> revisa citas, referencias, títulos, tablas, números, siglas y lenguaje. Pulsa <b>Corregir lo seguro</b> y luego <b>Poner comentarios en el documento</b> para lo demás.</li>
+    <li><b>Revisión:</b> <b>Revisor</b> revisa citas, referencias, títulos, tablas, números, siglas y lenguaje; también detecta siglas usadas antes de presentarlas, «citado por» en lugar de «como se citó en» y varias obras fuera de orden. Pulsa <b>Corregir lo seguro</b> y luego <b>Poner comentarios en el documento</b> para lo demás.</li>
     <li><b>Formato:</b> <b>Formato</b> → elige la fuente → <b>Aplicar formato APA 7</b>. Agrega portada, número de página y tabla de contenido.</li>
   </ol>
+  <figure><img src="assets/capturas/citas.png" alt="Generador de citas APA 7" width="320"><figcaption>El generador de citas: eliges la clase y Romus arma la cita con su regla.</figcaption></figure>
 </section>
 
 <section id="herramientas">
-  <h2><span class="num">10</span>Todas las herramientas, por etapa</h2>
-  <p>En el panel, pestaña <b>Investigar → Todas las herramientas</b>, o en la cinta con los menús de <b>Investigación</b>. En <b>Mi proyecto</b>, Romus te sugiere las de tu etapa.</p>
+  <h2><span class="num">11</span>Todas las herramientas, por etapa</h2>
+  <p>En el panel, pestaña <b>Investigar → Todas las herramientas</b>, o en la cinta de Romus. En <b>Mi proyecto</b>, Romus te sugiere las de tu etapa.</p>
   <table>
     <tr><th>Etapa</th><th>Herramientas</th></tr>
     <tr><td>Planear</td><td>Idear · Estructura · Coherencia · Rúbrica</td></tr>
-    <tr><td>Fundamentar</td><td>Buscar literatura (también solo en español) · Mi biblioteca (importa de Zotero o Mendeley) · Fichas de lectura · Matriz de antecedentes · Frases sin cita</td></tr>
+    <tr><td>Fundamentar</td><td>Buscar literatura (también solo en español) · Mi biblioteca (importa de Zotero o Mendeley) · Mis documentos (preguntar, extraer, contrastar, redactar) · Fichas de lectura · Matriz de antecedentes · Frases sin cita</td></tr>
     <tr><td>Diseñar y recolectar</td><td>Tamaño de muestra · Cuestionario o guion de entrevista · Validación por jueces (V de Aiken, Lawshe) · Consentimientos, asentimiento y carta</td></tr>
-    <tr><td>Analizar</td><td>SPSS, R o jamovi · ATLAS.ti</td></tr>
+    <tr><td>Analizar</td><td>SPSS, R o jamovi · ATLAS.ti · Codificar en Mis documentos y exportar .qdpx</td></tr>
     <tr><td>Escribir</td><td>Discusión triangulada · Conclusiones frente a objetivos · Resumen y abstract</td></tr>
-    <tr><td>Entregar</td><td>¿Mis fuentes existen? · Respuesta a observaciones del jurado · Acta de asesoría · Simulacro de sustentación · Diapositivas · Tesis → artículo · Declaración de uso de IA</td></tr>
+    <tr><td>Entregar</td><td>¿Mis fuentes existen? · Fidelidad de citas (¿la fuente dice lo que le atribuyes?) · Datos por confirmar · Respuesta a observaciones del jurado · Acta de asesoría · Simulacro de sustentación · Diapositivas · Tesis → artículo · Declaración de uso de IA</td></tr>
     <tr><td>Docentes</td><td>Modo director: informe de revisión de cada estudiante y seguimiento</td></tr>
   </table>
   <div class="caja oro"><strong>Observaciones del jurado</strong>Abre el documento con los comentarios del jurado y di <span class="di">«responde a las observaciones»</span>. Romus arma la matriz de respuesta, puede contestar dentro de cada comentario y marcar como resueltos los que ya atendiste.</div>
 </section>
 
 <section id="sustentar">
-  <h2><span class="num">11</span>Prepararte para sustentar y entregar</h2>
+  <h2><span class="num">12</span>Prepararte para sustentar y entregar</h2>
   <h3>Tu presentación y el ensayo en PowerPoint</h3>
   <ol class="pasos">
     <li>En Word, pestaña <b>Romus → Escribir y entregar → Presentación</b>. Elige la duración y pulsa <b>Descargar presentación (.pptx)</b>.</li>
@@ -267,10 +312,12 @@
 </section>
 
 <section id="problemas">
-  <h2><span class="num">12</span>Problemas frecuentes</h2>
+  <h2><span class="num">13</span>Problemas frecuentes</h2>
   <table>
     <tr><th>Problema</th><th>Solución</th></tr>
     <tr><td>Romus desaparece al cerrar Word, o no aparece el botón</td><td>No lo cargues a mano con «Cargar mi complemento»: usa el instalador, que lo deja permanente. Si ya lo instalaste y desapareció, abre el menú Inicio de Windows → <b>Romus → Reparar Romus</b>, cierra Word por completo y vuelve a abrirlo. En Word para la web, vuelve a cargar el manifiesto (se borra si limpias los datos del navegador).</td></tr>
+    <tr><td>Pulso un botón de la cinta y el panel no muestra nada</td><td>Pasaba en Word 2016 y 2019 hasta la versión 3.8. Cierra Word por completo y ábrelo de nuevo (Romus se actualiza solo). Si sigue igual, ejecuta el instalador otra vez.</td></tr>
+    <tr><td>Una clave de IA no funciona</td><td>Romus te dice por qué (clave incompleta, de otra IA, sin saldo). Prueba <b>Un clic</b> con OpenRouter, que no pide copiar claves.</td></tr>
     <tr><td>Romus no me oye o el micrófono se apaga</td><td>Conecta Gemini (paso 3), activa «Siempre atento» y permite el micrófono. En <b>Ajustes → Voz → Reconocimiento de voz</b> elige «Oído de Romus».</td></tr>
     <tr><td>Repite o responde a su propia voz</td><td>Usa audífonos o baja el volumen.</td></tr>
     <tr><td>«Límite de la IA por minuto»</td><td>El plan gratuito de Gemini tiene límites: espera un momento.</td></tr>
@@ -280,6 +327,6 @@
 </section>
 
 </main>
-<footer>Romus para Word · creado por Brian Gonzalo Suárez Acevedo · <a href="https://github.com/PassBri/romus">github.com/PassBri/romus</a></footer>
+<footer>Romus para Word y PowerPoint v3.8.2 · creado por Brian Gonzalo Suárez Acevedo · <a href="https://github.com/PassBri/romus">github.com/PassBri/romus</a></footer>
 </body>
 </html>
