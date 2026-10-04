@@ -69,6 +69,9 @@
     @media (max-width: 640px) { .zona { flex-direction: column; } .panel { width: 100%; height: 60vh; border-left: 0; border-top: 1px solid var(--linea); } .pagina { padding: 28px 18px; min-height: 0; } }
     .ver-word { font-size: 12.5px; color: #444; display: inline-flex; align-items: center; gap: 6px; margin-left: 6px; }
   .ver-word select { font: inherit; padding: 3px 6px; border: 1px solid #c8c6c4; border-radius: 3px; background: #fff; }
+  .pagina table.apa { border-collapse: collapse; border-top: 1.5px solid #000; border-bottom: 1.5px solid #000; }
+  .pagina table.apa td { border: 0 !important; }
+  .pagina table.apa tr:first-child td { border-bottom: 1px solid #000 !important; font-weight: 700; background: #fff; }
 </style>
 </head>
 <body>
@@ -206,7 +209,7 @@
       pag.innerHTML = "";
       d.paras.forEach((p, i) => {
         let el;
-        if (p.tabla) { el = document.createElement("table"); p.tabla.forEach(f => { const tr = document.createElement("tr"); f.forEach(c => { const td = document.createElement("td"); td.textContent = c; tr.appendChild(td); }); el.appendChild(tr); }); }
+        if (p.tabla) { el = document.createElement("table"); if (p.apa) el.className = "apa"; p.tabla.forEach(f => { const tr = document.createElement("tr"); f.forEach(c => { const td = document.createElement("td"); td.textContent = c; tr.appendChild(td); }); el.appendChild(tr); }); }
         else if (p.salto) { el = document.createElement("div"); el.className = "salto"; el.textContent = "· · · Salto de página · · ·"; }
         else {
           el = document.createElement("p"); el.className = "pf " + String(p.style || "Normal").replace(/\s+/g, "-"); el.contentEditable = "true"; el.spellcheck = true;

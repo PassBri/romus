@@ -10,7 +10,7 @@
            xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
            xsi:type="TaskPaneApp">
   <Id>5f564e3f-5a46-472e-8454-27f2c1cdfc22</Id>
-  <Version>3.9.2.0</Version>
+  <Version>3.9.3.0</Version>
   <ProviderName>Brian Suárez</ProviderName>
   <DefaultLocale>es-ES</DefaultLocale>
   <DisplayName DefaultValue="Romus"/>

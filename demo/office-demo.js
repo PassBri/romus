@@ -156,14 +156,32 @@
         getRange() { const p = docu.paras.find(x => x.text.includes(c.sobre)) || docu.paras[0]; return { text: c.sobre, load() {}, paragraphs: { getFirst() { return { text: p.text, load() {} }; } } }; }
       })));
     },
-    getTrackedChanges() { return { load() {}, items: [], acceptAll() {}, rejectAll() {} }; }
+    getTrackedChanges() { return { load() {}, items: [], acceptAll() {}, rejectAll() {} }; },
+    get tables() {
+      const items = docu.paras.filter(p => p.tabla).map(p => ({
+        rowCount: p.tabla.length,
+        getBorder() { p.apa = true; return {}; }, set headerRowCount(v) { p.apa = true; }, set shadingColor(v) {},
+        font: {}, rows: { getFirst() { return { font: {}, getBorder() { return {}; }, set shadingColor(v) {} }; } },
+        getRange() { return { paragraphs: { items: [], load() { return this; } } }; }
+      }));
+      return { items, load() { return this; } };
+    }
   };
   const encabezado = { insertParagraph(t) { docu.encabezado = t; return { load() {}, alignment: "Right", getRange() { return { insertField() {} }; } }; }, clear() {}, load() { return this; }, paragraphs: new Col([]) };
 
   const ctx = {
     document: {
       body,
-      sections: { getFirst() { return { getHeader() { return encabezado; }, getFooter() { return encabezado; } }; }, load() { return this; }, items: [] },
+      sections: { getFirst() { return { getHeader() { return encabezado; }, getFooter() { return encabezado; } }; }, load() { return this; },
+        get items() { return [{ pageSetup: new Proxy({}, { set: (o, k, v) => { (docu.margenes = docu.margenes || {})[k] = v; return true; } }) }]; } },
+      getStyles() {
+        docu.estilos = docu.estilos || {};
+        const mk = (n) => ({ nameLocal: n, builtIn: true, type: "Paragraph", font: {}, paragraphFormat: {} });
+        const lista = ["Normal", "Título 1", "Título 2", "Título 3", "Título 4", "Título 5", "Título"].map(n => docu.estilos[n] = docu.estilos[n] || mk(n));
+        Object.keys(docu.estilos).forEach(n => { if (!lista.includes(docu.estilos[n])) lista.push(docu.estilos[n]); });
+        return { items: lista, load() { return this; } };
+      },
+      addStyle(n) { docu.estilos = docu.estilos || {}; return (docu.estilos[n] = { nameLocal: n, builtIn: false, type: "Paragraph", font: {}, paragraphFormat: {} }); },
       getSelection() {
         if (docu.seleccion && docu.paras.includes(docu.seleccion.p0) && docu.paras.includes(docu.seleccion.p1)) return docu.seleccion;
         const p = docu.paras[docu.paras.length - 1]; return new Rango(p, p.text.length, p, p.text.length);

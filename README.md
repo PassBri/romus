@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-3.9.2-185abd" alt="versión 3.9.2">
+  <img src="https://img.shields.io/badge/versión-3.9.3-185abd" alt="versión 3.9.3">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -373,6 +373,13 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 
 ## Novedades
 
+### v3.9.3 · Formato APA con las herramientas de Word
+- **Estilos de Word en APA 7**: Romus ajusta Normal y Título 1 a 5 (fuente, interlineado doble, sangría, niveles de título y control de líneas viudas), así lo que escribas después ya sale en APA y la tabla de contenido y el panel de navegación se arman solos.
+- **Estilos propios**: «Referencia APA» (sangría francesa), «Cita en bloque APA», «Tabla número APA», «Tabla título APA» y «Nota de tabla APA», visibles en la galería de estilos de Word.
+- **Tablas APA**: sin líneas verticales, con bordes arriba, abajo y bajo el encabezado, encabezado en negrita sobre fondo blanco y repetido en cada página.
+- **Más**: márgenes de 2,54 cm (si tu Word lo permite desde complementos), citas de 40 palabras o más en bloque, salto de página antes de Referencias y Anexos, y DOI y URL como hipervínculos.
+- Si tu versión de Word no permite alguna de estas acciones desde un complemento, Romus aplica el formato párrafo por párrafo y te dice qué hacer a mano.
+
 ### v3.9.2 · Biblioteca de metodología para leer o escuchar
 - **[Biblioteca de metodología](https://passbri.github.io/romus/biblioteca.html)**: 114 temas para leer o escuchar. Cubre todo el proceso de investigación, en el orden de Hernández Sampieri et al. (2014), más APA 7 y los 39 temas del libro *Teoría: conocimiento científico* de Brian Suárez. Los textos son explicaciones originales y cada uno indica qué capítulo leer para profundizar.
 - **Escuchar**: lee en voz alta y resalta cada frase. Puedes elegir la voz y la velocidad, tocar una frase para saltar a ella o seguir con el siguiente tema para oír una ruta completa, como un audiolibro.
@@ -553,4 +560,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word y PowerPoint · v3.9.2</sub></p>
+<p align="center"><sub>Romus para Word y PowerPoint · v3.9.3</sub></p>
