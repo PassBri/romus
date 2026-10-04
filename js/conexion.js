@@ -49,6 +49,26 @@ window.Conexion = (function () {
     alConectar(p, prueba);
     return Object.assign({ perfil: p }, prueba);
   }
+  /* ---------- Oído: una IA solo para transcribir la voz (la que escribe no cambia) ---------- */
+  const AUDIO = ["gemini", "openai", "groq"];
+  async function conectarOido(clave) {
+    const r = reconocer(clave);
+    if (!r) return { ok: false, mensaje: diagnostico(clave) };
+    if (!AUDIO.includes(r.proveedor)) return { ok: false, mensaje: `Esa clave es de ${r.nombre}, que no entiende audio. Para el oído usa una clave de Google Gemini (gratis), OpenAI o Groq.` };
+    const c = Config.get();
+    const activo = c.perfiles.find(x => x.id === c.perfilActivo && (x.apiKey || "").trim());
+    const previo = c.perfiles.find(x => x.proveedor === r.proveedor);
+    const p = Object.assign(previo ? Object.assign({}, previo) : Config.nuevoPerfil(r.proveedor), { apiKey: r.clave });
+    if (!p.modelo) p.modelo = (Config.PROVEEDORES.find(x => x.id === r.proveedor) || {}).modelos[0] || "";
+    const prueba = await probar(p);
+    if (!prueba.ok) return Object.assign({ perfil: p }, prueba);
+    const perfiles = previo ? c.perfiles.map(x => x === previo ? p : x) : c.perfiles.concat([p]);
+    const cambios = { perfiles, perfilVoz: p.id };
+    if (!activo) cambios.perfilActivo = p.id; // sin otra IA: también escribe
+    Config.set(cambios);
+    const sigue = activo && activo.proveedor !== p.proveedor ? ` ${activo.nombre} sigue escribiendo; ${p.nombre} solo transcribe lo que dices.` : "";
+    return { ok: true, perfil: p, mensaje: `✓ Oído listo con ${p.nombre}.${sigue}` };
+  }
   async function probar(p) {
     try {
       const r = await IA.probarConexion(p);
@@ -131,7 +151,7 @@ window.Conexion = (function () {
   }
 
   /* ---------- 3. Respaldo de la configuración ---------- */
-  const CAMPOS = ["perfiles", "perfilActivo", "nivelInvestigacion", "enfoqueInvestigacion", "datosProyecto", "codigoPro", "idioma", "vozURI", "estilo", "velocidad", "tono", "modoAyuda", "minutosSustentacion"];
+  const CAMPOS = ["perfiles", "perfilActivo", "perfilVoz", "nivelInvestigacion", "enfoqueInvestigacion", "datosProyecto", "codigoPro", "idioma", "vozURI", "estilo", "velocidad", "tono", "modoAyuda", "minutosSustentacion"];
   function exportar() {
     const c = Config.get(), o = { v: 1, fecha: new Date().toISOString().slice(0, 10) };
     CAMPOS.forEach(k => { if (c[k] !== undefined) o[k] = c[k]; });
@@ -190,6 +210,6 @@ window.Conexion = (function () {
     window.open(url, "_blank", "noopener");
   }
 
-  return { reconocer, diagnostico, conectarClave, probar, openRouter, modelosGratis, claveEnPortapapeles, exportar, importar, descargarRespaldo, leerArchivo, guiaGemini, abrirEnlace, CALLBACK,
+  return { reconocer, diagnostico, conectarClave, conectarOido, probar, openRouter, modelosGratis, claveEnPortapapeles, exportar, importar, descargarRespaldo, leerArchivo, guiaGemini, abrirEnlace, CALLBACK,
     set alConectar(fn) { alConectar = fn || (() => {}); } };
 })();

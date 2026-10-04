@@ -1080,6 +1080,7 @@
     if (!Voz.soportaReconocimiento()) {
       $("txtComando").focus();
       pistaSinMicrofono("El micrófono integrado no está disponible en este Word.");
+      if (window.Escucha && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !Escucha.perfilTranscripcion()) { ofrecerOido(); return; }
       agregarMensaje("sistema", `Este Word no permite el micrófono dentro del panel. Haz clic en la caja de texto y pulsa ${esMac ? "Fn dos veces" : "Windows + H"} para dictar.`);
       return;
     }
@@ -1125,6 +1126,44 @@
     }
   }
 
+  /* Tarjeta «Darle oído a Romus»: conecta una IA que entienda audio sin cambiar la que escribe. */
+  function ofrecerOido() {
+    const viejo = document.querySelector("#conversacion .tarjeta-oido");
+    if (viejo) { viejo.scrollIntoView({ block: "center", behavior: "smooth" }); viejo.classList.remove("destello"); void viejo.offsetWidth; viejo.classList.add("destello"); return; }
+    const c = Config.get();
+    const activo = c.perfiles.find(x => x.id === c.perfilActivo && (x.apiKey || "").trim());
+    const t = document.createElement("div");
+    t.className = "tarjeta-oido";
+    const quien = activo && !["gemini", "openai", "groq"].includes(activo.proveedor)
+      ? `<p>${escaparHTML(activo.nombre)} escribe muy bien, pero no entiende audio. Agrega un oído gratis con Google Gemini: ${escaparHTML(activo.nombre)} seguirá escribiendo y Gemini solo transcribirá lo que dices.</p>`
+      : activo ? `<p>Conecta un oído gratis con Google Gemini (también sirve una clave de OpenAI o Groq).</p>`
+      : `<p>Aún no hay ninguna IA conectada. Con una clave gratis de Google Gemini, Romus te oye y además escribe, corrige y te asesora.</p>`;
+    t.innerHTML = `<b>Para que Romus te oiga en Word de escritorio</b>${quien}
+      <ol><li><button type="button" class="enlace oido-abrir">Abre aistudio.google.com ↗</button>, entra con tu cuenta de Google y pulsa «Create API key».</li><li>Copia la clave y pégala aquí:</li></ol>
+      <div class="bv-fila"><input class="ajuste oido-clave" placeholder="AIza…" spellcheck="false" autocomplete="off"><button type="button" class="boton primario oido-conectar">Conectar oído</button></div>
+      <small class="oido-nota"></small>
+      <small class="oido-alt">Mientras tanto puedes dictar: haz clic en la caja de abajo y pulsa ${esMac ? "Fn dos veces" : "Windows + H"}.</small>`;
+    const inp = t.querySelector(".oido-clave"), nota = t.querySelector(".oido-nota");
+    t.querySelector(".oido-abrir").addEventListener("click", () => Conexion.abrirEnlace("https://aistudio.google.com/apikey"));
+    const conectar = async () => {
+      const v = inp.value.trim();
+      if (!v) { nota.textContent = "Pega primero la clave."; return; }
+      nota.textContent = "Probando la clave…"; nota.className = "oido-nota";
+      const r = await Conexion.conectarOido(v);
+      nota.textContent = r.mensaje; nota.className = "oido-nota " + (r.ok ? "ok-nota" : "error-nota");
+      if (!r.ok) return;
+      inp.value = ""; t.classList.add("lista");
+      pintarNotaMotor(); pintarPerfiles();
+      hablar("Listo, ya te oigo.");
+      setTimeout(() => { if (!Voz.escuchando) empezarEscucha(); }, 1200);
+    };
+    t.querySelector(".oido-conectar").addEventListener("click", conectar);
+    inp.addEventListener("paste", () => setTimeout(() => { if (Conexion.reconocer(inp.value)) conectar(); }, 30));
+    inp.addEventListener("keydown", (e) => { if (e.key === "Enter") conectar(); });
+    agregarMensaje("sistema", "Todavía no te puedo oír.", t);
+    (async () => { const r = await Conexion.claveEnPortapapeles(); if (r && ["gemini", "openai", "groq"].includes(r.proveedor) && !inp.value) { inp.value = r.clave; nota.textContent = `Encontré una clave de ${r.nombre} que copiaste. Pulsa «Conectar oído».`; } })();
+  }
+
   let ultimoAvisoTranscripcion = 0;
   function manejarErrorMic(codigo) {
     // Errores pasajeros del oído propio: se avisa sin apagar el micrófono.
@@ -1151,6 +1190,13 @@
     };
     const m = mensajes[codigo] || ("Error del micrófono: " + codigo);
     if (codigo === "no-speech") { $("transcripcion").textContent = m; return; }
+    if (codigo === "sin-transcriptor" || codigo === "network" || codigo === "service-not-allowed") {
+      if (window.Escucha && navigator.mediaDevices && !Escucha.perfilTranscripcion()) {
+        ofrecerOido(); pistaSinMicrofono("");
+        if (Config.get().manosLibres) { $("chkManosLibres").checked = false; Config.set({ manosLibres: false }); }
+        return;
+      }
+    }
     agregarMensaje("sistema", `${m} Alternativa: haz clic en la caja de texto y pulsa ${esMac ? "Fn dos veces" : "Windows + H"} para dictar con el sistema.`);
     pistaSinMicrofono("");
     if (codigo === "sin-transcriptor") { pistaSinMicrofono(""); return; }
@@ -1407,6 +1453,16 @@
       $("notaConexion").textContent = res.mensaje; if (res.ok) $("inpClaveAuto").value = "";
     };
     $("btnClaveAuto").addEventListener("click", auto);
+    // Ajustes → Voz: conectar solo el oído
+    const oidoAj = async () => {
+      const v = $("inpOidoAj").value.trim(); if (!v) return;
+      $("notaOidoAj").textContent = "Probando la clave…";
+      const r = await Conexion.conectarOido(v);
+      $("notaOidoAj").textContent = r.mensaje;
+      if (r.ok) { $("inpOidoAj").value = ""; pintarNotaMotor(); pintarPerfiles(); }
+    };
+    $("btnOidoAj").addEventListener("click", oidoAj);
+    $("inpOidoAj").addEventListener("paste", () => setTimeout(() => { if (Conexion.reconocer($("inpOidoAj").value)) oidoAj(); }, 30));
     $("inpClaveAuto").addEventListener("paste", () => setTimeout(auto, 30));
     // Modelos gratuitos de OpenRouter
     $("selModeloGratis").addEventListener("change", () => {

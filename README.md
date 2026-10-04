@@ -13,7 +13,7 @@ Di «Ok Romus» y trabaja tu documento hablando: leer, corregir, redactar, dar f
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-3.8.2-185abd" alt="versión 3.8.2">
+  <img src="https://img.shields.io/badge/versión-3.8.3-185abd" alt="versión 3.8.3">
   <img src="https://img.shields.io/badge/Word-web%20·%20Windows%20·%20Mac-2b579a" alt="Word web, Windows y Mac">
   <img src="https://img.shields.io/badge/IA-Claude%20·%20GPT%20·%20Gemini%20·%20local-c239b3" alt="IA compatible">
   <img src="https://img.shields.io/badge/idioma-español-ffc43c" alt="Español">
@@ -373,6 +373,10 @@ Office.js (Word API 1.3+, Dialog API) · Web Speech API · Web Audio API · Canv
 
 ## Novedades
 
+### v3.8.3 · Que Romus te oiga en Word de escritorio
+- Word de escritorio no trae reconocimiento de voz, así que Romus necesita un «oído»: una IA que entienda audio. Si pulsas **Hablar** sin tenerlo, aparece una tarjeta para conectarlo ahí mismo con una clave gratis de Google Gemini (también OpenAI o Groq) y Romus empieza a escucharte.
+- **La IA que escribe no cambia**: si usas Claude, Claude sigue redactando y Gemini solo transcribe lo que dices. También se configura en **Ajustes → Voz → Oído de Romus**, y el respaldo lo guarda.
+
 ### v3.8.2 · Word virtual: prueba Romus sin instalar nada
 - **[Word virtual](https://passbri.github.io/romus/demo.html)**: una página que imita Word con la pestaña «Romus» completa (los mismos grupos y botones del complemento) y el panel a la derecha. Cada botón abre su función de verdad sobre una hoja editable.
 - Trae un documento de ejemplo con errores APA típicos para ver el revisor, los comentarios al margen, la inserción de citas y las etapas de la tesis. Puedes escribir en la hoja, empezar en blanco u ocultar los comentarios.
@@ -525,4 +529,4 @@ GitHub: [@PassBri](https://github.com/PassBri)
 
 ---
 
-<p align="center"><sub>Romus para Word y PowerPoint · v3.8.2</sub></p>
+<p align="center"><sub>Romus para Word y PowerPoint · v3.8.3</sub></p>
