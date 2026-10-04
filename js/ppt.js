@@ -428,14 +428,14 @@ Respuesta del estudiante (transcrita de su voz, puede tener errores de transcrip
         const fin = () => { try { ev && ev.completed && ev.completed(); } catch (e) { /* ya terminado */ } };
         if (compartido()) { fin(); try { const pr = Office.addin.showAsTaskpane(); if (pr && pr.catch) pr.catch(() => {}); } catch (e) { /* visible */ } $("hojaIA").classList.add("oculto"); ACCIONES[k](); return; }
         // PowerPoint sin motor compartido: el botón corre en una instancia oculta; el panel visible recoge la acción.
-        if (!visible()) window.__soyFuncion = true;
+        window.__soyFuncion = true; // nunca es el panel visible: solo deja la orden
         try { localStorage.setItem("romus.ppt.pendiente", JSON.stringify({ k, t: Date.now() })); } catch (e) { /* sin almacenamiento */ }
-        correrPendiente(); fin();
+        fin();
       };
       window["romusPpt" + k] = fn;
       try { if (Office.actions && Office.actions.associate) Office.actions.associate("romusPpt" + k, fn); } catch (e) { /* ya registrada */ }
     });
-    if (!compartido()) { correrPendiente(); setInterval(() => { try { if (localStorage.getItem("romus.ppt.pendiente")) correrPendiente(); } catch (e) { /* sin almacenamiento */ } }, 700); }
+    if (!compartido()) { setTimeout(correrPendiente, 1500); window.addEventListener("focus", correrPendiente); setInterval(() => { try { if (localStorage.getItem("romus.ppt.pendiente")) correrPendiente(); } catch (e) { /* sin almacenamiento */ } }, 700); }
   }
 
 

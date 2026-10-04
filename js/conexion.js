@@ -11,6 +11,7 @@ window.Conexion = (function () {
   /* ---------- Reconocer la clave por su forma ---------- */
   const FORMAS = [
     [/^AIza[0-9A-Za-z_-]{30,}$/, "gemini", "Google Gemini"],
+    [/^AQ\.[0-9A-Za-z_-]{30,}$/, "gemini", "Google Gemini"], // formato nuevo de AI Studio
     [/^sk-ant-[0-9A-Za-z_-]{20,}$/, "anthropic", "Claude (Anthropic)"],
     [/^sk-or-(v1-)?[0-9A-Za-z_-]{20,}$/, "openrouter", "OpenRouter"],
     [/^gsk_[0-9A-Za-z]{20,}$/, "groq", "Groq"],
@@ -186,7 +187,7 @@ window.Conexion = (function () {
   const PASOS_GEMINI = [
     ["Abre AI Studio", "Pulsa el botón «Abrir AI Studio» y entra con tu cuenta de Google.", "abrir"],
     ["Crea la clave", "Pulsa «Create API key» (Crear clave de API). Si te pide un proyecto, elige el que aparece.", "crear"],
-    ["Cópiala", "Junto a la clave (empieza por AIza…), pulsa el ícono de copiar.", "copiar"],
+    ["Cópiala", "Junto a la clave (empieza por AIza… o AQ.…), pulsa el ícono de copiar.", "copiar"],
     ["Vuelve a Word", "Romus la reconoce sola: pulsa «Pegar la clave que copiaste» o pégala en la casilla.", "pegar"]
   ];
   function guiaGemini(cont) {

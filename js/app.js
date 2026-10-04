@@ -1140,7 +1140,7 @@
       : `<p>Aún no hay ninguna IA conectada. Con una clave gratis de Google Gemini, Romus te oye y además escribe, corrige y te asesora.</p>`;
     t.innerHTML = `<b>Para que Romus te oiga en Word de escritorio</b>${quien}
       <ol><li><button type="button" class="enlace oido-abrir">Abre aistudio.google.com ↗</button>, entra con tu cuenta de Google y pulsa «Create API key».</li><li>Copia la clave y pégala aquí:</li></ol>
-      <div class="bv-fila"><input class="ajuste oido-clave" placeholder="AIza…" spellcheck="false" autocomplete="off"><button type="button" class="boton primario oido-conectar">Conectar oído</button></div>
+      <div class="bv-fila"><input class="ajuste oido-clave" placeholder="AIza… o AQ.…" spellcheck="false" autocomplete="off"><button type="button" class="boton primario oido-conectar">Conectar oído</button></div>
       <small class="oido-nota"></small>
       <small class="oido-alt">Mientras tanto puedes dictar: haz clic en la caja de abajo y pulsa ${esMac ? "Fn dos veces" : "Windows + H"}.</small>`;
     const inp = t.querySelector(".oido-clave"), nota = t.querySelector(".oido-nota");
@@ -1242,7 +1242,18 @@
 
   /* ============ Hojas: ajustes y ayuda ============ */
 
-  function abrirHoja(id) { $(id).classList.remove("oculto"); if (id === "panelAjustes") pintarNotaMotor(); }
+  function abrirHoja(id) { $(id).classList.remove("oculto"); if (id === "panelAjustes") { pintarNotaMotor(); pintarNotaCinta(); } }
+  /** Diagnóstico de la cinta: qué motor usa Word y qué pasó con el último botón. */
+  function pintarNotaCinta() {
+    const n = $("notaCinta"); if (!n) return;
+    const hace = (t) => { const s = Math.round((Date.now() - t) / 1000); return s < 60 ? `hace ${s} s` : s < 3600 ? `hace ${Math.round(s / 60)} min` : "hace más de una hora"; };
+    let u = null, rec = 0;
+    try { u = JSON.parse(localStorage.getItem("romus.cinta.ultimo") || "null"); rec = +localStorage.getItem("romus.cinta.recogido") || 0; } catch (e) { /* sin almacenamiento */ }
+    const modo = runtimeCompartido() ? "motor compartido (Microsoft 365): los botones actúan directo en este panel" : "motor separado (Office 2016/2019): cada botón deja la orden y este panel la ejecuta";
+    let t = `Tu Word usa ${modo}.`;
+    if (!runtimeCompartido()) t += u ? ` Último botón recibido: «${escaparHTML(NOMBRE_CINTA[u.clave] || ((window.Herramientas && Herramientas.porId(u.clave.charAt(0).toLowerCase() + u.clave.slice(1))) || {}).nombre || u.clave)}» ${hace(u.t)}${rec >= u.t ? ", y el panel lo ejecutó." : ", pero el panel no lo recogió: cierra Word por completo y ábrelo de nuevo."}` : " Aún no ha llegado ningún clic de la cinta a este equipo: si pulsas un botón y no aparece aquí, Word no está cargando la versión nueva de Romus (vuelve a ejecutar el instalador y marca «Limpiar la caché»).";
+    n.innerHTML = t;
+  }
   function cerrarHoja(id) { $(id).classList.add("oculto"); }
 
   function pintarNotaMotor() {
@@ -1560,11 +1571,14 @@
         correrCinta(clave);
         return;
       }
-      // Word sin motor compartido: este botón corre en una instancia oculta. La acción se deja pendiente
-      // y el panel visible la recoge (al instante si está abierto, o apenas lo abras).
-      if (!soyPanelVisible()) window.__soyFuncion = true;
-      try { localStorage.setItem("romus.cinta.pendiente", JSON.stringify({ clave, t: Date.now() })); } catch (e) { /* sin almacenamiento */ }
-      if (soyPanelVisible()) ejecutarPendienteCinta();
+      // Word sin motor compartido (Office 2016/2019): el botón SIEMPRE corre en una instancia aparte,
+      // nunca en el panel que ves. Esta instancia solo deja la acción pendiente y el panel visible la recoge.
+      window.__soyFuncion = true;
+      try { if (Voz.escuchando) Voz.detenerEscucha(false); } catch (e) { /* sin micrófono */ }
+      try {
+        localStorage.setItem("romus.cinta.pendiente", JSON.stringify({ clave, t: Date.now() }));
+        localStorage.setItem("romus.cinta.ultimo", JSON.stringify({ clave, t: Date.now(), w: window.innerWidth, h: window.innerHeight }));
+      } catch (e) { /* sin almacenamiento */ }
       terminar();
     };
   }
@@ -1591,6 +1605,7 @@
       const p = JSON.parse(localStorage.getItem("romus.cinta.pendiente") || "null");
       if (!p) return;
       localStorage.removeItem("romus.cinta.pendiente");
+      try { localStorage.setItem("romus.cinta.recogido", String(Date.now())); } catch (e) { /* sin almacenamiento */ }
       if (Date.now() - p.t < 5 * 60000) setTimeout(() => correrCinta(p.clave), 300);
     } catch (e) { /* nada pendiente */ }
   }
@@ -1843,6 +1858,8 @@
   }
 
   async function iniciar(info) {
+    // Lo primero: registrar los botones de la cinta, para que Word los encuentre aunque algo más falle al arrancar.
+    try { registrarCinta(); } catch (e) { console.warn("Romus: cinta", e); }
     estado.enWord = !!(info && info.host === Office.HostType.Word);
     aplicarTema();
     $("avisoFueraWord").classList.toggle("oculto", estado.enWord);
@@ -1865,12 +1882,14 @@
     conectarEventos();
     irPestana(Config.get().pestana || "inicio", { sinScroll: true });
     if (window.Herramientas) Herramientas.pintar($("invHerramientas"));
-    registrarCinta();
-    ejecutarPendienteCinta();
-    // Word sin runtime compartido: si el panel ya está abierto, recoge las acciones de la cinta
-    if (!runtimeCompartido()) {
+    // Word sin runtime compartido: el panel visible recoge las acciones de la cinta. Se espera un momento al
+    // arrancar: si esta instancia es la que Word abrió solo para un botón, no debe quedarse con la acción.
+    const compartido = runtimeCompartido();
+    setTimeout(ejecutarPendienteCinta, compartido ? 0 : 1500);
+    if (!compartido) {
       window.addEventListener("storage", (e) => { if (e.key === "romus.cinta.pendiente" && e.newValue) ejecutarPendienteCinta(); });
-      setInterval(() => { try { if (localStorage.getItem("romus.cinta.pendiente")) ejecutarPendienteCinta(); } catch (e) { /* sin almacenamiento */ } }, 700);
+      window.addEventListener("focus", () => ejecutarPendienteCinta());
+      setInterval(() => { try { if (localStorage.getItem("romus.cinta.pendiente")) ejecutarPendienteCinta(); } catch (e) { /* sin almacenamiento */ } }, 500);
     }
     Voz.cargarVoces().then(llenarVoces);
     ajustarAltura();
@@ -1880,7 +1899,8 @@
     } else {
       $("pistaDictado").innerHTML = `<kbd>Ctrl</kbd> + <kbd>Espacio</kbd> para hablar`; $("pistaDictado").title = "Si el micrófono falla, usa el dictado del sistema en la caja";
     }
-    if (estado.enWord && Config.get().manosLibres && document.visibilityState !== "hidden") empezarEscucha();
+    // La escucha continua arranca solo en el panel visible (no en la instancia oculta de un botón de la cinta).
+    setTimeout(() => { if (!window.__soyFuncion && estado.enWord && Config.get().manosLibres && document.visibilityState !== "hidden" && !Voz.escuchando) empezarEscucha(); }, compartido ? 0 : 1500);
   }
 
   if (window.Office && Office.onReady) {

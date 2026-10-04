@@ -6,7 +6,7 @@
   <title>Romus</title>
   <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
   <script>/* Word virtual (demo.html): reemplaza Office.js por la simulación */ if (/[?&]demo=1(&|$)/.test(location.search)) document.write('<script src="demo/office-demo.js?v=1"><\/script>');</script>
-  <link rel="stylesheet" href="css/taskpane.css?v=3.8.3">
+  <link rel="stylesheet" href="css/taskpane.css?v=3.8.4">
 </head>
 <body>
   <div id="app">
@@ -88,7 +88,7 @@
             <button id="btnClaveGemini" class="boton secundario">Abrir aistudio.google.com ↗</button></li>
           <li><span>Pégala aquí:</span>
             <button id="btnPegarCopiada" class="chip-pegar oculto" type="button"></button>
-            <div class="bv-fila"><input id="inpClaveRapida" type="password" placeholder="AIza… (o una clave de Claude, OpenAI, Groq…)" autocomplete="off" spellcheck="false"><button id="btnConectarRapido" class="boton primario">Conectar</button></div>
+            <div class="bv-fila"><input id="inpClaveRapida" type="password" placeholder="AIza… o AQ.… (o una clave de Claude, OpenAI, Groq…)" autocomplete="off" spellcheck="false"><button id="btnConectarRapido" class="boton primario">Conectar</button></div>
             <small id="bvNota"></small>
             <button id="btnVerGuia" class="enlace-sutil" type="button">Ver cómo se hace (animación)</button>
             <div id="guiaGemini"></div></li>
@@ -353,6 +353,8 @@
           <p id="resultadoPrueba" class="nota"></p>
         </div>
 
+        <h3>Botones de la cinta</h3>
+        <p class="nota" id="notaCinta"></p>
         <h3>Respaldo de la configuración</h3>
         <p class="nota">Guarda tus IA, claves, nivel, enfoque y datos del proyecto para no volver a configurarlos (otro computador, caché de Word limpiada…). <b>El respaldo incluye tus claves: guárdalo en privado.</b></p>
         <div class="fila">
@@ -415,7 +417,7 @@
         </label>
         <p class="nota" id="notaMotorVoz"></p>
         <label class="campo">Oído de Romus: clave de Gemini (gratis), OpenAI o Groq solo para oírte
-          <span class="bv-fila"><input id="inpOidoAj" class="ajuste" placeholder="AIza…" spellcheck="false" autocomplete="off"><button id="btnOidoAj" class="boton secundario" type="button">Conectar oído</button></span>
+          <span class="bv-fila"><input id="inpOidoAj" class="ajuste" placeholder="AIza… o AQ.…" spellcheck="false" autocomplete="off"><button id="btnOidoAj" class="boton secundario" type="button">Conectar oído</button></span>
         </label>
         <p class="nota" id="notaOidoAj">La IA que escribe no cambia: esta clave solo se usa para transcribir tu voz.</p>
         <p class="nota">La voz, el estilo, el tono y la velocidad se cambian en el panel principal, en la tarjeta «Voz de lectura».</p>
@@ -523,33 +525,33 @@
     </div>
   </div>
 
-  <script src="js/config.js?v=3.8.3"></script>
-  <script src="js/voz.js?v=3.8.3"></script>
-  <script src="js/escucha.js?v=3.8.3"></script>
-  <script src="js/orbe.js?v=3.8.3"></script>
-  <script src="js/romus.js?v=3.8.3"></script>
-  <script src="js/ia.js?v=3.8.3"></script>
-  <script src="js/conexion.js?v=3.8.3"></script>
-  <script src="js/documento.js?v=3.8.3"></script>
-  <script src="js/panel.js?v=3.8.3"></script>
-  <script src="js/guia.js?v=3.8.3"></script>
-  <script src="js/teoria.js?v=3.8.3"></script>
-  <script src="js/investigacion.js?v=3.8.3"></script>
-  <script src="js/jurado.js?v=3.8.3"></script>
-  <script src="js/asesor.js?v=3.8.3"></script>
-  <script src="js/datos.js?v=3.8.3"></script>
-  <script src="js/docx.js?v=3.8.3"></script>
-  <script src="js/formato.js?v=3.8.3"></script>
-  <script src="js/citas.js?v=3.8.3"></script>
-  <script src="js/apa.js?v=3.8.3"></script>
-  <script src="js/instrumentos.js?v=3.8.3"></script>
-  <script src="js/biblioteca.js?v=3.8.3"></script>
-  <script src="js/escritura.js?v=3.8.3"></script>
-  <script src="js/revision.js?v=3.8.3"></script>
-  <script src="js/presentacion.js?v=3.8.3"></script>
-  <script src="vendor/jszip.min.js?v=3.8.3"></script>
-  <script src="js/archivos.js?v=3.8.3"></script>
-  <script src="js/herramientas.js?v=3.8.3"></script>
-  <script src="js/app.js?v=3.8.3"></script>
+  <script src="js/config.js?v=3.8.4"></script>
+  <script src="js/voz.js?v=3.8.4"></script>
+  <script src="js/escucha.js?v=3.8.4"></script>
+  <script src="js/orbe.js?v=3.8.4"></script>
+  <script src="js/romus.js?v=3.8.4"></script>
+  <script src="js/ia.js?v=3.8.4"></script>
+  <script src="js/conexion.js?v=3.8.4"></script>
+  <script src="js/documento.js?v=3.8.4"></script>
+  <script src="js/panel.js?v=3.8.4"></script>
+  <script src="js/guia.js?v=3.8.4"></script>
+  <script src="js/teoria.js?v=3.8.4"></script>
+  <script src="js/investigacion.js?v=3.8.4"></script>
+  <script src="js/jurado.js?v=3.8.4"></script>
+  <script src="js/asesor.js?v=3.8.4"></script>
+  <script src="js/datos.js?v=3.8.4"></script>
+  <script src="js/docx.js?v=3.8.4"></script>
+  <script src="js/formato.js?v=3.8.4"></script>
+  <script src="js/citas.js?v=3.8.4"></script>
+  <script src="js/apa.js?v=3.8.4"></script>
+  <script src="js/instrumentos.js?v=3.8.4"></script>
+  <script src="js/biblioteca.js?v=3.8.4"></script>
+  <script src="js/escritura.js?v=3.8.4"></script>
+  <script src="js/revision.js?v=3.8.4"></script>
+  <script src="js/presentacion.js?v=3.8.4"></script>
+  <script src="vendor/jszip.min.js?v=3.8.4"></script>
+  <script src="js/archivos.js?v=3.8.4"></script>
+  <script src="js/herramientas.js?v=3.8.4"></script>
+  <script src="js/app.js?v=3.8.4"></script>
 </body>
 </html>
